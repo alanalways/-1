@@ -118,15 +118,91 @@
                             step="10000">
                     </div>
 
-                    <div class="param-group">
-                        <label class="param-label">每月定期定額</label>
-                        <input type="number" class="param-input" id="monthlyInvestment" value="10000" min="0"
-                            step="1000">
+                    <!-- 回測時間範圍 -->
+                    <div class="param-group" id="dateRangeGroup">
+                        <label class="param-label">📅 回測時間範圍</label>
+                        <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                            <input type="date" class="param-input" id="startDate" style="flex: 1;">
+                            <span style="color: var(--text-muted); align-self: center;">至</span>
+                            <input type="date" class="param-input" id="endDate" style="flex: 1;">
+                        </div>
+                        <small style="color: var(--text-muted); font-size: 0.75rem;">
+                            留空則使用投資年限
+                        </small>
                     </div>
 
                     <div class="param-group">
                         <label class="param-label">投資年限：<span id="yearsValue">10</span> 年</label>
                         <input type="range" class="param-range" id="years" min="1" max="30" value="10">
+                    </div>
+
+                    <!-- 分時段投資規劃 -->
+                    <div class="param-group">
+                        <label class="param-label">
+                            <input type="checkbox" id="usePhases">
+                            📊 分時段投資規劃
+                        </label>
+                    </div>
+
+                    <!-- 投資階段設定 -->
+                    <div id="investmentPhases" style="display: none;">
+                        <div class="phase-list" id="phaseList">
+                            <div class="phase-item" data-phase="1">
+                                <div class="phase-header">第 1 階段</div>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                                    <div>
+                                        <label class="param-label" style="font-size: 0.75rem;">月數</label>
+                                        <input type="number" class="param-input phase-months" value="36" min="1"
+                                            style="padding: 0.5rem;">
+                                    </div>
+                                    <div>
+                                        <label class="param-label" style="font-size: 0.75rem;">每月金額</label>
+                                        <input type="number" class="param-input phase-amount" value="5000" min="0"
+                                            step="1000" style="padding: 0.5rem;">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="phase-item" data-phase="2">
+                                <div class="phase-header">第 2 階段</div>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                                    <div>
+                                        <label class="param-label" style="font-size: 0.75rem;">月數</label>
+                                        <input type="number" class="param-input phase-months" value="36" min="1"
+                                            style="padding: 0.5rem;">
+                                    </div>
+                                    <div>
+                                        <label class="param-label" style="font-size: 0.75rem;">每月金額</label>
+                                        <input type="number" class="param-input phase-amount" value="10000" min="0"
+                                            step="1000" style="padding: 0.5rem;">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="phase-item" data-phase="3">
+                                <div class="phase-header">第 3 階段</div>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                                    <div>
+                                        <label class="param-label" style="font-size: 0.75rem;">月數</label>
+                                        <input type="number" class="param-input phase-months" value="48" min="1"
+                                            style="padding: 0.5rem;">
+                                    </div>
+                                    <div>
+                                        <label class="param-label" style="font-size: 0.75rem;">每月金額</label>
+                                        <input type="number" class="param-input phase-amount" value="20000" min="0"
+                                            step="1000" style="padding: 0.5rem;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="chart-btn" id="addPhase" style="width: 100%; margin-top: 0.5rem;">
+                            ➕ 新增階段
+                        </button>
+                    </div>
+
+                    <!-- 固定月投資（不分時段時使用）-->
+                    <div class="param-group" id="fixedMonthlyGroup">
+                        <label class="param-label">每月定期定額</label>
+                        <input type="number" class="param-input" id="monthlyInvestment" value="10000" min="0"
+                            step="1000">
                     </div>
 
                     <!-- 固定模擬專用 -->

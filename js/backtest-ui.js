@@ -52,6 +52,18 @@ function initElements() {
     elements.annualReturnValue = document.getElementById('annualReturnValue');
     elements.annualReturnGroup = document.getElementById('annualReturnGroup');
 
+    // 日期範圍
+    elements.startDate = document.getElementById('startDate');
+    elements.endDate = document.getElementById('endDate');
+    elements.dateRangeGroup = document.getElementById('dateRangeGroup');
+
+    // 分時段投資
+    elements.usePhases = document.getElementById('usePhases');
+    elements.investmentPhases = document.getElementById('investmentPhases');
+    elements.phaseList = document.getElementById('phaseList');
+    elements.addPhase = document.getElementById('addPhase');
+    elements.fixedMonthlyGroup = document.getElementById('fixedMonthlyGroup');
+
     elements.commissionRate = document.getElementById('commissionRate');
     elements.taxRate = document.getElementById('taxRate');
     elements.dipBuyStrategy = document.getElementById('dipBuyStrategy');
@@ -80,6 +92,18 @@ function initElements() {
     elements.currencyBtns = document.querySelectorAll('.currency-btn');
     elements.lastUpdated = document.getElementById('lastUpdated');
     elements.toast = document.getElementById('toast');
+
+    // 設定預設日期範圍
+    const today = new Date();
+    const tenYearsAgo = new Date(today);
+    tenYearsAgo.setFullYear(today.getFullYear() - 10);
+
+    if (elements.startDate) {
+        elements.startDate.value = tenYearsAgo.toISOString().split('T')[0];
+    }
+    if (elements.endDate) {
+        elements.endDate.value = today.toISOString().split('T')[0];
+    }
 }
 
 function initEventListeners() {
@@ -167,6 +191,19 @@ function initEventListeners() {
             }
         });
     });
+
+    // 分時段投資開關
+    if (elements.usePhases) {
+        elements.usePhases.addEventListener('change', (e) => {
+            elements.investmentPhases.style.display = e.target.checked ? 'block' : 'none';
+            elements.fixedMonthlyGroup.style.display = e.target.checked ? 'none' : 'block';
+        });
+    }
+
+    // 新增投資階段
+    if (elements.addPhase) {
+        elements.addPhase.addEventListener('click', addInvestmentPhase);
+    }
 }
 
 // === 搜尋功能 ===
@@ -287,7 +324,7 @@ async function runSimulation() {
 }
 
 function getParams() {
-    return {
+    const params = {
         initialCapital: parseFloat(elements.initialCapital.value) || 100000,
         monthlyInvestment: parseFloat(elements.monthlyInvestment.value) || 10000,
         years: parseInt(elements.years.value) || 10,
@@ -298,6 +335,70 @@ function getParams() {
         rsiThreshold: parseFloat(elements.rsiThreshold.value) || 30,
         reinvestDividends: elements.reinvestDividends.checked
     };
+
+    // 日期範圍
+    if (elements.startDate && elements.startDate.value) {
+        params.startDate = elements.startDate.value;
+    }
+    if (elements.endDate && elements.endDate.value) {
+        params.endDate = elements.endDate.value;
+    }
+
+    // 分時段投資
+    if (elements.usePhases && elements.usePhases.checked) {
+        params.usePhases = true;
+        params.investmentPhases = getInvestmentPhases();
+    } else {
+        params.usePhases = false;
+    }
+
+    return params;
+}
+
+// 取得分時段投資設定
+function getInvestmentPhases() {
+    const phases = [];
+    const phaseItems = document.querySelectorAll('.phase-item');
+
+    phaseItems.forEach((item, index) => {
+        const months = parseInt(item.querySelector('.phase-months').value) || 12;
+        const amount = parseFloat(item.querySelector('.phase-amount').value) || 0;
+
+        phases.push({
+            phase: index + 1,
+            months: months,
+            amount: amount
+        });
+    });
+
+    return phases;
+}
+
+// 新增投資階段
+function addInvestmentPhase() {
+    const phaseCount = document.querySelectorAll('.phase-item').length + 1;
+
+    const phaseHTML = `
+        <div class="phase-item" data-phase="${phaseCount}">
+            <div class="phase-header">
+                第 ${phaseCount} 階段
+                <button class="remove-phase" onclick="this.closest('.phase-item').remove()" style="float: right; background: none; border: none; color: #ef4444; cursor: pointer;">✕</button>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                <div>
+                    <label class="param-label" style="font-size: 0.75rem;">月數</label>
+                    <input type="number" class="param-input phase-months" value="12" min="1" style="padding: 0.5rem;">
+                </div>
+                <div>
+                    <label class="param-label" style="font-size: 0.75rem;">每月金額</label>
+                    <input type="number" class="param-input phase-amount" value="10000" min="0" step="1000" style="padding: 0.5rem;">
+                </div>
+            </div>
+        </div>
+    `;
+
+    elements.phaseList.insertAdjacentHTML('beforeend', phaseHTML);
+    showToast(`已新增第 ${phaseCount} 階段`, 'success');
 }
 
 // === 圖表 ===

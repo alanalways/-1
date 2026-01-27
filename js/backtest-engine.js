@@ -40,10 +40,31 @@ class BacktestEngine {
             throw new Error('歷史資料不足');
         }
 
-        // 計算回測期間
-        const monthsToBacktest = Math.min(config.years * 12, history.length - 1);
-        const startIndex = history.length - 1 - monthsToBacktest;
-        const backtestHistory = history.slice(startIndex);
+        // 根據日期範圍過濾資料
+        let backtestHistory = history;
+        let monthsToBacktest;
+
+        if (config.startDate || config.endDate) {
+            backtestHistory = history.filter(h => {
+                const date = h.date;
+                if (config.startDate && date < config.startDate) return false;
+                if (config.endDate && date > config.endDate) return false;
+                return true;
+            });
+            monthsToBacktest = backtestHistory.length - 1;
+        } else {
+            // 使用年限計算
+            monthsToBacktest = Math.min(config.years * 12, history.length - 1);
+            const startIndex = history.length - 1 - monthsToBacktest;
+            backtestHistory = history.slice(startIndex);
+        }
+
+        if (backtestHistory.length < 2) {
+            throw new Error('選定時間範圍內資料不足');
+        }
+
+        // 建立分時段投資金額表
+        const investmentSchedule = this.buildInvestmentSchedule(config);
 
         // 初始化
         let totalShares = 0;
@@ -73,8 +94,14 @@ class BacktestEngine {
             const month = data.date.slice(0, 7);
             const rsi = rsiValues[i] || 50;
 
-            // 計算本月投資金額
-            let investment = i === 0 ? config.initialCapital : config.monthlyInvestment;
+            // 計算本月投資金額 (支援分時段投資)
+            let investment;
+            if (i === 0) {
+                investment = config.initialCapital;
+            } else {
+                // 使用分時段投資金額表
+                investment = investmentSchedule[Math.min(i - 1, investmentSchedule.length - 1)];
+            }
 
             // 逢低加碼策略
             if (config.dipBuyStrategy === 'rsi' && rsi < config.rsiThreshold) {
@@ -139,7 +166,7 @@ class BacktestEngine {
 
         // 計算統計
         const finalValue = timeline[timeline.length - 1];
-        const years = monthsToBacktest / 12;
+        const years = (monthsToBacktest || backtestHistory.length - 1) / 12 || 1;
         const cagr = Math.pow(finalValue.marketValue / totalCost, 1 / years) - 1;
 
         // 夏普比率 (假設無風險利率 2%)
@@ -336,6 +363,32 @@ class BacktestEngine {
     }
 
     // === 工具函數 ===
+
+    /**
+     * 建立投資金額時間表 (支援分時段投資)
+     * @param {Object} config - 配置參數
+     * @returns {Array} - 每月投資金額陣列
+     */
+    buildInvestmentSchedule(config) {
+        const schedule = [];
+
+        if (config.usePhases && config.investmentPhases && config.investmentPhases.length > 0) {
+            // 分時段投資
+            for (const phase of config.investmentPhases) {
+                for (let m = 0; m < phase.months; m++) {
+                    schedule.push(phase.amount);
+                }
+            }
+        } else {
+            // 固定月投資 (預設 30 年 = 360 個月)
+            const maxMonths = 360;
+            for (let m = 0; m < maxMonths; m++) {
+                schedule.push(config.monthlyInvestment || 10000);
+            }
+        }
+
+        return schedule;
+    }
 
     /**
      * 常態分佈隨機數 (Box-Muller)
