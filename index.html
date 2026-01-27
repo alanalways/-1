@@ -1,90 +1,173 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📈 台股每日市場分析報告 | Daily Taiwan Stock Report</title>
-    <meta name="description" content="每日自動更新的台股市場分析報告，包含美股、期貨、重金屬行情與 20 檔推薦股票">
+    <title>Discover Latest (Alan) - Daily Market Intel</title>
+    <link rel="stylesheet" href="css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
 </head>
-<body>
-    <!-- Header -->
-    <header class="header">
-        <div class="header-left">
-            <div class="logo">
-                <span class="logo-icon">📊</span>
-                <span class="logo-text">DailyDip</span>
-                <span class="logo-badge">LIVE</span>
-            </div>
-            <nav class="header-nav">
-                <button class="nav-btn active">🔥 ALL</button>
-                <button class="nav-btn">📈 BULLISH</button>
-                <button class="nav-btn">📉 BEARISH</button>
-                <button class="nav-btn">⚖️ NEUTRAL</button>
-            </nav>
-        </div>
-        <div class="header-right">
-            <div class="search-box">
-                <span class="search-icon">🔍</span>
-                <input type="text" placeholder="搜尋股票代號..." class="search-input">
-            </div>
-            <div class="update-time" id="updateTime">
-                <span>更新時間：載入中...</span>
-            </div>
-        </div>
-    </header>
 
-    <div class="main-container">
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner-container">
+            <div class="loading-spinner"></div>
+            <p class="loading-text">載入市場數據中...</p>
+        </div>
+    </div>
+
+    <div class="app-container">
         <!-- Sidebar -->
         <aside class="sidebar">
-            <div class="sidebar-header">
-                <span class="sidebar-title">BULLISH</span>
-                <span class="sidebar-count" id="bullishCount">0</span>
+            <div class="brand">
+                <div class="logo-icon">🚀</div>
+                <div class="logo-text">
+                    <h1>Discover Latest</h1>
+                    <span class="subtitle">By Alan</span>
+                </div>
             </div>
-            <div class="stock-list" id="bullishList">
-                <!-- 動態載入 -->
-            </div>
-            
-            <div class="sidebar-header">
-                <span class="sidebar-title">BEARISH</span>
-                <span class="sidebar-count" id="bearishCount">0</span>
-            </div>
-            <div class="stock-list" id="bearishList">
-                <!-- 動態載入 -->
+
+            <nav class="sidebar-nav">
+                <a href="#dashboard" class="nav-item active" data-page="dashboard">
+                    <span class="nav-icon">📊</span>
+                    <span class="nav-label">儀表板</span>
+                </a>
+                <a href="#watchlist" class="nav-item" data-page="watchlist">
+                    <span class="nav-icon">⭐</span>
+                    <span class="nav-label">自選清單</span>
+                </a>
+                <a href="#analysis" class="nav-item" data-page="analysis">
+                    <span class="nav-icon">🧠</span>
+                    <span class="nav-label">深度分析</span>
+                </a>
+                <a href="#global" class="nav-item" data-page="global">
+                    <span class="nav-icon">🌍</span>
+                    <span class="nav-label">國際市場</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="update-info">
+                    <span class="update-label">最後更新</span>
+                    <span class="update-time" id="lastUpdated">--</span>
+                </div>
+                <button class="refresh-btn" id="refreshBtn" title="重新載入數據">
+                    🔄 刷新數據
+                </button>
             </div>
         </aside>
 
         <!-- Main Content -->
         <main class="main-content">
-            <!-- Market Intelligence Section -->
-            <section class="market-section">
-                <h2 class="section-title">
-                    <span class="title-icon">🤖</span>
-                    MARKET INTELLIGENCE
-                </h2>
+            <!-- Header -->
+            <header class="header">
+                <div class="header-left">
+                    <h2 class="page-title" id="pageTitle">市場儀表板</h2>
+                </div>
+                <div class="header-right">
+                    <div class="search-box">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" class="search-input" id="searchInput" placeholder="搜尋股票代號或名稱...">
+                    </div>
+                    <button class="theme-toggle" id="themeToggle" title="切換主題">🌙</button>
+                </div>
+            </header>
+
+            <!-- Dashboard Page -->
+            <section class="page-content" id="dashboardPage">
+                <!-- Market Overview Cards -->
+                <div class="section-header">
+                    <h3>📈 市場概覽</h3>
+                </div>
                 <div class="market-cards" id="marketCards">
-                    <!-- 動態載入卡片 -->
+                    <!-- Skeleton Loading -->
+                    <div class="market-card skeleton">
+                        <div class="skeleton-line"></div>
+                        <div class="skeleton-line short"></div>
+                    </div>
+                    <div class="market-card skeleton">
+                        <div class="skeleton-line"></div>
+                        <div class="skeleton-line short"></div>
+                    </div>
+                    <div class="market-card skeleton">
+                        <div class="skeleton-line"></div>
+                        <div class="skeleton-line short"></div>
+                    </div>
+                    <div class="market-card skeleton">
+                        <div class="skeleton-line"></div>
+                        <div class="skeleton-line short"></div>
+                    </div>
+                </div>
+
+                <!-- Filter Bar -->
+                <div class="filter-bar">
+                    <span class="filter-icon">🎯</span>
+                    <span class="filter-label">篩選：</span>
+                    <button class="filter-btn active" data-filter="all">全部</button>
+                    <button class="filter-btn" data-filter="bullish">🟢 看多</button>
+                    <button class="filter-btn" data-filter="bearish">🔴 看空</button>
+                    <button class="filter-btn" data-filter="smc">🧱 SMC 訊號</button>
+                    <div class="sort-dropdown">
+                        <label>排序：</label>
+                        <select id="sortSelect">
+                            <option value="score">評分 (高→低)</option>
+                            <option value="change">漲跌幅</option>
+                            <option value="volume">成交量</option>
+                            <option value="name">名稱 A-Z</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Stock Cards -->
+                <div class="section-header">
+                    <h3>🎯 今日精選 (Top 20)</h3>
+                    <span class="stock-count" id="stockCount">載入中...</span>
+                </div>
+                <div class="stock-cards" id="stockCards">
+                    <!-- Stock cards will be inserted here -->
                 </div>
             </section>
 
-            <!-- Trading Analysis Section -->
-            <section class="trading-section">
-                <h2 class="section-title">
-                    <span class="title-icon">📊</span>
-                    TRADING ANALYSIS
-                </h2>
-                <div class="filter-bar">
-                    <span class="filter-icon">⚡</span>
-                    <span class="filter-label">MARKETS:</span>
-                    <button class="filter-btn active">ALL</button>
-                    <button class="filter-btn">上市</button>
-                    <button class="filter-btn">上櫃</button>
+            <!-- Watchlist Page -->
+            <section class="page-content hidden" id="watchlistPage">
+                <div class="section-header">
+                    <h3>⭐ 我的自選清單</h3>
                 </div>
-                <div class="stock-cards" id="stockCards">
-                    <!-- 動態載入股票卡片 -->
+                <div class="watchlist-empty" id="watchlistEmpty">
+                    <div class="empty-icon">📋</div>
+                    <p>尚未加入任何股票</p>
+                    <span>點擊股票卡片上的 ⭐ 按鈕加入自選</span>
+                </div>
+                <div class="stock-cards" id="watchlistCards"></div>
+            </section>
+
+            <!-- Analysis Page -->
+            <section class="page-content hidden" id="analysisPage">
+                <div class="section-header">
+                    <h3>🧠 深度分析</h3>
+                </div>
+                <div class="analysis-container" id="analysisContainer">
+                    <div class="analysis-empty">
+                        <div class="empty-icon">📊</div>
+                        <p>選擇一檔股票進行深度分析</p>
+                        <span>從儀表板點擊股票卡片的 📊 按鈕</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Global Markets Page -->
+            <section class="page-content hidden" id="globalPage">
+                <div class="section-header">
+                    <h3>🌍 國際市場</h3>
+                </div>
+                <div class="global-markets-grid" id="globalMarketsGrid">
+                    <!-- Will be populated by JS -->
                 </div>
             </section>
         </main>
@@ -93,9 +176,23 @@
     <!-- Toast Notification -->
     <div class="toast" id="toast">
         <span class="toast-icon">✅</span>
-        <span class="toast-message">資料已更新</span>
+        <span class="toast-message" id="toastMessage"></span>
     </div>
 
-    <script src="js/app.js" type="module"></script>
+    <!-- Stock Detail Modal -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal" id="stockModal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">股票詳情</h3>
+                <button class="modal-close" id="modalClose">✕</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Content injected by JS -->
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
 </body>
+
 </html>
