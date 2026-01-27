@@ -1,86 +1,126 @@
-# 📈 台股每日市場分析報告系統 (Daily Stock Report)
+# 📈 Discover Latest - 台股智能分析平台
 
-這是一個全自動化的台股市場分析系統，每日收盤後自動抓取資料、分析市場趨勢，並生成精美的深色主題網頁報告。
+專業級台股市場分析與投資模擬平台，整合即時行情、技術分析與複利回測功能。
 
-![UI Preview](https://via.placeholder.com/800x450.png?text=UI+Preview+Coming+Soon)
+**🔗 線上版本：[https://alanalways.github.io/report/](https://alanalways.github.io/report/)**
 
-## ✨ 特色
+---
 
-*   **完全自動化**：透過 GitHub Actions 每日自動執行，無需人工介入。
-*   **免費開源 API**：使用 TWSE、Yahoo Finance 等公開資料來源，無需付費訂閱。
-*   **深色主題 UI**：專為長時間閱讀設計的現代化深色介面。
-*   **規則式 AI 分析**：內建技術面與籌碼面分析邏輯，自動篩選 20 檔潛力個股。
-*   **靜態部署**：直接部署於 GitHub Pages，免費且高瀏覽效能。
+## ✨ 核心功能
+
+### 📊 市場儀表板
+- **1,000+ 台股即時資料**：涵蓋上市/上櫃個股
+- **Smart Money Concepts 分析**：Order Block、FVG、流動性分析
+- **快速篩選**：多頭強勢、SMC 結構、成交量爆發、分類篩選
+- **智能評分**：多維度技術面評估
+
+### 🎯 複利雪球模擬器
+- **歷史回測**：最多 20 年歷史資料
+- **未來預測**：馬可夫模型蒙地卡羅模擬
+- **固定模擬**：自訂年化報酬率預測
+- **分時段投資**：支援多階段定期定額規劃
+- **圖表顯示**：
+  - 📈 投資組合市值
+  - 💰 累積投入本金
+  - 📉 股價走勢（雙 Y 軸）
+- **週單位資料點**：更清晰的長期趨勢觀察
+
+### 🌍 國際市場追蹤
+- 道瓊、S&P 500、那斯達克
+- 歐洲主要指數
+- 亞太市場概覽
+
+---
 
 ## 🚀 快速開始
 
-### 1. 安裝依賴
-
-此專案使用 Node.js 開發，請確保已安裝 Node.js (v18+)。
+### 本地開發
 
 ```bash
+# 安裝依賴
 npm install
-```
 
-### 2. 本地開發與測試
+# 啟動本地伺服器
+npm run dev
+# 或
+npx serve . -p 3000
 
-抓取最新資料並生成報告：
-
-```bash
+# 抓取最新資料
 npm run update-data
 ```
 
-啟動本地伺服器預覽：
+瀏覽器開啟 `http://localhost:3000` 即可。
 
-```bash
-npm run dev
-```
-
-瀏覽器打開 `http://localhost:3000` 即可看到結果。
-
-## 📊 資料來源 (Open Source / Public Access)
-
-本系統堅持使用免費公開的資料來源：
-
-*   **台股大盤與個股**：[臺灣證券交易所 (TWSE)](https://www.twse.com.tw/) 公開數據介面。
-*   **國際股市與商品**：Yahoo Finance 公開 API 端點。
-*   **期貨資訊**：臺灣期貨交易所 (Taifex) 公開數據。
-*   **財經新聞**：各大財經網頁RSS或公開頁面解析。
-
-> **注意**：本系統僅供學術研究與個人參考，資料來源的穩定性取決於各服務提供者。
-
-## 🛠️ 部署設定 (GitHub Pages)
-
-本專案已設定好 GitHub Actions，只需簡單設定即可自動化運作：
-
-1.  將程式碼推送到 GitHub repository。
-2.  進入 GitHub 倉庫的 **Settings** > **Pages**。
-3.  在 **Build and deployment** 下的 **Source** 選擇 `Deploy from a branch`。
-4.  **Branch** 選擇 `main` (或 `master`)，資料夾選擇 `/ (root)`。
-5.  按下 **Save**。
-
-設定完成後，GitHub Actions 會在每個交易日收盤後（約台北時間 15:00）自動抓取資料並更新網站。
+---
 
 ## 📁 專案結構
 
 ```
 .
-├── css/                # 樣式表 (深色主題)
-├── js/                 # 前端邏輯
-├── data/               # 生成的市場資料 (JSON)
-├── scripts/            # 後端 Node.js 腳本
-│   ├── fetch-data.js   # 資料抓取
-│   ├── analyze.js      # 分析邏輯
-│   └── generate-report.js # 主程式
-└── .github/workflows/  # 自動化排程設定
+├── index.html              # 主頁面（整合所有功能）
+├── css/
+│   └── style.css           # 深色主題樣式
+├── js/
+│   ├── app.js              # 主應用邏輯
+│   ├── backtest-data.js    # 資料取得（Yahoo Finance）
+│   └── backtest-engine.js  # 回測計算引擎
+├── data/                   # 市場資料 (JSON)
+├── scripts/                # Node.js 後端腳本
+└── .github/workflows/      # GitHub Actions 自動化
 ```
 
-## 📝 自定義分析邏輯
+---
 
-如果你想調整選股策略，可以編輯 `scripts/analyze.js`：
+## 📊 資料來源
 
-*   `calculateStockScore`: 調整評分權重（技術面、成交量等）。
-*   `generateAnalysisText`: 修改分析評語的生成模板。
+| 來源 | 用途 |
+|------|------|
+| [臺灣證券交易所 (TWSE)](https://www.twse.com.tw/) | 台股即時行情 |
+| [證券櫃檯買賣中心 (TPEx)](https://www.tpex.org.tw/) | 上櫃股票資料 |
+| [Yahoo Finance](https://finance.yahoo.com/) | 歷史價格、國際市場 |
+| [FinMind](https://finmindtrade.com/) | 補充資料來源 |
+
+> ⚠️ 本系統僅供學術研究與個人參考，不構成投資建議。
 
 ---
-Made with ❤️ by [Your Name]
+
+## 🔧 主要技術
+
+- **前端**：Vanilla JS + Chart.js
+- **資料**：Yahoo Finance API + CORS Proxy
+- **部署**：GitHub Pages (靜態)
+- **自動化**：GitHub Actions 每日更新
+
+---
+
+## 📱 使用方式
+
+1. **儀表板**：瀏覽台股即時行情與分析
+2. **自選清單**：收藏關注的個股
+3. **複利模擬器**：
+   - 搜尋股票代碼（如 0050、0056、00830）
+   - 設定投資參數
+   - 點擊「🚀 開始模擬」
+4. **深度分析**：點擊個股進入詳細技術分析
+5. **國際市場**：追蹤全球主要指數
+
+---
+
+## 📈 模擬器支援標的
+
+台灣 ETF 搜尋自動加上 `.TW` 後綴：
+- `0050` → 元大台灣50
+- `0056` → 元大高股息
+- `00830` → 國泰費城半導體
+- `00940` → 元大台灣價值高息
+- `2330` → 台積電
+
+---
+
+## 📝 授權
+
+MIT License
+
+---
+
+Made with ❤️ by Alan

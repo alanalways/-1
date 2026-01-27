@@ -721,23 +721,44 @@ function initSimulator() {
         let labels, datasets;
 
         if (mode === 'backtest') {
-            labels = result.timeline.map(t => t.date);
+            // 週單位取樣 (每7筆取1筆)
+            const weeklyData = result.timeline.filter((_, i) => i % 7 === 0 || i === result.timeline.length - 1);
+            labels = weeklyData.map(t => t.date);
+
+            // 計算股價的縮放比例以便在同一圖表顯示
+            const maxPrice = Math.max(...weeklyData.map(t => t.price));
+            const maxValue = Math.max(...weeklyData.map(t => t.marketValue));
+            const priceScale = maxValue / maxPrice * 0.5; // 股價縮放到市值的50%高度
+
             datasets = [
                 {
                     label: '投資組合市值',
-                    data: result.timeline.map(t => t.marketValue),
+                    data: weeklyData.map(t => t.marketValue),
                     borderColor: '#3b82f6',
                     backgroundColor: 'rgba(59, 130, 246, 0.1)',
                     fill: true,
-                    tension: 0.3
+                    tension: 0.3,
+                    yAxisID: 'y'
                 },
                 {
                     label: '投入本金',
-                    data: result.timeline.map(t => t.cost),
+                    data: weeklyData.map(t => t.cost),
                     borderColor: '#6b7280',
                     borderDash: [5, 5],
                     fill: false,
-                    tension: 0
+                    tension: 0,
+                    yAxisID: 'y'
+                },
+                {
+                    label: '股價',
+                    data: weeklyData.map(t => t.price),
+                    borderColor: '#f59e0b',
+                    backgroundColor: 'rgba(245, 158, 11, 0.05)',
+                    fill: false,
+                    tension: 0.3,
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    yAxisID: 'y1'
                 }
             ];
         } else if (mode === 'forecast') {
@@ -803,15 +824,57 @@ function initSimulator() {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
                 plugins: {
                     legend: { position: 'top' },
                     zoom: {
                         zoom: { wheel: { enabled: true }, pinch: { enabled: true }, mode: 'x' },
                         pan: { enabled: true, mode: 'x' }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                let label = context.dataset.label || '';
+                                if (label) label += ': ';
+                                if (context.parsed.y !== null) {
+                                    if (context.dataset.yAxisID === 'y1') {
+                                        label += 'NT$' + context.parsed.y.toFixed(2);
+                                    } else {
+                                        label += 'NT$' + Math.round(context.parsed.y).toLocaleString();
+                                    }
+                                }
+                                return label;
+                            }
+                        }
                     }
                 },
                 scales: {
-                    y: { beginAtZero: false }
+                    y: {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        beginAtZero: false,
+                        title: {
+                            display: true,
+                            text: '市值 / 本金 (NT$)'
+                        }
+                    },
+                    y1: {
+                        type: 'linear',
+                        display: mode === 'backtest',
+                        position: 'right',
+                        beginAtZero: false,
+                        grid: {
+                            drawOnChartArea: false
+                        },
+                        title: {
+                            display: true,
+                            text: '股價 (NT$)'
+                        }
+                    }
                 }
             }
         });
