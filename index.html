@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📈 台股每日市場分析報告 | Daily Taiwan Stock Report</title>
+    <meta name="description" content="每日自動更新的台股市場分析報告，包含美股、期貨、重金屬行情與 20 檔推薦股票">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <div class="logo">
+                <span class="logo-icon">📊</span>
+                <span class="logo-text">DailyDip</span>
+                <span class="logo-badge">LIVE</span>
+            </div>
+            <nav class="header-nav">
+                <button class="nav-btn active">🔥 ALL</button>
+                <button class="nav-btn">📈 BULLISH</button>
+                <button class="nav-btn">📉 BEARISH</button>
+                <button class="nav-btn">⚖️ NEUTRAL</button>
+            </nav>
+        </div>
+        <div class="header-right">
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" placeholder="搜尋股票代號..." class="search-input">
+            </div>
+            <div class="update-time" id="updateTime">
+                <span>更新時間：載入中...</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <span class="sidebar-title">BULLISH</span>
+                <span class="sidebar-count" id="bullishCount">0</span>
+            </div>
+            <div class="stock-list" id="bullishList">
+                <!-- 動態載入 -->
+            </div>
+            
+            <div class="sidebar-header">
+                <span class="sidebar-title">BEARISH</span>
+                <span class="sidebar-count" id="bearishCount">0</span>
+            </div>
+            <div class="stock-list" id="bearishList">
+                <!-- 動態載入 -->
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Market Intelligence Section -->
+            <section class="market-section">
+                <h2 class="section-title">
+                    <span class="title-icon">🤖</span>
+                    MARKET INTELLIGENCE
+                </h2>
+                <div class="market-cards" id="marketCards">
+                    <!-- 動態載入卡片 -->
+                </div>
+            </section>
+
+            <!-- Trading Analysis Section -->
+            <section class="trading-section">
+                <h2 class="section-title">
+                    <span class="title-icon">📊</span>
+                    TRADING ANALYSIS
+                </h2>
+                <div class="filter-bar">
+                    <span class="filter-icon">⚡</span>
+                    <span class="filter-label">MARKETS:</span>
+                    <button class="filter-btn active">ALL</button>
+                    <button class="filter-btn">上市</button>
+                    <button class="filter-btn">上櫃</button>
+                </div>
+                <div class="stock-cards" id="stockCards">
+                    <!-- 動態載入股票卡片 -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <span class="toast-icon">✅</span>
+        <span class="toast-message">資料已更新</span>
+    </div>
+
+    <script src="js/app.js" type="module"></script>
+</body>
+</html>

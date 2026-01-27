@@ -1,0 +1,39 @@
+name: Daily Market Report Update
+
+on:
+  schedule:
+    # UTC 07:00 = 台北時間 15:00（每個交易日收盤後）
+    - cron: '0 7 * * 1-5'
+  workflow_dispatch: # 手動觸發
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci || npm install
+
+      - name: Update market data
+        run: npm run update-data
+        env:
+          TZ: 'Asia/Taipei'
+
+      - name: Commit and push changes
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email 'actions@github.com'
+          git add -A
+          git diff --staged --quiet || git commit -m "📊 每日市場報告更新 $(TZ='Asia/Taipei' date +'%Y-%m-%d %H:%M')"
+          git push
