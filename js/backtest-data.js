@@ -133,8 +133,8 @@ async function fetchHistoricalData(symbol, years = 20) {
         const now = Math.floor(Date.now() / 1000);
         const period1 = now - (years * 365.25 * 24 * 60 * 60);
 
-        // 月線資料
-        const url = `${YAHOO_CHART_API}/${symbol}?period1=${Math.floor(period1)}&period2=${now}&interval=1mo&events=div`;
+        // 週線資料 (用於週單位顯示)
+        const url = `${YAHOO_CHART_API}/${symbol}?period1=${Math.floor(period1)}&period2=${now}&interval=1wk&events=div`;
 
         const response = await fetchWithCORS(url);
         const data = await response.json();

@@ -721,8 +721,10 @@ function initSimulator() {
         let labels, datasets;
 
         if (mode === 'backtest') {
-            // 週單位取樣 (每7筆取1筆)
-            const weeklyData = result.timeline.filter((_, i) => i % 7 === 0 || i === result.timeline.length - 1);
+            // 資料已為週線，直接使用 (若資料太多則取每 4 週一點)
+            const weeklyData = result.timeline.length > 260
+                ? result.timeline.filter((_, i) => i % 4 === 0 || i === result.timeline.length - 1)
+                : result.timeline;
             labels = weeklyData.map(t => t.date);
 
             // 計算股價的縮放比例以便在同一圖表顯示
