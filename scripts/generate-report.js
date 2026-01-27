@@ -1,6 +1,6 @@
 /**
- * 台股每日市場分析報告 - 報告生成主程式
- * 整合資料抓取與 AI 分析
+ * Discover Latest - Professional Financial Platform
+ * Report Generation with Cache System
  */
 
 import fs from 'fs';
@@ -8,7 +8,44 @@ import path from 'path';
 import fetcher from './fetch-data.js';
 import analyzer from './analyze.js';
 
-// 產生 AI 觀點 (簡易規則版)
+// === Cache Configuration ===
+const CACHE_DIR = path.join(process.cwd(), 'data', 'cache');
+const STOCK_CACHE_FILE = path.join(CACHE_DIR, 'stocks-cache.json');
+
+// Ensure cache directory exists
+if (!fs.existsSync(CACHE_DIR)) {
+    fs.mkdirSync(CACHE_DIR, { recursive: true });
+}
+
+// === Cache Functions ===
+function saveStockCache(stocks) {
+    try {
+        const cacheData = {
+            date: new Date().toISOString().split('T')[0],
+            timestamp: Date.now(),
+            stocks: stocks
+        };
+        fs.writeFileSync(STOCK_CACHE_FILE, JSON.stringify(cacheData, null, 2), 'utf-8');
+        console.log(`💾 已快取 ${stocks.length} 檔股票資料`);
+    } catch (error) {
+        console.error('快取寫入失敗:', error.message);
+    }
+}
+
+function loadStockCache() {
+    try {
+        if (fs.existsSync(STOCK_CACHE_FILE)) {
+            const cacheData = JSON.parse(fs.readFileSync(STOCK_CACHE_FILE, 'utf-8'));
+            console.log(`📂 載入快取資料 (日期: ${cacheData.date}, 共 ${cacheData.stocks?.length || 0} 檔)`);
+            return cacheData;
+        }
+    } catch (error) {
+        console.error('快取讀取失敗:', error.message);
+    }
+    return null;
+}
+
+// === AI Insights ===
 function generateAIInsight(recommendations, usIndices) {
     const bullishCount = recommendations.filter(s => s.signal === 'BULLISH').length;
     const bearishCount = recommendations.filter(s => s.signal === 'BEARISH').length;
@@ -24,44 +61,27 @@ function generateAIInsight(recommendations, usIndices) {
 }
 
 function generateAIAdvice(recommendations) {
-    const logicSummary = recommendations.slice(0, 3).map(s => s.reasons[0]).filter(Boolean).join('、');
-    return `今日 SMC 策略掃描顯示，資金集中於具備「${logicSummary || '特定型態'}」之個股。建議關注機構訂單塊 (Order Block) 與流動性獵取訊號。`;
+    const reasons = recommendations.slice(0, 5).flatMap(s => s.reasons || []).filter(Boolean);
+    const uniqueReasons = [...new Set(reasons)].slice(0, 3);
+    return `今日 SMC 策略掃描顯示，資金集中於具備「${uniqueReasons.join('、') || '特定型態'}」之個股。建議關注機構訂單塊 (Order Block) 與流動性獵取訊號。`;
 }
 
-// 產生 Fallback 資料
-function getFallbackStocks() {
-    return [
-        {
-            code: '2330.TW', name: '台積電', closePrice: 580, changePercent: 1.5, volumeRatio: 1.2,
-            tags: [{ label: '半導體', type: 'neutral' }, { label: '權值王', type: 'bullish' }],
-            analysis: '🔥 台積電：先進製程需求強勁，均線多頭排列。',
-            signal: 'BULLISH'
-        },
-        {
-            code: '2454.TW', name: '聯發科', closePrice: 950, changePercent: -0.5, volumeRatio: 0.8,
-            tags: [{ label: 'IC設計', type: 'neutral' }],
-            analysis: '📊 聯發科：高檔震盪，等待營收公布。',
-            signal: 'NEUTRAL'
-        }
-    ];
-}
-
+// === Main Report Generation ===
 async function generateReport() {
-    console.log('🚀 開始執行 Discover Latest (Alan) 市場掃描...');
+    console.log('🚀 開始執行 Discover Latest (Alan) 市場掃描...\n');
 
-    // === 1. 抓取各項資料 ===
+    // === 1. Fetch Market Data ===
     console.log('📊 抓取台股大盤資訊...');
     const twIndex = await fetcher.fetchTaiwanStockIndex();
 
-    console.log('🌍 抓取美股與國際指標 (DXY, VIX)...');
+    console.log('🌍 抓取美股與國際指標 (DXY, VIX, SOX)...');
     const usIndices = await fetcher.fetchUSStockIndices();
 
-    console.log('💰 抓取重金屬與期貨...');
+    console.log('💰 抓取商品期貨與加密貨幣...');
     const commodities = await fetcher.fetchCommodities();
 
-    console.log('📈 全力掃描台股市場 (Listing All Stocks)...');
-    // 注意：這裡抓取全市場，資料量大
-    const allStocks = await fetcher.fetchAllStocks();
+    console.log('📈 全力掃描台股市場...');
+    let allStocks = await fetcher.fetchAllStocks();
 
     console.log('📘 抓取個股基本面 (BWIBBU)...');
     const fundamentals = await fetcher.fetchStockFundamentals();
@@ -75,37 +95,69 @@ async function generateReport() {
     console.log('📰 抓取最新財經新聞...');
     const news = await fetcher.fetchFinanceNews();
 
-    // === 2. 處理股票資料 (High Performance Batch Process) ===
-    console.log(`\n🔍 啟動 SMC 分析引擎，掃描 ${allStocks.length} 檔股票...`);
+    // === 2. Cache Handling ===
+    const cache = loadStockCache();
+
+    // If API returned data, save to cache
+    if (allStocks.length > 0) {
+        saveStockCache(allStocks);
+    }
+    // If API failed, use cache
+    else if (cache && cache.stocks && cache.stocks.length > 0) {
+        console.log('⚠️ API 無即時資料，使用快取資料...');
+        allStocks = cache.stocks;
+    }
+
+    // === 3. Process Stocks ===
+    console.log(`\n🔍 處理 ${allStocks.length} 檔股票資料...`);
+
+    // Build yesterday's data map for volume ratio calculation
+    const yesterdayMap = new Map();
+    if (cache && cache.stocks) {
+        cache.stocks.forEach(s => {
+            const vol = parseFloat(s.volume?.replace(/,/g, '') || 0);
+            if (vol > 0) {
+                yesterdayMap.set(s.code, vol);
+            }
+        });
+    }
 
     let enrichedStocks = [];
 
     for (const stock of allStocks) {
         const code = stock.code;
-        const close = parseFloat(stock.closePrice?.replace(/,/g, '') || 0);
-        const open = parseFloat(stock.openPrice?.replace(/,/g, '') || 0);
 
+        // Parse prices (handle comma-formatted numbers)
+        const close = parseFloat(stock.closePrice?.toString().replace(/,/g, '') || 0);
+        const open = parseFloat(stock.openPrice?.toString().replace(/,/g, '') || 0);
+        const high = parseFloat(stock.highPrice?.toString().replace(/,/g, '') || 0);
+        const low = parseFloat(stock.lowPrice?.toString().replace(/,/g, '') || 0);
+        const volume = parseFloat(stock.volume?.toString().replace(/,/g, '') || 0);
+
+        // Skip invalid data
         if (open === 0 || close === 0) continue;
 
-        const changePercent = open > 0 ? ((close - open) / open * 100).toFixed(2) : 0;
+        // Calculate change percent
+        const changePercent = ((close - open) / open * 100);
 
+        // Calculate volume ratio using yesterday's data
+        const yesterdayVol = yesterdayMap.get(code) || volume;
+        const volumeRatio = yesterdayVol > 0 ? (volume / yesterdayVol) : 1.0;
+
+        // Get fundamentals
         const fund = fundamentals.get(code) || {};
         const sector = sectorMap[code] || '其他';
-
-        // 模擬 Volume Ratio
-        let volumeRatio = 1.0;
-        if (Math.abs(changePercent) > 2) volumeRatio = 1.2 + Math.random();
 
         enrichedStocks.push({
             code: `${code}.TW`,
             name: stock.name,
             market: '上市',
-            openPrice: stock.openPrice,
-            highPrice: stock.highPrice,
-            lowPrice: stock.lowPrice,
-            closePrice: stock.closePrice,
-            volume: stock.volume,
-            changePercent: parseFloat(changePercent),
+            openPrice: open.toString(),
+            highPrice: high.toString(),
+            lowPrice: low.toString(),
+            closePrice: close.toString(),
+            volume: volume.toString(),
+            changePercent: parseFloat(changePercent.toFixed(2)),
             changeVal: stock.changeVal,
             volumeRatio: parseFloat(volumeRatio.toFixed(2)),
             sector: sector,
@@ -115,19 +167,17 @@ async function generateReport() {
         });
     }
 
-    if (enrichedStocks.length === 0) {
-        console.log('⚠️ 無法取得即時股票資料，使用範例資料...');
-        enrichedStocks = getFallbackStocks();
-    }
+    console.log(`✅ 成功處理 ${enrichedStocks.length} 檔股票`);
 
-    // 選出推薦股票 (SMC Analysis)
+    // === 4. SMC Analysis ===
+    console.log('\n🧠 執行 SMC/ICT 分析...');
     console.time('SMC_Analysis');
     const recommendations = analyzer.selectRecommendations(enrichedStocks, 20);
     console.timeEnd('SMC_Analysis');
 
-    console.log(`✅ 已篩選出 ${recommendations.length} 檔高機率設置 (High Probability Setups)`);
+    console.log(`✅ 已篩選出 ${recommendations.length} 檔高機率設置`);
 
-    // === 3. 組合市場情報 ===
+    // === 5. Build Market Intelligence ===
     const foreignFutures = futuresData.find(f => f.identity === '外資') || {};
     const foreignNetOI = foreignFutures.netOI || 'N/A';
 
@@ -135,11 +185,9 @@ async function generateReport() {
         {
             icon: '📈',
             category: '盤後總結',
-            title: twIndex
-                ? `加權指數 ${twIndex.index}`
-                : '市場數據載入中',
+            title: twIndex ? `加權指數 ${twIndex.index}` : '市場數據載入中',
             content: twIndex
-                ? `漲跌 ${twIndex.change} • 成交 ${parseInt(twIndex.amount.replace(/,/g, '') / 100000000)}億\n${twIndex.change.startsWith('-') ? '空方管控' : '多方控盤'}`
+                ? `漲跌 ${twIndex.change} • 成交 ${Math.round(parseInt(twIndex.amount.replace(/,/g, '')) / 100000000)}億\n${twIndex.change.startsWith('-') ? '空方管控' : '多方控盤'}`
                 : '暫無資料',
             stats: twIndex ? [
                 { label: '指數', value: twIndex.index, change: parseFloat(twIndex.change || 0) }
@@ -159,7 +207,7 @@ async function generateReport() {
             category: '宏觀經濟',
             title: '美股 & 國際指標',
             content: usIndices.length > 0
-                ? `DJI ${usIndices.find(i => i.symbol === 'DJI')?.changePercent}% | NDX ${usIndices.find(i => i.symbol === 'NASDAQ')?.changePercent}%`
+                ? `DJI ${usIndices.find(i => i.symbol === 'DJI')?.changePercent}% | NDX ${usIndices.find(i => i.symbol === 'NASDAQ')?.changePercent}% | VIX ${usIndices.find(i => i.symbol === 'VIX')?.changePercent}%`
                 : '數據載入中...',
             stats: usIndices.slice(0, 3).map(i => ({
                 label: i.symbol,
@@ -175,9 +223,10 @@ async function generateReport() {
         }
     ];
 
-    // === 4. 輸出報告 ===
+    // === 6. Output Report ===
     const reportData = {
         lastUpdated: new Date().toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' }),
+        totalStocksAnalyzed: enrichedStocks.length,
         marketIntelligence,
         recommendations,
         raw: {
@@ -191,7 +240,11 @@ async function generateReport() {
     const outputPath = path.join(process.cwd(), 'data', 'market-data.json');
     fs.writeFileSync(outputPath, JSON.stringify(reportData, null, 2), 'utf-8');
 
-    console.log(`🎉 報告生成完成！已儲存至 ${outputPath}`);
+    console.log(`\n🎉 報告生成完成！`);
+    console.log(`   📊 分析股票數：${enrichedStocks.length}`);
+    console.log(`   🎯 精選推薦數：${recommendations.length}`);
+    console.log(`   💾 已儲存至：${outputPath}`);
 }
 
+// Execute
 generateReport().catch(console.error);

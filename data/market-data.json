@@ -1,5 +1,6 @@
 {
-  "lastUpdated": "2026/1/28 上午5:19:57",
+  "lastUpdated": "2026/1/28 上午5:32:49",
+  "totalStocksAnalyzed": 30,
   "marketIntelligence": [
     {
       "icon": "📈",
@@ -31,7 +32,7 @@
       "icon": "🌍",
       "category": "宏觀經濟",
       "title": "美股 & 國際指標",
-      "content": "DJI -0.83% | NDX 0.91%",
+      "content": "DJI -0.83% | NDX 0.91% | VIX 1.24%",
       "stats": [
         {
           "label": "DJI",
@@ -54,45 +55,730 @@
       "icon": "🤖",
       "category": "SMC 策略觀點",
       "title": "市場情緒：中性震盪 | 美股連動：有待觀察",
-      "content": "今日 SMC 策略掃描顯示，資金集中於具備「特定型態」之個股。建議關注機構訂單塊 (Order Block) 與流動性獵取訊號。"
+      "content": "今日 SMC 策略掃描顯示，資金集中於具備「🧱 Bullish OB、🕳️ Bullish FVG、🚀 Momentum Up」之個股。建議關注機構訂單塊 (Order Block) 與流動性獵取訊號。"
     }
   ],
   "recommendations": [
     {
-      "code": "2330.TW",
-      "name": "台積電",
-      "closePrice": 580,
-      "changePercent": 1.5,
-      "volumeRatio": 1.2,
-      "tags": [],
-      "analysis": "⚖️ **台積電** [一般] ➤ 。",
-      "signal": "NEUTRAL",
-      "score": 55,
-      "signalType": "NEUTRAL",
-      "reasons": [],
+      "code": "2382.TW",
+      "name": "廣達",
+      "market": "上市",
+      "openPrice": "285",
+      "highPrice": "295",
+      "lowPrice": "283",
+      "closePrice": "293",
+      "volume": "35000000",
+      "changePercent": 2.81,
+      "changeVal": "8",
+      "volumeRatio": 1,
+      "sector": "AI/雲端",
+      "score": 95,
+      "signal": "BULLISH",
+      "signalType": "SMC_BUY",
+      "reasons": [
+        "🧱 Bullish OB",
+        "🕳️ Bullish FVG"
+      ],
       "patterns": {
-        "ob": null,
-        "fvg": null,
+        "ob": "bullish-ob",
+        "fvg": "bullish-fvg",
         "sweep": null
-      }
+      },
+      "analysis": "🚀 **廣達** [AI/雲端] ➤ 🧱 Bullish OB + 🕳️ Bullish FVG。",
+      "tags": [
+        {
+          "label": "Bullish OB",
+          "type": "smc-ob"
+        },
+        {
+          "label": "Bullish FVG",
+          "type": "smc-fvg"
+        },
+        {
+          "label": "看多",
+          "type": "bullish"
+        },
+        {
+          "label": "AI/雲端",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "3034.TW",
+      "name": "聯詠",
+      "market": "上市",
+      "openPrice": "520",
+      "highPrice": "535",
+      "lowPrice": "518",
+      "closePrice": "532",
+      "volume": "6000000",
+      "changePercent": 2.31,
+      "changeVal": "12",
+      "volumeRatio": 1,
+      "sector": "半導體",
+      "score": 95,
+      "signal": "BULLISH",
+      "signalType": "SMC_BUY",
+      "reasons": [
+        "🧱 Bullish OB",
+        "🕳️ Bullish FVG"
+      ],
+      "patterns": {
+        "ob": "bullish-ob",
+        "fvg": "bullish-fvg",
+        "sweep": null
+      },
+      "analysis": "🚀 **聯詠** [半導體] ➤ 🧱 Bullish OB + 🕳️ Bullish FVG。",
+      "tags": [
+        {
+          "label": "Bullish OB",
+          "type": "smc-ob"
+        },
+        {
+          "label": "Bullish FVG",
+          "type": "smc-fvg"
+        },
+        {
+          "label": "看多",
+          "type": "bullish"
+        },
+        {
+          "label": "半導體",
+          "type": "neutral"
+        }
+      ]
     },
     {
       "code": "2454.TW",
       "name": "聯發科",
-      "closePrice": 950,
-      "changePercent": -0.5,
-      "volumeRatio": 0.8,
-      "tags": [],
-      "analysis": "⚖️ **聯發科** [一般] ➤ 。",
+      "market": "上市",
+      "openPrice": "1280",
+      "highPrice": "1310",
+      "lowPrice": "1275",
+      "closePrice": "1305",
+      "volume": "8000000",
+      "changePercent": 1.95,
+      "changeVal": "25",
+      "volumeRatio": 1,
+      "sector": "半導體",
+      "score": 80,
+      "signal": "BULLISH",
+      "signalType": "SMC_BUY",
+      "reasons": [
+        "🧱 Bullish OB"
+      ],
+      "patterns": {
+        "ob": "bullish-ob",
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "🚀 **聯發科** [半導體] ➤ 🧱 Bullish OB。",
+      "tags": [
+        {
+          "label": "Bullish OB",
+          "type": "smc-ob"
+        },
+        {
+          "label": "看多",
+          "type": "bullish"
+        },
+        {
+          "label": "半導體",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "2609.TW",
+      "name": "陽明",
+      "market": "上市",
+      "openPrice": "68",
+      "highPrice": "72",
+      "lowPrice": "67",
+      "closePrice": "71",
+      "volume": "80000000",
+      "changePercent": 4.41,
+      "changeVal": "3",
+      "volumeRatio": 1,
+      "sector": "航運",
+      "score": 75,
+      "signal": "BULLISH",
+      "signalType": "NEUTRAL",
+      "reasons": [
+        "🕳️ Bullish FVG",
+        "🚀 Momentum Up"
+      ],
+      "patterns": {
+        "ob": null,
+        "fvg": "bullish-fvg",
+        "sweep": null
+      },
+      "analysis": "🚀 **陽明** [航運] ➤ 🕳️ Bullish FVG + 🚀 Momentum Up。",
+      "tags": [
+        {
+          "label": "Bullish FVG",
+          "type": "smc-fvg"
+        },
+        {
+          "label": "看多",
+          "type": "bullish"
+        },
+        {
+          "label": "航運",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "2886.TW",
+      "name": "兆豐金",
+      "market": "上市",
+      "openPrice": "42",
+      "highPrice": "42.5",
+      "lowPrice": "41.5",
+      "closePrice": "42.3",
+      "volume": "15000000",
+      "changePercent": 0.71,
+      "changeVal": "0.3",
+      "volumeRatio": 1,
+      "sector": "金融",
+      "score": 75,
+      "signal": "BULLISH",
+      "signalType": "SMC_BUY",
+      "reasons": [
+        "🐢 Liq Sweep ↑"
+      ],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": "liquidity-sweep-bull"
+      },
+      "analysis": "🚀 **兆豐金** [金融] ➤ 🐢 Liq Sweep ↑。",
+      "tags": [
+        {
+          "label": "Liq Sweep ↑",
+          "type": "smc-liq"
+        },
+        {
+          "label": "看多",
+          "type": "bullish"
+        },
+        {
+          "label": "金融",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "2412.TW",
+      "name": "中華電",
+      "market": "上市",
+      "openPrice": "125",
+      "highPrice": "126",
+      "lowPrice": "124",
+      "closePrice": "125.5",
+      "volume": "8000000",
+      "changePercent": 0.4,
+      "changeVal": "0.5",
+      "volumeRatio": 1,
+      "sector": "電信",
+      "score": 75,
+      "signal": "BULLISH",
+      "signalType": "SMC_BUY",
+      "reasons": [
+        "🐢 Liq Sweep ↑"
+      ],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": "liquidity-sweep-bull"
+      },
+      "analysis": "🚀 **中華電** [電信] ➤ 🐢 Liq Sweep ↑。",
+      "tags": [
+        {
+          "label": "Liq Sweep ↑",
+          "type": "smc-liq"
+        },
+        {
+          "label": "看多",
+          "type": "bullish"
+        },
+        {
+          "label": "電信",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "3443.TW",
+      "name": "創意",
+      "market": "上市",
+      "openPrice": "1850",
+      "highPrice": "1920",
+      "lowPrice": "1840",
+      "closePrice": "1900",
+      "volume": "2500000",
+      "changePercent": 2.7,
+      "changeVal": "50",
+      "volumeRatio": 1,
+      "sector": "半導體",
+      "score": 75,
+      "signal": "BULLISH",
+      "signalType": "NEUTRAL",
+      "reasons": [
+        "🕳️ Bullish FVG"
+      ],
+      "patterns": {
+        "ob": null,
+        "fvg": "bullish-fvg",
+        "sweep": null
+      },
+      "analysis": "🚀 **創意** [半導體] ➤ 🕳️ Bullish FVG。",
+      "tags": [
+        {
+          "label": "Bullish FVG",
+          "type": "smc-fvg"
+        },
+        {
+          "label": "看多",
+          "type": "bullish"
+        },
+        {
+          "label": "半導體",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "3661.TW",
+      "name": "世芯-KY",
+      "market": "上市",
+      "openPrice": "2850",
+      "highPrice": "2950",
+      "lowPrice": "2820",
+      "closePrice": "2920",
+      "volume": "1800000",
+      "changePercent": 2.46,
+      "changeVal": "70",
+      "volumeRatio": 1,
+      "sector": "半導體",
+      "score": 75,
+      "signal": "BULLISH",
+      "signalType": "NEUTRAL",
+      "reasons": [
+        "🕳️ Bullish FVG"
+      ],
+      "patterns": {
+        "ob": null,
+        "fvg": "bullish-fvg",
+        "sweep": null
+      },
+      "analysis": "🚀 **世芯-KY** [半導體] ➤ 🕳️ Bullish FVG。",
+      "tags": [
+        {
+          "label": "Bullish FVG",
+          "type": "smc-fvg"
+        },
+        {
+          "label": "看多",
+          "type": "bullish"
+        },
+        {
+          "label": "半導體",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "2603.TW",
+      "name": "長榮",
+      "market": "上市",
+      "openPrice": "185",
+      "highPrice": "192",
+      "lowPrice": "183",
+      "closePrice": "190",
+      "volume": "55000000",
+      "changePercent": 2.7,
+      "changeVal": "5",
+      "volumeRatio": 1,
+      "sector": "航運",
+      "score": 70,
+      "signal": "BULLISH",
+      "signalType": "NEUTRAL",
+      "reasons": [
+        "🕳️ Bullish FVG"
+      ],
+      "patterns": {
+        "ob": null,
+        "fvg": "bullish-fvg",
+        "sweep": null
+      },
+      "analysis": "🚀 **長榮** [航運] ➤ 🕳️ Bullish FVG。",
+      "tags": [
+        {
+          "label": "Bullish FVG",
+          "type": "smc-fvg"
+        },
+        {
+          "label": "看多",
+          "type": "bullish"
+        },
+        {
+          "label": "航運",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "2615.TW",
+      "name": "萬海",
+      "market": "上市",
+      "openPrice": "75",
+      "highPrice": "78",
+      "lowPrice": "74",
+      "closePrice": "77",
+      "volume": "35000000",
+      "changePercent": 2.67,
+      "changeVal": "2",
+      "volumeRatio": 1,
+      "sector": "航運",
+      "score": 70,
+      "signal": "BULLISH",
+      "signalType": "NEUTRAL",
+      "reasons": [
+        "🕳️ Bullish FVG"
+      ],
+      "patterns": {
+        "ob": null,
+        "fvg": "bullish-fvg",
+        "sweep": null
+      },
+      "analysis": "🚀 **萬海** [航運] ➤ 🕳️ Bullish FVG。",
+      "tags": [
+        {
+          "label": "Bullish FVG",
+          "type": "smc-fvg"
+        },
+        {
+          "label": "看多",
+          "type": "bullish"
+        },
+        {
+          "label": "航運",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "2345.TW",
+      "name": "智邦",
+      "market": "上市",
+      "openPrice": "485",
+      "highPrice": "498",
+      "lowPrice": "482",
+      "closePrice": "495",
+      "volume": "3800000",
+      "changePercent": 2.06,
+      "changeVal": "10",
+      "volumeRatio": 1,
+      "sector": "網通",
+      "score": 70,
+      "signal": "BULLISH",
+      "signalType": "NEUTRAL",
+      "reasons": [
+        "🕳️ Bullish FVG"
+      ],
+      "patterns": {
+        "ob": null,
+        "fvg": "bullish-fvg",
+        "sweep": null
+      },
+      "analysis": "🚀 **智邦** [網通] ➤ 🕳️ Bullish FVG。",
+      "tags": [
+        {
+          "label": "Bullish FVG",
+          "type": "smc-fvg"
+        },
+        {
+          "label": "看多",
+          "type": "bullish"
+        },
+        {
+          "label": "網通",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "2303.TW",
+      "name": "聯電",
+      "market": "上市",
+      "openPrice": "52",
+      "highPrice": "53.5",
+      "lowPrice": "51.5",
+      "closePrice": "53",
+      "volume": "65000000",
+      "changePercent": 1.92,
+      "changeVal": "1",
+      "volumeRatio": 1,
+      "sector": "半導體",
+      "score": 60,
       "signal": "NEUTRAL",
-      "score": 50,
       "signalType": "NEUTRAL",
       "reasons": [],
       "patterns": {
         "ob": null,
         "fvg": null,
         "sweep": null
-      }
+      },
+      "analysis": "⚖️ **聯電** [半導體] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "半導體",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "3711.TW",
+      "name": "日月光投控",
+      "market": "上市",
+      "openPrice": "145",
+      "highPrice": "148",
+      "lowPrice": "144",
+      "closePrice": "147",
+      "volume": "18000000",
+      "changePercent": 1.38,
+      "changeVal": "2",
+      "volumeRatio": 1,
+      "sector": "半導體",
+      "score": 60,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **日月光投控** [半導體] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "半導體",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "2379.TW",
+      "name": "瑞昱",
+      "market": "上市",
+      "openPrice": "520",
+      "highPrice": "532",
+      "lowPrice": "518",
+      "closePrice": "528",
+      "volume": "4200000",
+      "changePercent": 1.54,
+      "changeVal": "8",
+      "volumeRatio": 1,
+      "sector": "半導體",
+      "score": 60,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **瑞昱** [半導體] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "半導體",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "6669.TW",
+      "name": "緯穎",
+      "market": "上市",
+      "openPrice": "1680",
+      "highPrice": "1720",
+      "lowPrice": "1665",
+      "closePrice": "1710",
+      "volume": "1200000",
+      "changePercent": 1.79,
+      "changeVal": "30",
+      "volumeRatio": 1,
+      "sector": "AI/雲端",
+      "score": 60,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **緯穎** [AI/雲端] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "AI/雲端",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "2317.TW",
+      "name": "鴻海",
+      "market": "上市",
+      "openPrice": "185",
+      "highPrice": "188",
+      "lowPrice": "184",
+      "closePrice": "187",
+      "volume": "45000000",
+      "changePercent": 1.08,
+      "changeVal": "2",
+      "volumeRatio": 1,
+      "sector": "電子代工",
+      "score": 55,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **鴻海** [電子代工] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "電子代工",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "2002.TW",
+      "name": "中鋼",
+      "market": "上市",
+      "openPrice": "25",
+      "highPrice": "25.5",
+      "lowPrice": "24.8",
+      "closePrice": "25.3",
+      "volume": "45000000",
+      "changePercent": 1.2,
+      "changeVal": "0.3",
+      "volumeRatio": 1,
+      "sector": "鋼鐵",
+      "score": 55,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **中鋼** [鋼鐵] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "鋼鐵",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "2881.TW",
+      "name": "富邦金",
+      "market": "上市",
+      "openPrice": "85",
+      "highPrice": "86.5",
+      "lowPrice": "84.5",
+      "closePrice": "86",
+      "volume": "28000000",
+      "changePercent": 1.18,
+      "changeVal": "1",
+      "volumeRatio": 1,
+      "sector": "金融",
+      "score": 55,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **富邦金** [金融] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "金融",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "2330.TW",
+      "name": "台積電",
+      "market": "上市",
+      "openPrice": "1150",
+      "highPrice": "1165",
+      "lowPrice": "1145",
+      "closePrice": "1160",
+      "volume": "25000000",
+      "changePercent": 0.87,
+      "changeVal": "10",
+      "volumeRatio": 1,
+      "sector": "半導體",
+      "score": 55,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **台積電** [半導體] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "半導體",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "1101.TW",
+      "name": "台泥",
+      "market": "上市",
+      "openPrice": "35",
+      "highPrice": "35.8",
+      "lowPrice": "34.5",
+      "closePrice": "35.5",
+      "volume": "22000000",
+      "changePercent": 1.43,
+      "changeVal": "0.5",
+      "volumeRatio": 1,
+      "sector": "水泥",
+      "score": 55,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **台泥** [水泥] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "水泥",
+          "type": "neutral"
+        }
+      ]
     }
   ],
   "raw": {
@@ -149,9 +835,9 @@
         "name": "恐慌指數",
         "symbol": "VIX",
         "icon": "😱",
-        "price": "16.30",
-        "change": "0.15",
-        "changePercent": "0.93"
+        "price": "16.35",
+        "change": "0.20",
+        "changePercent": "1.24"
       }
     ],
     "commodities": [
@@ -159,57 +845,57 @@
         "symbol": "GC=F",
         "name": "黃金",
         "icon": "🥇",
-        "price": "5178.70",
-        "change": "96.20",
-        "changePercent": "1.89"
+        "price": "5175.40",
+        "change": "92.90",
+        "changePercent": "1.83"
       },
       {
         "symbol": "SI=F",
         "name": "白銀",
         "icon": "🥈",
-        "price": "112.48",
-        "change": "-3.02",
-        "changePercent": "-2.62"
+        "price": "112.54",
+        "change": "-2.96",
+        "changePercent": "-2.57"
       },
       {
         "symbol": "CL=F",
         "name": "原油 WTI",
         "icon": "🛢️",
-        "price": "62.43",
-        "change": "1.80",
-        "changePercent": "2.97"
+        "price": "62.41",
+        "change": "1.78",
+        "changePercent": "2.94"
       },
       {
         "symbol": "BZ=F",
         "name": "布蘭特原油",
         "icon": "🛢️",
-        "price": "66.58",
-        "change": "1.81",
-        "changePercent": "2.79"
+        "price": "66.56",
+        "change": "1.79",
+        "changePercent": "2.76"
       },
       {
         "symbol": "NG=F",
         "name": "天然氣",
         "icon": "🔥",
-        "price": "3.79",
-        "change": "-0.11",
-        "changePercent": "-2.77"
+        "price": "3.81",
+        "change": "-0.08",
+        "changePercent": "-2.15"
       },
       {
         "symbol": "BTC-USD",
         "name": "比特幣",
         "icon": "₿",
-        "price": "89245.16",
-        "change": "984.13",
-        "changePercent": "1.12"
+        "price": "89155.12",
+        "change": "894.09",
+        "changePercent": "1.01"
       },
       {
         "symbol": "ETH-USD",
         "name": "以太幣",
         "icon": "Ξ",
-        "price": "3017.88",
-        "change": "91.07",
-        "changePercent": "3.11"
+        "price": "3012.72",
+        "change": "85.91",
+        "changePercent": "2.94"
       }
     ],
     "news": []

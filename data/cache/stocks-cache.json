@@ -1,0 +1,306 @@
+{
+    "date": "2026-01-27",
+    "timestamp": 1738022400000,
+    "stocks": [
+        {
+            "code": "2330",
+            "name": "台積電",
+            "openPrice": "1150",
+            "highPrice": "1165",
+            "lowPrice": "1145",
+            "closePrice": "1160",
+            "volume": "25000000",
+            "changeVal": "10"
+        },
+        {
+            "code": "2317",
+            "name": "鴻海",
+            "openPrice": "185",
+            "highPrice": "188",
+            "lowPrice": "184",
+            "closePrice": "187",
+            "volume": "45000000",
+            "changeVal": "2"
+        },
+        {
+            "code": "2454",
+            "name": "聯發科",
+            "openPrice": "1280",
+            "highPrice": "1310",
+            "lowPrice": "1275",
+            "closePrice": "1305",
+            "volume": "8000000",
+            "changeVal": "25"
+        },
+        {
+            "code": "2382",
+            "name": "廣達",
+            "openPrice": "285",
+            "highPrice": "295",
+            "lowPrice": "283",
+            "closePrice": "293",
+            "volume": "35000000",
+            "changeVal": "8"
+        },
+        {
+            "code": "2308",
+            "name": "台達電",
+            "openPrice": "380",
+            "highPrice": "388",
+            "lowPrice": "378",
+            "closePrice": "385",
+            "volume": "12000000",
+            "changeVal": "5"
+        },
+        {
+            "code": "3034",
+            "name": "聯詠",
+            "openPrice": "520",
+            "highPrice": "535",
+            "lowPrice": "518",
+            "closePrice": "532",
+            "volume": "6000000",
+            "changeVal": "12"
+        },
+        {
+            "code": "2881",
+            "name": "富邦金",
+            "openPrice": "85",
+            "highPrice": "86.5",
+            "lowPrice": "84.5",
+            "closePrice": "86",
+            "volume": "28000000",
+            "changeVal": "1"
+        },
+        {
+            "code": "2882",
+            "name": "國泰金",
+            "openPrice": "65",
+            "highPrice": "66",
+            "lowPrice": "64.5",
+            "closePrice": "65.5",
+            "volume": "22000000",
+            "changeVal": "0.5"
+        },
+        {
+            "code": "2412",
+            "name": "中華電",
+            "openPrice": "125",
+            "highPrice": "126",
+            "lowPrice": "124",
+            "closePrice": "125.5",
+            "volume": "8000000",
+            "changeVal": "0.5"
+        },
+        {
+            "code": "2603",
+            "name": "長榮",
+            "openPrice": "185",
+            "highPrice": "192",
+            "lowPrice": "183",
+            "closePrice": "190",
+            "volume": "55000000",
+            "changeVal": "5"
+        },
+        {
+            "code": "2609",
+            "name": "陽明",
+            "openPrice": "68",
+            "highPrice": "72",
+            "lowPrice": "67",
+            "closePrice": "71",
+            "volume": "80000000",
+            "changeVal": "3"
+        },
+        {
+            "code": "2615",
+            "name": "萬海",
+            "openPrice": "75",
+            "highPrice": "78",
+            "lowPrice": "74",
+            "closePrice": "77",
+            "volume": "35000000",
+            "changeVal": "2"
+        },
+        {
+            "code": "3008",
+            "name": "大立光",
+            "openPrice": "2150",
+            "highPrice": "2180",
+            "lowPrice": "2130",
+            "closePrice": "2165",
+            "volume": "1200000",
+            "changeVal": "15"
+        },
+        {
+            "code": "2357",
+            "name": "華碩",
+            "openPrice": "485",
+            "highPrice": "495",
+            "lowPrice": "482",
+            "closePrice": "492",
+            "volume": "5500000",
+            "changeVal": "7"
+        },
+        {
+            "code": "2379",
+            "name": "瑞昱",
+            "openPrice": "520",
+            "highPrice": "532",
+            "lowPrice": "518",
+            "closePrice": "528",
+            "volume": "4200000",
+            "changeVal": "8"
+        },
+        {
+            "code": "3711",
+            "name": "日月光投控",
+            "openPrice": "145",
+            "highPrice": "148",
+            "lowPrice": "144",
+            "closePrice": "147",
+            "volume": "18000000",
+            "changeVal": "2"
+        },
+        {
+            "code": "2303",
+            "name": "聯電",
+            "openPrice": "52",
+            "highPrice": "53.5",
+            "lowPrice": "51.5",
+            "closePrice": "53",
+            "volume": "65000000",
+            "changeVal": "1"
+        },
+        {
+            "code": "2886",
+            "name": "兆豐金",
+            "openPrice": "42",
+            "highPrice": "42.5",
+            "lowPrice": "41.5",
+            "closePrice": "42.3",
+            "volume": "15000000",
+            "changeVal": "0.3"
+        },
+        {
+            "code": "2891",
+            "name": "中信金",
+            "openPrice": "32",
+            "highPrice": "32.5",
+            "lowPrice": "31.8",
+            "closePrice": "32.2",
+            "volume": "25000000",
+            "changeVal": "0.2"
+        },
+        {
+            "code": "2002",
+            "name": "中鋼",
+            "openPrice": "25",
+            "highPrice": "25.5",
+            "lowPrice": "24.8",
+            "closePrice": "25.3",
+            "volume": "45000000",
+            "changeVal": "0.3"
+        },
+        {
+            "code": "1101",
+            "name": "台泥",
+            "openPrice": "35",
+            "highPrice": "35.8",
+            "lowPrice": "34.5",
+            "closePrice": "35.5",
+            "volume": "22000000",
+            "changeVal": "0.5"
+        },
+        {
+            "code": "1301",
+            "name": "台塑",
+            "openPrice": "58",
+            "highPrice": "59",
+            "lowPrice": "57.5",
+            "closePrice": "58.5",
+            "volume": "18000000",
+            "changeVal": "0.5"
+        },
+        {
+            "code": "1303",
+            "name": "南亞",
+            "openPrice": "48",
+            "highPrice": "49",
+            "lowPrice": "47.5",
+            "closePrice": "48.5",
+            "volume": "15000000",
+            "changeVal": "0.5"
+        },
+        {
+            "code": "2207",
+            "name": "和泰車",
+            "openPrice": "680",
+            "highPrice": "695",
+            "lowPrice": "675",
+            "closePrice": "690",
+            "volume": "1500000",
+            "changeVal": "10"
+        },
+        {
+            "code": "3045",
+            "name": "台灣大",
+            "openPrice": "98",
+            "highPrice": "99",
+            "lowPrice": "97.5",
+            "closePrice": "98.5",
+            "volume": "5000000",
+            "changeVal": "0.5"
+        },
+        {
+            "code": "4904",
+            "name": "遠傳",
+            "openPrice": "78",
+            "highPrice": "79",
+            "lowPrice": "77.5",
+            "closePrice": "78.5",
+            "volume": "6000000",
+            "changeVal": "0.5"
+        },
+        {
+            "code": "2345",
+            "name": "智邦",
+            "openPrice": "485",
+            "highPrice": "498",
+            "lowPrice": "482",
+            "closePrice": "495",
+            "volume": "3800000",
+            "changeVal": "10"
+        },
+        {
+            "code": "3443",
+            "name": "創意",
+            "openPrice": "1850",
+            "highPrice": "1920",
+            "lowPrice": "1840",
+            "closePrice": "1900",
+            "volume": "2500000",
+            "changeVal": "50"
+        },
+        {
+            "code": "3661",
+            "name": "世芯-KY",
+            "openPrice": "2850",
+            "highPrice": "2950",
+            "lowPrice": "2820",
+            "closePrice": "2920",
+            "volume": "1800000",
+            "changeVal": "70"
+        },
+        {
+            "code": "6669",
+            "name": "緯穎",
+            "openPrice": "1680",
+            "highPrice": "1720",
+            "lowPrice": "1665",
+            "closePrice": "1710",
+            "volume": "1200000",
+            "changeVal": "30"
+        }
+    ]
+}
