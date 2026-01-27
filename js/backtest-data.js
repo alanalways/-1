@@ -51,23 +51,74 @@ async function fetchWithCORS(url) {
  * @returns {Promise<Array>} - 搜尋結果
  */
 async function searchSymbol(query) {
+    // 台灣股票/ETF 代碼清單 (常用)
+    const twStockList = {
+        '0050': { name: '元大台灣50', type: 'ETF' },
+        '0056': { name: '元大高股息', type: 'ETF' },
+        '00830': { name: '國泰費城半導體', type: 'ETF' },
+        '00878': { name: '國泰永續高股息', type: 'ETF' },
+        '00881': { name: '國泰台灣5G+', type: 'ETF' },
+        '00919': { name: '群益台灣精選高息', type: 'ETF' },
+        '00929': { name: '復華台灣科技優息', type: 'ETF' },
+        '00940': { name: '元大台灣價值高息', type: 'ETF' },
+        '2330': { name: '台積電', type: 'EQUITY' },
+        '2317': { name: '鴻海', type: 'EQUITY' },
+        '2454': { name: '聯發科', type: 'EQUITY' },
+        '2603': { name: '長榮', type: 'EQUITY' },
+        '2882': { name: '國泰金', type: 'EQUITY' },
+        '2881': { name: '富邦金', type: 'EQUITY' },
+        '2412': { name: '中華電', type: 'EQUITY' }
+    };
+
+    const results = [];
+
+    // 如果是純數字（台灣股票代碼），直接加入結果
+    if (/^\d{4,5}$/.test(query)) {
+        const twSymbol = query + '.TW';
+        const stockInfo = twStockList[query];
+
+        results.push({
+            symbol: twSymbol,
+            name: stockInfo?.name || `台股 ${query}`,
+            type: stockInfo?.type || 'EQUITY',
+            exchange: 'TAI'
+        });
+
+        // 也嘗試上櫃 .TWO
+        results.push({
+            symbol: query + '.TWO',
+            name: stockInfo?.name || `上櫃 ${query}`,
+            type: stockInfo?.type || 'EQUITY',
+            exchange: 'TPE'
+        });
+    }
+
+    // 嘗試 Yahoo Finance 搜尋 API
     try {
         const url = `${YAHOO_SEARCH_API}?q=${encodeURIComponent(query)}&quotesCount=10&newsCount=0`;
         const response = await fetchWithCORS(url);
         const data = await response.json();
 
         if (data.quotes) {
-            return data.quotes.map(q => ({
+            const yahooResults = data.quotes.map(q => ({
                 symbol: q.symbol,
                 name: q.shortname || q.longname || q.symbol,
                 type: q.quoteType,
                 exchange: q.exchange
             }));
+
+            // 合併結果，優先顯示本地清單
+            for (const r of yahooResults) {
+                if (!results.find(x => x.symbol === r.symbol)) {
+                    results.push(r);
+                }
+            }
         }
     } catch (error) {
-        console.error('搜尋失敗:', error);
+        console.error('Yahoo 搜尋失敗, 使用本地結果:', error);
     }
-    return [];
+
+    return results;
 }
 
 /**

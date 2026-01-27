@@ -397,6 +397,7 @@ function navigateTo(page) {
     const titles = {
         dashboard: '市場儀表板',
         watchlist: '我的自選清單',
+        simulator: '複利雪球模擬器',
         analysis: '深度分析',
         global: '國際市場'
     };
@@ -409,6 +410,11 @@ function navigateTo(page) {
     // Re-render watchlist if needed
     if (page === 'watchlist') {
         renderWatchlist();
+    }
+
+    // Initialize simulator if needed
+    if (page === 'simulator' && !state.simulatorInitialized) {
+        initSimulator();
     }
 }
 
@@ -515,6 +521,331 @@ function showToast(message, type = 'success') {
     setTimeout(() => {
         elements.toast.classList.remove('show');
     }, 3000);
+}
+
+// === Simulator ===
+let simChart = null;
+let simEngine = null;
+let simSelectedSymbol = null;
+
+function initSimulator() {
+    state.simulatorInitialized = true;
+    simEngine = new BacktestEngine();
+
+    const els = {
+        search: document.getElementById('simSymbolSearch'),
+        results: document.getElementById('simSearchResults'),
+        selected: document.getElementById('simSelectedSymbol'),
+        symbolName: document.getElementById('simSymbolName'),
+        symbolCode: document.getElementById('simSymbolCode'),
+        modeTabs: document.querySelectorAll('.sim-mode-tab'),
+        runBtn: document.getElementById('simRunButton'),
+        years: document.getElementById('simYears'),
+        yearsValue: document.getElementById('simYearsValue'),
+        annualReturn: document.getElementById('simAnnualReturn'),
+        annualReturnValue: document.getElementById('simAnnualReturnValue'),
+        annualReturnGroup: document.getElementById('simAnnualReturnGroup'),
+        usePhases: document.getElementById('simUsePhases'),
+        phasesContainer: document.getElementById('simInvestmentPhases'),
+        fixedMonthlyGroup: document.getElementById('simFixedMonthlyGroup'),
+        addPhase: document.getElementById('simAddPhase'),
+        chartTitle: document.getElementById('simChartTitle'),
+        loading: document.getElementById('simLoading'),
+        startDate: document.getElementById('simStartDate'),
+        endDate: document.getElementById('simEndDate')
+    };
+
+    // Default dates
+    const today = new Date();
+    const tenYearsAgo = new Date(today);
+    tenYearsAgo.setFullYear(today.getFullYear() - 10);
+    els.startDate.value = tenYearsAgo.toISOString().split('T')[0];
+    els.endDate.value = today.toISOString().split('T')[0];
+
+    let currentMode = 'backtest';
+    let searchTimeout = null;
+
+    // Search
+    els.search.addEventListener('input', (e) => {
+        clearTimeout(searchTimeout);
+        const query = e.target.value.trim();
+
+        if (query.length < 2) {
+            els.results.innerHTML = '';
+            return;
+        }
+
+        searchTimeout = setTimeout(async () => {
+            const results = await searchSymbol(query);
+            els.results.innerHTML = results.slice(0, 8).map(r => `
+                <div class="sim-search-item" data-symbol="${r.symbol}" data-name="${r.name}">
+                    <strong>${r.symbol}</strong> - ${r.name} 
+                    <span style="color: var(--text-muted);">${r.type || ''}</span>
+                </div>
+            `).join('');
+
+            els.results.querySelectorAll('.sim-search-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    simSelectedSymbol = {
+                        symbol: item.dataset.symbol,
+                        name: item.dataset.name
+                    };
+                    els.symbolName.textContent = simSelectedSymbol.name;
+                    els.symbolCode.textContent = simSelectedSymbol.symbol;
+                    els.selected.style.display = 'flex';
+                    els.results.innerHTML = '';
+                    els.search.value = '';
+                    els.runBtn.disabled = false;
+                });
+            });
+        }, 300);
+    });
+
+    // Mode tabs
+    els.modeTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            els.modeTabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            currentMode = tab.dataset.mode;
+
+            els.annualReturnGroup.style.display = currentMode === 'simulation' ? 'block' : 'none';
+        });
+    });
+
+    // Years slider
+    els.years.addEventListener('input', (e) => {
+        els.yearsValue.textContent = e.target.value;
+    });
+
+    // Annual return slider
+    els.annualReturn.addEventListener('input', (e) => {
+        els.annualReturnValue.textContent = e.target.value;
+    });
+
+    // Phases toggle
+    els.usePhases.addEventListener('change', (e) => {
+        els.phasesContainer.style.display = e.target.checked ? 'block' : 'none';
+        els.fixedMonthlyGroup.style.display = e.target.checked ? 'none' : 'block';
+    });
+
+    // Add phase
+    els.addPhase.addEventListener('click', () => {
+        const count = document.querySelectorAll('.sim-phase-item').length + 1;
+        const html = `
+            <div class="sim-phase-item" data-phase="${count}">
+                <div class="sim-phase-header">
+                    第 ${count} 階段
+                    <button onclick="this.closest('.sim-phase-item').remove()" 
+                            style="float: right; background: none; border: none; color: #ef4444; cursor: pointer;">✕</button>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                    <div>
+                        <label style="font-size: 0.75rem;">月數</label>
+                        <input type="number" class="sim-phase-months" value="12" min="1">
+                    </div>
+                    <div>
+                        <label style="font-size: 0.75rem;">每月金額</label>
+                        <input type="number" class="sim-phase-amount" value="10000" min="0" step="1000">
+                    </div>
+                </div>
+            </div>
+        `;
+        document.getElementById('simPhaseList').insertAdjacentHTML('beforeend', html);
+    });
+
+    // Run simulation
+    els.runBtn.addEventListener('click', async () => {
+        if (!simSelectedSymbol) return;
+
+        els.loading.style.display = 'flex';
+        els.chartTitle.textContent = `${simSelectedSymbol.name} 模擬中...`;
+
+        try {
+            const params = getSimParams();
+            let result;
+
+            if (currentMode === 'backtest') {
+                const data = await BacktestData.fetchHistoricalData(simSelectedSymbol.symbol, params.years);
+                result = simEngine.runBacktest(data, params);
+            } else if (currentMode === 'forecast') {
+                const data = await BacktestData.fetchHistoricalData(simSelectedSymbol.symbol, 10);
+                result = simEngine.runForecast(data, params);
+            } else {
+                result = simEngine.runSimulation(params);
+            }
+
+            renderSimChart(result, currentMode);
+            updateSimStats(result, currentMode);
+            els.chartTitle.textContent = `${simSelectedSymbol.name} - ${currentMode === 'backtest' ? '歷史回測' : currentMode === 'forecast' ? '未來預測' : '固定模擬'}`;
+
+        } catch (err) {
+            console.error('Simulation error:', err);
+            showToast('模擬失敗：' + err.message, 'error');
+        }
+
+        els.loading.style.display = 'none';
+    });
+
+    function getSimParams() {
+        const params = {
+            initialCapital: parseFloat(document.getElementById('simInitialCapital').value) || 100000,
+            monthlyInvestment: parseFloat(document.getElementById('simMonthlyInvestment').value) || 10000,
+            years: parseInt(document.getElementById('simYears').value) || 10,
+            annualReturn: parseFloat(document.getElementById('simAnnualReturn').value) / 100 || 0.07,
+            startDate: els.startDate.value || null,
+            endDate: els.endDate.value || null
+        };
+
+        if (els.usePhases.checked) {
+            params.usePhases = true;
+            params.investmentPhases = [];
+            document.querySelectorAll('.sim-phase-item').forEach((item, i) => {
+                params.investmentPhases.push({
+                    phase: i + 1,
+                    months: parseInt(item.querySelector('.sim-phase-months').value) || 12,
+                    amount: parseFloat(item.querySelector('.sim-phase-amount').value) || 0
+                });
+            });
+        }
+
+        return params;
+    }
+
+    function renderSimChart(result, mode) {
+        const ctx = document.getElementById('simMainChart').getContext('2d');
+
+        if (simChart) {
+            simChart.destroy();
+        }
+
+        let labels, datasets;
+
+        if (mode === 'backtest') {
+            labels = result.timeline.map(t => t.date);
+            datasets = [
+                {
+                    label: '投資組合市值',
+                    data: result.timeline.map(t => t.marketValue),
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    fill: true,
+                    tension: 0.3
+                },
+                {
+                    label: '投入本金',
+                    data: result.timeline.map(t => t.cost),
+                    borderColor: '#6b7280',
+                    borderDash: [5, 5],
+                    fill: false,
+                    tension: 0
+                }
+            ];
+        } else if (mode === 'forecast') {
+            labels = result.timeline.map(t => t.date);
+            datasets = [
+                {
+                    label: '樂觀 (P90)',
+                    data: result.timeline.map(t => t.p90),
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    fill: '+1',
+                    tension: 0.3
+                },
+                {
+                    label: '中位數 (P50)',
+                    data: result.timeline.map(t => t.p50),
+                    borderColor: '#3b82f6',
+                    fill: false,
+                    tension: 0.3
+                },
+                {
+                    label: '保守 (P10)',
+                    data: result.timeline.map(t => t.p10),
+                    borderColor: '#ef4444',
+                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                    fill: '-1',
+                    tension: 0.3
+                },
+                {
+                    label: '投入本金',
+                    data: result.timeline.map(t => t.capital),
+                    borderColor: '#6b7280',
+                    borderDash: [5, 5],
+                    fill: false,
+                    tension: 0
+                }
+            ];
+        } else {
+            labels = result.timeline.map(t => t.date);
+            datasets = [
+                {
+                    label: '投資組合價值',
+                    data: result.timeline.map(t => t.value),
+                    borderColor: '#8b5cf6',
+                    backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                    fill: true,
+                    tension: 0.3
+                },
+                {
+                    label: '投入本金',
+                    data: result.timeline.map(t => t.capital),
+                    borderColor: '#6b7280',
+                    borderDash: [5, 5],
+                    fill: false,
+                    tension: 0
+                }
+            ];
+        }
+
+        simChart = new Chart(ctx, {
+            type: 'line',
+            data: { labels, datasets },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'top' },
+                    zoom: {
+                        zoom: { wheel: { enabled: true }, pinch: { enabled: true }, mode: 'x' },
+                        pan: { enabled: true, mode: 'x' }
+                    }
+                },
+                scales: {
+                    y: { beginAtZero: false }
+                }
+            }
+        });
+    }
+
+    function updateSimStats(result, mode) {
+        const fmt = (val) => 'NT$' + Math.round(val).toLocaleString();
+        const pct = (val) => (val * 100).toFixed(2) + '%';
+
+        if (mode === 'backtest') {
+            document.getElementById('simStatFinalValue').textContent = fmt(result.summary.finalMarketValue);
+            document.getElementById('simStatTotalReturn').textContent = pct(result.summary.totalReturn);
+            document.getElementById('simStatCAGR').textContent = pct(result.summary.cagr);
+            document.getElementById('simStatMaxDrawdown').textContent = pct(result.summary.maxDrawdown);
+            document.getElementById('simStatSharpe').textContent = result.summary.sharpeRatio.toFixed(2);
+            document.getElementById('simStatDividends').textContent = fmt(result.summary.totalDividends);
+        } else if (mode === 'forecast') {
+            document.getElementById('simStatFinalValue').textContent = fmt(result.summary.median);
+            document.getElementById('simStatTotalReturn').textContent = pct(result.summary.medianReturn);
+            document.getElementById('simStatCAGR').textContent = '--';
+            document.getElementById('simStatMaxDrawdown').textContent = '--';
+            document.getElementById('simStatSharpe').textContent = '--';
+            document.getElementById('simStatDividends').textContent = '--';
+        } else {
+            document.getElementById('simStatFinalValue').textContent = fmt(result.summary.finalValue);
+            document.getElementById('simStatTotalReturn').textContent = pct(result.summary.totalGainPercent);
+            document.getElementById('simStatCAGR').textContent = pct(result.summary.annualReturn);
+            document.getElementById('simStatMaxDrawdown').textContent = '--';
+            document.getElementById('simStatSharpe').textContent = '--';
+            document.getElementById('simStatDividends').textContent = '--';
+        }
+    }
+
+    console.log('✅ Simulator initialized');
 }
 
 // === Export for debugging ===
