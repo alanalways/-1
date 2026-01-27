@@ -10,12 +10,12 @@
     --bg-tertiary: #21262d;
     --bg-card: #1c2128;
     --bg-hover: #30363d;
-    
+
     /* Text Colors */
     --text-primary: #e6edf3;
     --text-secondary: #8b949e;
     --text-muted: #6e7681;
-    
+
     /* Accent Colors */
     --accent-green: #3fb950;
     --accent-green-dim: rgba(63, 185, 80, 0.15);
@@ -25,53 +25,55 @@
     --accent-blue-dim: rgba(88, 166, 255, 0.15);
     --accent-yellow: #d29922;
     --accent-purple: #a371f7;
-    
+
     /* Gradients */
     --gradient-green: linear-gradient(135deg, #238636 0%, #2ea043 100%);
     --gradient-red: linear-gradient(135deg, #da3633 0%, #f85149 100%);
     --gradient-blue: linear-gradient(135deg, #1f6feb 0%, #58a6ff 100%);
-    --gradient-card: linear-gradient(180deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0) 100%);
-    
+    --gradient-card: linear-gradient(180deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0) 100%);
+
     /* Borders */
     --border-color: #30363d;
     --border-subtle: rgba(240, 246, 252, 0.1);
-    
+
     /* Shadows */
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
     --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
     --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
     --shadow-glow-green: 0 0 20px rgba(63, 185, 80, 0.3);
     --shadow-glow-red: 0 0 20px rgba(248, 81, 73, 0.3);
-    
+
     /* Typography */
     --font-sans: 'Inter', 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
     --font-mono: 'SF Mono', 'Fira Code', monospace;
-    
+
     /* Spacing */
     --spacing-xs: 4px;
     --spacing-sm: 8px;
     --spacing-md: 16px;
     --spacing-lg: 24px;
     --spacing-xl: 32px;
-    
+
     /* Border Radius */
     --radius-sm: 6px;
     --radius-md: 8px;
     --radius-lg: 12px;
     --radius-xl: 16px;
-    
+
     /* Transitions */
     --transition-fast: 150ms ease;
     --transition-normal: 250ms ease;
     --transition-slow: 350ms ease;
-    
+
     /* Layout */
     --sidebar-width: 280px;
     --header-height: 64px;
 }
 
 /* === Reset & Base === */
-*, *::before, *::after {
+*,
+*::before,
+*::after {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
@@ -145,8 +147,15 @@ body {
 }
 
 @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.6; }
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.6;
+    }
 }
 
 .header-nav {
@@ -679,7 +688,9 @@ body {
 }
 
 @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 /* === Scrollbar === */
@@ -706,11 +717,11 @@ body {
     .sidebar {
         display: none;
     }
-    
+
     .main-content {
         margin-left: 0;
     }
-    
+
     .header-nav {
         display: none;
     }
@@ -720,17 +731,49 @@ body {
     .market-cards {
         grid-template-columns: 1fr;
     }
-    
+
     .header {
         padding: 0 var(--spacing-md);
     }
-    
+
     .search-box {
         display: none;
     }
-    
+
     .stock-card-stats {
         flex-direction: column;
         gap: var(--spacing-sm);
     }
+}
+
+/* === SMC / ICT Extended Tags === */
+.tag.smc-ob {
+    background: rgba(255, 215, 0, 0.15);
+    color: #ffd700;
+    border: 1px solid rgba(255, 215, 0, 0.3);
+}
+
+.tag.smc-fvg {
+    background: rgba(138, 43, 226, 0.15);
+    color: #8a2be2;
+    border: 1px solid rgba(138, 43, 226, 0.3);
+}
+
+.tag.smc-liq {
+    background: rgba(0, 191, 255, 0.15);
+    color: #00bfff;
+    border: 1px solid rgba(0, 191, 255, 0.3);
+}
+
+.tag.wyckoff {
+    background: rgba(255, 69, 0, 0.15);
+    color: #ff4500;
+    border: 1px solid rgba(255, 69, 0, 0.3);
+}
+
+/* Adjustments for JetBrains Mono */
+.stock-card .analysis-text,
+.tag,
+.stock-code {
+    font-family: 'JetBrains Mono', 'Menlo', 'Monaco', 'Courier New', monospace;
 }

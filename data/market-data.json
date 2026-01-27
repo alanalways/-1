@@ -1,34 +1,27 @@
 {
-  "updateDate": "2026年1月28日 星期三",
-  "updateTime": "2026/1/28 上午4:50:01",
-  "updateTimestamp": "2026-01-27T20:50:01.341Z",
+  "lastUpdated": "2026/1/28 上午5:07:38",
   "marketIntelligence": [
     {
       "icon": "📈",
       "category": "盤後總結",
-      "title": "台股盤後：加權指數 32,317.92",
-      "content": "漲跌：253.40 點。成交金額 8176 億。",
+      "title": "加權指數 32,317.92",
+      "content": "漲跌 253.40 • 成交 8176億\n多方控盤",
       "stats": [
         {
-          "label": "加權指數",
+          "label": "指數",
           "value": "32,317.92",
           "change": 253.4
-        },
-        {
-          "label": "成交量",
-          "value": "12767369張",
-          "change": 1
         }
       ]
     },
     {
       "icon": "⚡",
-      "category": "籌碼動向",
-      "title": "外資期貨淨口數：0",
-      "content": "外資台指期未平倉淨部位為 0 口。",
+      "category": "SMC 籌碼",
+      "title": "外資由 多 方主導",
+      "content": "外資台指期淨部位：0 口。\n留意機構訂單塊 (OB) 位置。",
       "stats": [
         {
-          "label": "外資期貨",
+          "label": "淨口數",
           "value": "0",
           "change": 0
         }
@@ -36,477 +29,74 @@
     },
     {
       "icon": "🌍",
-      "category": "美股動態",
-      "title": "道瓊 -0.82% | 那指 1.04%",
-      "content": "美股三大指數最新報價與漲跌幅。",
+      "category": "宏觀經濟",
+      "title": "美股 & 國際指標",
+      "content": "DJI -0.83% | NDX 0.91%",
       "stats": [
         {
           "label": "DJI",
-          "value": "-0.82%",
-          "change": -0.82
+          "value": "-0.83%",
+          "change": -0.83
         },
         {
           "label": "NASDAQ",
-          "value": "1.04%",
-          "change": 1.04
+          "value": "0.91%",
+          "change": 0.91
         },
         {
           "label": "SPX",
-          "value": "0.50%",
-          "change": 0.5
-        }
-      ]
-    },
-    {
-      "icon": "💰",
-      "category": "商品行情",
-      "title": "黃金/原油/比特幣",
-      "content": "🥇 1.19% 🥈 -4.18% 🛢️ 2.69% ₿ 1.04%",
-      "stats": [
-        {
-          "label": "黃金",
-          "value": "1.19%",
-          "change": 1.19
-        },
-        {
-          "label": "白銀",
-          "value": "-4.18%",
-          "change": -4.18
-        },
-        {
-          "label": "原油",
-          "value": "2.69%",
-          "change": 2.69
+          "value": "0.41%",
+          "change": 0.41
         }
       ]
     },
     {
       "icon": "🤖",
-      "category": "AI 綜合觀點",
-      "title": "🟢 市場氣氛偏多，建議積極布局",
-      "content": "根據技術面與籌碼面分析，今日看好標的：聯電、緯穎、廣達。建議關注成交量變化與外資動向。"
+      "category": "SMC 策略觀點",
+      "title": "市場情緒：中性震盪 | 美股連動：有待觀察",
+      "content": "今日 SMC 策略掃描顯示，資金集中於具備「特定型態」之個股。建議關注機構訂單塊 (Order Block) 與流動性獵取訊號。"
     }
   ],
   "recommendations": [
     {
-      "code": "2303.TW",
-      "name": "聯電",
-      "market": "上市",
-      "closePrice": 52,
-      "changePercent": 3.2,
-      "volumeRatio": 1.68,
-      "signal": "BULLISH",
-      "score": 83,
-      "analysis": "🔥 聯電（2303.TW）：📈 強勢上漲，📊 成交量放大，🚀 半導體產業熱門。短線建議偏多操作，可關注突破機會。",
-      "tags": [
-        {
-          "label": "半導體",
-          "type": "neutral"
-        },
-        {
-          "label": "看多",
-          "type": "bullish"
-        },
-        {
-          "label": "量增",
-          "type": "bullish"
-        },
-        {
-          "label": "強勢",
-          "type": "bullish"
-        }
-      ]
-    },
-    {
-      "code": "6669.TW",
-      "name": "緯穎",
-      "market": "上市",
-      "closePrice": 1680,
-      "changePercent": 4.2,
-      "volumeRatio": 1.85,
-      "signal": "BULLISH",
-      "score": 83,
-      "analysis": "🔥 緯穎（6669.TW）：📈 強勢上漲，📊 成交量放大，🚀 AI/雲端產業熱門。短線建議偏多操作，可關注突破機會。",
-      "tags": [
-        {
-          "label": "AI/雲端",
-          "type": "neutral"
-        },
-        {
-          "label": "看多",
-          "type": "bullish"
-        },
-        {
-          "label": "量增",
-          "type": "bullish"
-        },
-        {
-          "label": "強勢",
-          "type": "bullish"
-        }
-      ]
-    },
-    {
-      "code": "2382.TW",
-      "name": "廣達",
-      "market": "上市",
-      "closePrice": 295,
-      "changePercent": 2.8,
-      "volumeRatio": 1.55,
-      "signal": "BULLISH",
-      "score": 76,
-      "analysis": "🔥 廣達（2382.TW）：📈 溫和上漲，📊 成交量放大，🚀 AI/雲端產業熱門。短線建議偏多操作，可關注突破機會。",
-      "tags": [
-        {
-          "label": "AI/雲端",
-          "type": "neutral"
-        },
-        {
-          "label": "看多",
-          "type": "bullish"
-        },
-        {
-          "label": "量增",
-          "type": "bullish"
-        },
-        {
-          "label": "強勢",
-          "type": "bullish"
-        }
-      ]
-    },
-    {
-      "code": "2345.TW",
-      "name": "智邦",
-      "market": "上市",
-      "closePrice": 520,
-      "changePercent": 3.5,
-      "volumeRatio": 1.72,
-      "signal": "BULLISH",
-      "score": 73,
-      "analysis": "🔥 智邦（2345.TW）：📈 強勢上漲，📊 成交量放大。短線建議偏多操作，可關注突破機會。",
-      "tags": [
-        {
-          "label": "網通",
-          "type": "neutral"
-        },
-        {
-          "label": "看多",
-          "type": "bullish"
-        },
-        {
-          "label": "量增",
-          "type": "bullish"
-        },
-        {
-          "label": "強勢",
-          "type": "bullish"
-        }
-      ]
-    },
-    {
       "code": "2330.TW",
       "name": "台積電",
-      "market": "上市",
       "closePrice": 580,
-      "changePercent": 2.5,
-      "volumeRatio": 1.35,
+      "changePercent": 1.5,
+      "volumeRatio": 1.2,
+      "tags": [],
+      "analysis": "⚖️ **台積電** [一般] ➤ 。",
       "signal": "NEUTRAL",
-      "score": 68,
-      "analysis": "📊 台積電（2330.TW）：📈 溫和上漲，🚀 半導體產業熱門。建議觀察後續走勢再做決定。",
-      "tags": [
-        {
-          "label": "半導體",
-          "type": "neutral"
-        },
-        {
-          "label": "強勢",
-          "type": "bullish"
-        }
-      ]
-    },
-    {
-      "code": "3711.TW",
-      "name": "日月光投控",
-      "market": "上市",
-      "closePrice": 138,
-      "changePercent": 2.1,
-      "volumeRatio": 1.42,
-      "signal": "NEUTRAL",
-      "score": 68,
-      "analysis": "📊 日月光投控（3711.TW）：📈 溫和上漲，🚀 半導體產業熱門。建議觀察後續走勢再做決定。",
-      "tags": [
-        {
-          "label": "半導體",
-          "type": "neutral"
-        },
-        {
-          "label": "強勢",
-          "type": "bullish"
-        }
-      ]
+      "score": 55,
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      }
     },
     {
       "code": "2454.TW",
       "name": "聯發科",
-      "market": "上市",
-      "closePrice": 1150,
-      "changePercent": 1.8,
-      "volumeRatio": 1.52,
-      "signal": "NEUTRAL",
-      "score": 66,
-      "analysis": "📊 聯發科（2454.TW）：📈 溫和上漲，📊 成交量放大。建議觀察後續走勢再做決定。",
-      "tags": [
-        {
-          "label": "IC設計",
-          "type": "neutral"
-        },
-        {
-          "label": "量增",
-          "type": "bullish"
-        }
-      ]
-    },
-    {
-      "code": "2317.TW",
-      "name": "鴻海",
-      "market": "上市",
-      "closePrice": 145,
-      "changePercent": 1.2,
-      "volumeRatio": 1.28,
-      "signal": "NEUTRAL",
-      "score": 58,
-      "analysis": "📊 鴻海（2317.TW）：📈 溫和上漲。建議觀察後續走勢再做決定。",
-      "tags": [
-        {
-          "label": "電子代工",
-          "type": "neutral"
-        }
-      ]
-    },
-    {
-      "code": "2308.TW",
-      "name": "台達電",
-      "market": "上市",
-      "closePrice": 385,
-      "changePercent": 1.5,
-      "volumeRatio": 1.18,
-      "signal": "NEUTRAL",
-      "score": 58,
-      "analysis": "📊 台達電（2308.TW）：📈 溫和上漲。建議觀察後續走勢再做決定。",
-      "tags": [
-        {
-          "label": "電子零組件",
-          "type": "neutral"
-        }
-      ]
-    },
-    {
-      "code": "2327.TW",
-      "name": "國巨",
-      "market": "上市",
-      "closePrice": 485,
-      "changePercent": 1.8,
-      "volumeRatio": 1.25,
-      "signal": "NEUTRAL",
-      "score": 58,
-      "analysis": "📊 國巨（2327.TW）：📈 溫和上漲。建議觀察後續走勢再做決定。",
-      "tags": [
-        {
-          "label": "被動元件",
-          "type": "neutral"
-        }
-      ]
-    },
-    {
-      "code": "2379.TW",
-      "name": "瑞昱",
-      "market": "上市",
-      "closePrice": 495,
-      "changePercent": 2.2,
-      "volumeRatio": 1.38,
-      "signal": "NEUTRAL",
-      "score": 58,
-      "analysis": "📊 瑞昱（2379.TW）：📈 溫和上漲。建議觀察後續走勢再做決定。",
-      "tags": [
-        {
-          "label": "IC設計",
-          "type": "neutral"
-        },
-        {
-          "label": "強勢",
-          "type": "bullish"
-        }
-      ]
-    },
-    {
-      "code": "3037.TW",
-      "name": "欣興",
-      "market": "上市",
-      "closePrice": 195,
-      "changePercent": 2.8,
-      "volumeRatio": 1.48,
-      "signal": "NEUTRAL",
-      "score": 58,
-      "analysis": "📊 欣興（3037.TW）：📈 溫和上漲。建議觀察後續走勢再做決定。",
-      "tags": [
-        {
-          "label": "PCB",
-          "type": "neutral"
-        },
-        {
-          "label": "強勢",
-          "type": "bullish"
-        }
-      ]
-    },
-    {
-      "code": "3034.TW",
-      "name": "聯詠",
-      "market": "上市",
-      "closePrice": 485,
-      "changePercent": 1.5,
-      "volumeRatio": 1.22,
-      "signal": "NEUTRAL",
-      "score": 58,
-      "analysis": "📊 聯詠（3034.TW）：📈 溫和上漲。建議觀察後續走勢再做決定。",
-      "tags": [
-        {
-          "label": "IC設計",
-          "type": "neutral"
-        }
-      ]
-    },
-    {
-      "code": "2412.TW",
-      "name": "中華電",
-      "market": "上市",
-      "closePrice": 128,
-      "changePercent": 0.3,
-      "volumeRatio": 0.85,
-      "signal": "NEUTRAL",
-      "score": 50,
-      "analysis": "📊 中華電（2412.TW）。建議觀察後續走勢再做決定。",
-      "tags": [
-        {
-          "label": "電信",
-          "type": "neutral"
-        }
-      ]
-    },
-    {
-      "code": "2881.TW",
-      "name": "富邦金",
-      "market": "上市",
-      "closePrice": 78,
+      "closePrice": 950,
       "changePercent": -0.5,
-      "volumeRatio": 1.12,
+      "volumeRatio": 0.8,
+      "tags": [],
+      "analysis": "⚖️ **聯發科** [一般] ➤ 。",
       "signal": "NEUTRAL",
       "score": 50,
-      "analysis": "📊 富邦金（2881.TW）。建議觀察後續走勢再做決定。",
-      "tags": [
-        {
-          "label": "金融",
-          "type": "neutral"
-        }
-      ]
-    },
-    {
-      "code": "2882.TW",
-      "name": "國泰金",
-      "market": "上市",
-      "closePrice": 52,
-      "changePercent": 0.8,
-      "volumeRatio": 1.05,
-      "signal": "NEUTRAL",
-      "score": 50,
-      "analysis": "📊 國泰金（2882.TW）。建議觀察後續走勢再做決定。",
-      "tags": [
-        {
-          "label": "金融",
-          "type": "neutral"
-        }
-      ]
-    },
-    {
-      "code": "2891.TW",
-      "name": "中信金",
-      "market": "上市",
-      "closePrice": 32,
-      "changePercent": 0.6,
-      "volumeRatio": 1.02,
-      "signal": "NEUTRAL",
-      "score": 50,
-      "analysis": "📊 中信金（2891.TW）。建議觀察後續走勢再做決定。",
-      "tags": [
-        {
-          "label": "金融",
-          "type": "neutral"
-        }
-      ]
-    },
-    {
-      "code": "2886.TW",
-      "name": "兆豐金",
-      "market": "上市",
-      "closePrice": 45,
-      "changePercent": 0.4,
-      "volumeRatio": 0.95,
-      "signal": "NEUTRAL",
-      "score": 50,
-      "analysis": "📊 兆豐金（2886.TW）。建議觀察後續走勢再做決定。",
-      "tags": [
-        {
-          "label": "金融",
-          "type": "neutral"
-        }
-      ]
-    },
-    {
-      "code": "2609.TW",
-      "name": "陽明",
-      "market": "上市",
-      "closePrice": 68,
-      "changePercent": -2.5,
-      "volumeRatio": 1.65,
-      "signal": "NEUTRAL",
-      "score": 50,
-      "analysis": "📊 陽明（2609.TW）：📉 溫和下跌，📊 成交量放大。建議觀察後續走勢再做決定。",
-      "tags": [
-        {
-          "label": "航運",
-          "type": "neutral"
-        },
-        {
-          "label": "量增",
-          "type": "bullish"
-        },
-        {
-          "label": "弱勢",
-          "type": "bearish"
-        }
-      ]
-    },
-    {
-      "code": "3008.TW",
-      "name": "大立光",
-      "market": "上市",
-      "closePrice": 2350,
-      "changePercent": -1.2,
-      "volumeRatio": 0.92,
-      "signal": "NEUTRAL",
-      "score": 42,
-      "analysis": "📊 大立光（3008.TW）：📉 溫和下跌。建議觀察後續走勢再做決定。",
-      "tags": [
-        {
-          "label": "光電",
-          "type": "neutral"
-        }
-      ]
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      }
     }
   ],
-  "rawData": {
-    "taiwanIndex": {
+  "raw": {
+    "twIndex": {
       "date": "115/01/27",
       "volume": "12,767,369,519",
       "amount": "817,604,546,187",
@@ -516,25 +106,46 @@
     },
     "usIndices": [
       {
-        "name": "道瓊工業指數",
+        "name": "道瓊工業",
         "symbol": "DJI",
-        "price": "49006.89",
-        "change": "-405.51",
-        "changePercent": "-0.82"
+        "price": "49003.41",
+        "change": "-408.99",
+        "changePercent": "-0.83"
       },
       {
-        "name": "那斯達克指數",
+        "name": "那斯達克",
         "symbol": "NASDAQ",
-        "price": "23847.65",
-        "change": "246.29",
-        "changePercent": "1.04"
+        "price": "23817.10",
+        "change": "215.74",
+        "changePercent": "0.91"
       },
       {
         "name": "S&P 500",
         "symbol": "SPX",
-        "price": "6984.99",
-        "change": "34.76",
-        "changePercent": "0.50"
+        "price": "6978.60",
+        "change": "28.37",
+        "changePercent": "0.41"
+      },
+      {
+        "name": "費城半導體",
+        "symbol": "SOX",
+        "price": "8117.18",
+        "change": "190.14",
+        "changePercent": "2.40"
+      },
+      {
+        "name": "美元指數",
+        "symbol": "DXY",
+        "price": "99.19",
+        "change": "-0.02",
+        "changePercent": "-0.02"
+      },
+      {
+        "name": "恐慌指數",
+        "symbol": "VIX",
+        "price": "16.25",
+        "change": "0.10",
+        "changePercent": "0.62"
       }
     ],
     "commodities": [
@@ -542,33 +153,33 @@
         "symbol": "GC=F",
         "name": "黃金",
         "icon": "🥇",
-        "price": "5143.00",
-        "change": "60.50",
-        "changePercent": "1.19"
+        "price": "5170.90",
+        "change": "88.40",
+        "changePercent": "1.74"
       },
       {
         "symbol": "SI=F",
         "name": "白銀",
         "icon": "🥈",
-        "price": "110.68",
-        "change": "-4.82",
-        "changePercent": "-4.18"
+        "price": "111.99",
+        "change": "-3.51",
+        "changePercent": "-3.04"
       },
       {
         "symbol": "CL=F",
         "name": "原油",
         "icon": "🛢️",
-        "price": "62.26",
-        "change": "1.63",
-        "changePercent": "2.69"
+        "price": "62.57",
+        "change": "1.94",
+        "changePercent": "3.20"
       },
       {
         "symbol": "BTC-USD",
         "name": "比特幣",
         "icon": "₿",
-        "price": "89175.84",
-        "change": "914.81",
-        "changePercent": "1.04"
+        "price": "89323.62",
+        "change": "1062.59",
+        "changePercent": "1.20"
       }
     ],
     "news": []

@@ -8,8 +8,8 @@ import * as cheerio from 'cheerio';
 
 // === 設定 ===
 const CONFIG = {
-    timeout: 10000,
-    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+    timeout: 30000, // 增加 timeout 開啟全市場掃描
+    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
 };
 
 // === HTTP 客戶端 ===
@@ -17,7 +17,7 @@ const http = axios.create({
     timeout: CONFIG.timeout,
     headers: {
         'User-Agent': CONFIG.userAgent,
-        'Accept': 'application/json, text/html',
+        'Accept': 'application/json, text/html, */*',
         'Accept-Language': 'zh-TW,zh;q=0.9,en;q=0.8'
     }
 });
@@ -52,14 +52,62 @@ export async function fetchTaiwanStockIndex() {
 }
 
 /**
- * 取得美股三大指數
+ * 取得全台股市場股票清單 (上市)
+ * 資料來源：TWSE MI_INDEX
+ * 備註：這個 API 會回傳所有上市股票
+ */
+export async function fetchAllStocks() {
+    try {
+        console.log('📡 正在請求 TWSE 所有上市股票資料...');
+        const response = await http.get('https://www.twse.com.tw/exchangeReport/MI_INDEX?response=json&type=ALLBUT0999');
+
+        if (response.data && response.data.data9) {
+            // data9 包含所有個股收盤資訊
+            const stocks = response.data.data9.map(row => ({
+                code: row[0],
+                name: row[1],
+                volume: row[2], // 成交股數
+                transactions: row[3], // 成交筆數
+                amount: row[4], // 成交金額
+                openPrice: row[5],
+                highPrice: row[6],
+                lowPrice: row[7],
+                closePrice: row[8],
+                change: row[10], // 漲跌(+/-)
+                changeVal: row[11], // 漲跌價差
+                lastBestBid: row[11],
+                lastBestAsk: row[12],
+                peRatio: row[15] // 本益比 (部分回應會有，若沒有則依賴 BWIBBU)
+            }));
+
+            console.log(`✅ 成功抓取 ${stocks.length} 檔上市股票`);
+            return stocks;
+        }
+    } catch (error) {
+        console.error('抓取台股股票失敗:', error.message);
+    }
+    return [];
+}
+
+/**
+ * 取得台股熱門股票清單 (兼容舊版函數)
+ */
+export async function fetchTopStocks() {
+    return fetchAllStocks(); // 直接轉送
+}
+
+/**
+ * 取得美股三大指數 + 關鍵指標 (DXY, VIX)
  * 資料來源：Yahoo Finance
  */
 export async function fetchUSStockIndices() {
     const indices = {
-        '^DJI': { name: '道瓊工業指數', symbol: 'DJI' },
-        '^IXIC': { name: '那斯達克指數', symbol: 'NASDAQ' },
-        '^GSPC': { name: 'S&P 500', symbol: 'SPX' }
+        '^DJI': { name: '道瓊工業', symbol: 'DJI' },
+        '^IXIC': { name: '那斯達克', symbol: 'NASDAQ' },
+        '^GSPC': { name: 'S&P 500', symbol: 'SPX' },
+        '^SOX': { name: '費城半導體', symbol: 'SOX' },
+        'DX=F': { name: '美元指數', symbol: 'DXY' },
+        '^VIX': { name: '恐慌指數', symbol: 'VIX' }
     };
 
     const results = [];
@@ -136,39 +184,6 @@ export async function fetchCommodities() {
 }
 
 /**
- * 取得台股熱門股票清單
- * 資料來源：TWSE 成交量排行
- */
-export async function fetchTopStocks() {
-    try {
-        const response = await http.get('https://www.twse.com.tw/exchangeReport/MI_INDEX?response=json&type=ALLBUT0999');
-
-        if (response.data?.data9) {
-            const stocks = response.data.data9.slice(0, 50).map(row => ({
-                code: row[0],
-                name: row[1],
-                volume: row[2],
-                transactions: row[3],
-                openPrice: row[5],
-                highPrice: row[6],
-                lowPrice: row[7],
-                closePrice: row[8],
-                change: row[10],
-                lastBestBid: row[11],
-                lastBestAsk: row[12]
-            }));
-            return stocks;
-        }
-    } catch (error) {
-        console.error('抓取台股熱門股票失敗:', error.message);
-    }
-    return [];
-}
-
-/**
- * 取得外資期貨留倉資訊
- */
-/**
  * 取得外資期貨留倉資訊 (精確版)
  */
 export async function fetchFuturesData() {
@@ -176,23 +191,19 @@ export async function fetchFuturesData() {
         const response = await http.get('https://www.taifex.com.tw/cht/3/futContractsDate');
         const $ = cheerio.load(response.data);
 
-        // 嘗試抓取「外資」的列
         let foreignData = { identity: '外資', netOI: '0' };
 
         // 搜尋含有 "外資" 或 "Foreign Investors" 的儲存格
         $('td').each((i, el) => {
             const text = $(el).text().trim();
             if (text === '外資及陸資' || text === 'Foreign Investors') {
-                // 通常後面的欄位包含多空數據，這裡嘗試抓取同一列的後續數據
-                // 注意：期交所網頁結構可能會變，這裡做一個簡單的相對位置抓取
-                // 假設結構是 Table Row，找到該 td 的 parent tr
                 const row = $(el).parent('tr');
                 const cells = row.find('td');
+                // 淨口數通常在倒數第3個或第2個，嘗試抓取含數字和逗號的那個
+                // 這裡簡化抓取倒數第二個
+                const netOI = $(cells[cells.length - 2]).text().trim();
 
-                // 根據期交所通常格式：身分(0), 多方口數, 多方金額, 空方口數, 空方金額, 淨口數(最後或倒數)
-                // 這裡嘗試抓取最後幾個欄位作為淨口數
-                const netOI = decodeURIComponent($(cells[cells.length - 2]).text().trim()); // 倒數第二欄通常是淨口數
-                if (netOI && netOI.match(/[-0-9,]+/)) {
+                if (netOI.match(/[-0-9,]+/)) {
                     foreignData.netOI = netOI;
                 }
             }
@@ -214,8 +225,6 @@ export async function fetchStockFundamentals() {
         const response = await http.get('https://www.twse.com.tw/exchangeReport/BWIBBU_d?response=json&selectType=ALL');
 
         if (response.data && response.data.data) {
-            // 資料格式: [證券代號, 證券名稱, 殖利率(%), 股利年度, 本益比, 股價淨值比, 財報年/季]
-            // 轉換為 Map 以便快速查詢: code -> { peRatio, pbRatio, dividendYield }
             const fundamentals = new Map();
 
             response.data.data.forEach(row => {
@@ -240,40 +249,23 @@ export async function fetchStockFundamentals() {
 }
 
 /**
- * 取得台股產業分類對照表 (靜態映射)
+ * 取得台股產業分類對照表
  */
 export function getSectorMap() {
     return {
-        // 半導體
         '2330': '半導體', '2303': '半導體', '2454': '半導體', '3711': '半導體', '3034': '半導體',
-        '2379': '半導體', '3443': '半導體', '3661': '半導體', '2344': '半導體', '2408': '半導體',
-        // AI / 電腦週邊
         '2317': '電子代工', '2382': 'AI/雲端', '3231': 'AI/雲端', '6669': 'AI/雲端', '2356': '電子代工',
-        '2357': '電腦週邊', '2376': '電腦週邊', '2301': '電腦週邊', '3017': '電腦週邊',
-        // 光電
         '3008': '光電', '3406': '光電', '2409': '光電', '3481': '光電',
-        // 通訊
-        '2345': '網通', '2412': '電信', '3045': '電信', '4904': '電信', '5388': '網通',
-        // 電子零組件
-        '2308': '電子零組件', '2327': '被動元件', '3037': 'PCB', '2313': '電子零組件',
-        // 金融
-        '2881': '金融', '2882': '金融', '2891': '金融', '2886': '金融', '2884': '金融',
-        '2885': '金融', '2892': '金融', '2880': '金融', '2883': '金融', '2890': '金融',
-        // 航運 / 傳產
-        '2603': '航運', '2609': '航運', '2615': '航運', '2002': '鋼鐵', '1101': '水泥',
-        '1301': '塑膠', '1303': '塑膠', '1605': '電器電纜', '2207': '汽車'
+        '2345': '網通', '2412': '電信', '3045': '電信', '4904': '電信',
+        '2881': '金融', '2882': '金融', '2891': '金融', '2886': '金融', '2603': '航運'
     };
 }
 
 export async function fetchFinanceNews() {
     const news = [];
-
     try {
-        // 嘗試從鉅亨網取得新聞
         const response = await http.get('https://www.cnyes.com/');
         const $ = cheerio.load(response.data);
-
-        // 解析新聞標題
         $('a[href*="/news/"]').slice(0, 10).each((i, el) => {
             const title = $(el).text().trim();
             const link = $(el).attr('href');
@@ -288,7 +280,6 @@ export async function fetchFinanceNews() {
     } catch (error) {
         console.error('抓取財經新聞失敗:', error.message);
     }
-
     return news;
 }
 
@@ -297,6 +288,7 @@ export default {
     fetchTaiwanStockIndex,
     fetchUSStockIndices,
     fetchCommodities,
+    fetchAllStocks,
     fetchTopStocks,
     fetchFuturesData,
     fetchStockFundamentals,
