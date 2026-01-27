@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>複利雪球模擬器 - Discover Latest</title>
+    <meta name="description" content="專業級複利回測與預測系統，支援台股、美股、ETF 與加密貨幣">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/backtest.css">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script>
+</head>
+
+<body>
+    <!-- 側邊欄 -->
+    <aside class="sidebar">
+        <div class="logo">
+            <span class="logo-icon">📈</span>
+            <div class="logo-text">
+                <span class="logo-title">Discover</span>
+                <span class="logo-subtitle">Latest</span>
+            </div>
+        </div>
+
+        <nav class="nav-menu">
+            <a href="index.html" class="nav-item">
+                <span class="nav-icon">📊</span>
+                <span>儀表板</span>
+            </a>
+            <a href="index.html#watchlist" class="nav-item">
+                <span class="nav-icon">⭐</span>
+                <span>自選清單</span>
+            </a>
+            <a href="backtest.html" class="nav-item active">
+                <span class="nav-icon">🎯</span>
+                <span>複利模擬器</span>
+            </a>
+            <a href="index.html#analysis" class="nav-item">
+                <span class="nav-icon">🔍</span>
+                <span>深度分析</span>
+            </a>
+            <a href="index.html#global" class="nav-item">
+                <span class="nav-icon">🌍</span>
+                <span>國際市場</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <p class="update-time">最後更新</p>
+            <p class="update-time" id="lastUpdated">--</p>
+        </div>
+    </aside>
+
+    <!-- 主內容 -->
+    <main class="main-content">
+        <!-- 頁首 -->
+        <header class="header">
+            <div>
+                <h1 class="page-title">📈 複利雪球模擬器</h1>
+                <p class="page-subtitle">Compound Snowball Simulator</p>
+            </div>
+            <div class="header-actions">
+                <div class="currency-toggle">
+                    <button class="currency-btn active" data-currency="TWD">TWD</button>
+                    <button class="currency-btn" data-currency="USD">USD</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- 搜尋區域 -->
+        <section class="search-section">
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" class="search-input" id="symbolSearch"
+                    placeholder="搜尋股票或 ETF，例如: 0050、台積電、NVDA、比特幣...">
+                <div class="search-results" id="searchResults"></div>
+            </div>
+            <div class="selected-symbol" id="selectedSymbol" style="display: none;">
+                <div class="selected-symbol-icon" id="symbolIcon">📊</div>
+                <div class="selected-symbol-info">
+                    <h3 id="symbolName">--</h3>
+                    <span id="symbolCode">--</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 模式切換 -->
+        <div class="mode-tabs">
+            <button class="mode-tab active" data-mode="backtest">
+                <span class="mode-icon">📊</span>
+                歷史回測
+            </button>
+            <button class="mode-tab" data-mode="forecast">
+                <span class="mode-icon">🔮</span>
+                未來預測
+            </button>
+            <button class="mode-tab" data-mode="simulation">
+                <span class="mode-icon">📈</span>
+                固定模擬
+            </button>
+        </div>
+
+        <!-- 主要內容區 -->
+        <div class="backtest-container">
+            <!-- 參數面板 -->
+            <aside class="params-panel">
+                <div class="params-section">
+                    <h3 class="params-section-title">📋 參數設定</h3>
+
+                    <div class="param-group">
+                        <label class="param-label">初始本金</label>
+                        <input type="number" class="param-input" id="initialCapital" value="100000" min="0"
+                            step="10000">
+                    </div>
+
+                    <div class="param-group">
+                        <label class="param-label">每月定期定額</label>
+                        <input type="number" class="param-input" id="monthlyInvestment" value="10000" min="0"
+                            step="1000">
+                    </div>
+
+                    <div class="param-group">
+                        <label class="param-label">投資年限：<span id="yearsValue">10</span> 年</label>
+                        <input type="range" class="param-range" id="years" min="1" max="30" value="10">
+                    </div>
+
+                    <!-- 固定模擬專用 -->
+                    <div class="param-group" id="annualReturnGroup" style="display: none;">
+                        <label class="param-label">年化報酬率：<span id="annualReturnValue">7</span>%</label>
+                        <input type="range" class="param-range" id="annualReturn" min="1" max="30" value="7">
+                    </div>
+                </div>
+
+                <!-- 進階設定 -->
+                <button class="advanced-toggle" id="advancedToggle">
+                    ▼ 交易成本與進階設定
+                </button>
+
+                <div class="advanced-content" id="advancedContent">
+                    <div class="param-group">
+                        <label class="param-label">手續費率 (%)</label>
+                        <input type="number" class="param-input" id="commissionRate" value="0.1425" min="0" max="1"
+                            step="0.01">
+                    </div>
+
+                    <div class="param-group">
+                        <label class="param-label">交易稅率 (%)</label>
+                        <input type="number" class="param-input" id="taxRate" value="0.3" min="0" max="1" step="0.1">
+                    </div>
+
+                    <div class="param-group">
+                        <label class="param-label">逢低加碼策略</label>
+                        <select class="param-input" id="dipBuyStrategy">
+                            <option value="none">不使用</option>
+                            <option value="rsi">RSI 指標法</option>
+                            <option value="signal">景氣燈號法</option>
+                        </select>
+                    </div>
+
+                    <div class="param-group" id="rsiThresholdGroup" style="display: none;">
+                        <label class="param-label">RSI 買入閾值</label>
+                        <input type="number" class="param-input" id="rsiThreshold" value="30" min="10" max="50">
+                    </div>
+
+                    <div class="param-group">
+                        <label class="param-label">
+                            <input type="checkbox" id="reinvestDividends" checked>
+                            股息再投入
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 執行按鈕 -->
+                <button class="run-button" id="runButton" disabled>
+                    <span>🚀</span>
+                    <span>開始模擬</span>
+                </button>
+            </aside>
+
+            <!-- 圖表與結果 -->
+            <section class="chart-section">
+                <div class="chart-header">
+                    <h2 class="chart-title" id="chartTitle">選擇標的後開始模擬</h2>
+                    <div class="chart-actions">
+                        <button class="chart-btn" id="resetZoom" style="display: none;">🔍 重置視角</button>
+                        <button class="chart-btn" id="downloadCSV" style="display: none;">📥 下載報表</button>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="mainChart"></canvas>
+                    <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+                        <div class="loading-spinner"></div>
+                    </div>
+                </div>
+
+                <!-- 圖例 -->
+                <div class="chart-legend" id="chartLegend" style="display: none;">
+                    <div class="legend-item">
+                        <div class="legend-color optimistic"></div>
+                        <span>樂觀 (P90)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color median"></div>
+                        <span>中位數 (P50)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color conservative"></div>
+                        <span>保守 (P10)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color capital"></div>
+                        <span>投入本金</span>
+                    </div>
+                </div>
+
+                <!-- 統計卡片 -->
+                <div class="stats-grid" id="statsGrid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="statFinalValue">--</div>
+                        <div class="stat-label">終值</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statTotalReturn">--</div>
+                        <div class="stat-label">總報酬</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statCAGR">--</div>
+                        <div class="stat-label">年化報酬</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statMaxDrawdown">--</div>
+                        <div class="stat-label">最大回撤</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statSharpe">--</div>
+                        <div class="stat-label">夏普比率</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statDividends">--</div>
+                        <div class="stat-label">累積股息</div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Toast 通知 -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Scripts -->
+    <script src="js/backtest-data.js"></script>
+    <script src="js/backtest-engine.js"></script>
+    <script src="js/backtest-ui.js"></script>
+</body>
+
+</html>
