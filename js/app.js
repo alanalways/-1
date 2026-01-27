@@ -114,7 +114,9 @@ async function loadMarketData() {
         if (!response.ok) throw new Error('Failed to load data');
 
         state.marketData = await response.json();
-        state.allStocks = state.marketData.recommendations || [];
+
+        // Load ALL stocks (全市場), not just recommendations
+        state.allStocks = state.marketData.allStocks || state.marketData.recommendations || [];
         state.filteredStocks = [...state.allStocks];
 
         // Update last updated time
@@ -122,7 +124,7 @@ async function loadMarketData() {
             elements.lastUpdated.textContent = state.marketData.lastUpdated;
         }
 
-        console.log(`✅ Loaded ${state.allStocks.length} stocks`);
+        console.log(`✅ Loaded ${state.allStocks.length} stocks (全市場)`);
     } catch (error) {
         console.error('Failed to load market data:', error);
         showToast('載入數據失敗，請稍後再試', 'error');

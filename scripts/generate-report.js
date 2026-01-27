@@ -169,13 +169,18 @@ async function generateReport() {
 
     console.log(`✅ 成功處理 ${enrichedStocks.length} 檔股票`);
 
-    // === 4. SMC Analysis ===
-    console.log('\n🧠 執行 SMC/ICT 分析...');
+    // === 4. SMC Analysis (ALL Stocks) ===
+    console.log('\n🧠 執行 SMC/ICT 分析 (全市場)...');
     console.time('SMC_Analysis');
-    const recommendations = analyzer.selectRecommendations(enrichedStocks, 20);
-    console.timeEnd('SMC_Analysis');
 
-    console.log(`✅ 已篩選出 ${recommendations.length} 檔高機率設置`);
+    // Analyze ALL stocks (not just top 20)
+    const allAnalyzedStocks = analyzer.selectRecommendations(enrichedStocks, enrichedStocks.length);
+
+    // Get top picks for recommendations section
+    const recommendations = allAnalyzedStocks.slice(0, 20);
+
+    console.timeEnd('SMC_Analysis');
+    console.log(`✅ 全市場分析完成：${allAnalyzedStocks.length} 檔`);
 
     // === 5. Build Market Intelligence ===
     const foreignFutures = futuresData.find(f => f.identity === '外資') || {};
@@ -223,12 +228,13 @@ async function generateReport() {
         }
     ];
 
-    // === 6. Output Report ===
+    // === 6. Output Report (with ALL stocks) ===
     const reportData = {
         lastUpdated: new Date().toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' }),
-        totalStocksAnalyzed: enrichedStocks.length,
+        totalStocksAnalyzed: allAnalyzedStocks.length,
         marketIntelligence,
-        recommendations,
+        allStocks: allAnalyzedStocks,  // 全部股票
+        recommendations,                // 精選 Top 20
         raw: {
             twIndex,
             usIndices,
@@ -241,8 +247,8 @@ async function generateReport() {
     fs.writeFileSync(outputPath, JSON.stringify(reportData, null, 2), 'utf-8');
 
     console.log(`\n🎉 報告生成完成！`);
-    console.log(`   📊 分析股票數：${enrichedStocks.length}`);
-    console.log(`   🎯 精選推薦數：${recommendations.length}`);
+    console.log(`   📊 全市場股票：${allAnalyzedStocks.length} 檔`);
+    console.log(`   🎯 精選推薦：${recommendations.length} 檔`);
     console.log(`   💾 已儲存至：${outputPath}`);
 }
 
