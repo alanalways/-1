@@ -1,13 +1,123 @@
 /**
  * Discover Latest - Advanced SMC Analysis Module
  * SMC (Smart Money Concepts) / ICT / Wyckoff / Order Flow
+ * 
+ * Enhanced with:
+ * - ATR-based dynamic thresholds
+ * - Swing High/Low detection
+ * - Market Structure Shift (MSS) filter
  */
 
+// 全域歷史資料緩存 (用於動態計算)
+let stockHistoryCache = new Map();
+
 /**
- * 偵測 Order Block (訂單塊)
+ * 計算 ATR (Average True Range) - 動態波動率
+ * @param {Array} history - 歷史 K 線資料 [{high, low, close}, ...]
+ * @param {number} period - 計算週期
+ */
+function calculateATR(history, period = 14) {
+    if (!history || history.length < period + 1) return null;
+
+    const trs = [];
+    for (let i = 1; i < history.length; i++) {
+        const high = history[i].high || history[i].highPrice;
+        const low = history[i].low || history[i].lowPrice;
+        const prevClose = history[i - 1].close || history[i - 1].closePrice;
+
+        const tr = Math.max(
+            high - low,
+            Math.abs(high - prevClose),
+            Math.abs(low - prevClose)
+        );
+        trs.push(tr);
+    }
+
+    const recentTRs = trs.slice(-period);
+    return recentTRs.reduce((a, b) => a + b, 0) / recentTRs.length;
+}
+
+/**
+ * 找出 Swing High/Low (轉折點)
+ * @param {Array} history - 歷史 K 線
+ * @param {number} lookback - 左右各看幾根 K 線
+ */
+function findSwingPoints(history, lookback = 5) {
+    if (!history || history.length < lookback * 2 + 1) {
+        return { swingHighs: [], swingLows: [] };
+    }
+
+    const swingHighs = [];
+    const swingLows = [];
+
+    for (let i = lookback; i < history.length - lookback; i++) {
+        const currentHigh = history[i].high || history[i].highPrice;
+        const currentLow = history[i].low || history[i].lowPrice;
+
+        // 檢查是否為 Swing High
+        let isSwingHigh = true;
+        let isSwingLow = true;
+
+        for (let j = i - lookback; j <= i + lookback; j++) {
+            if (j === i) continue;
+            const h = history[j].high || history[j].highPrice;
+            const l = history[j].low || history[j].lowPrice;
+            if (h >= currentHigh) isSwingHigh = false;
+            if (l <= currentLow) isSwingLow = false;
+        }
+
+        if (isSwingHigh) {
+            swingHighs.push({ index: i, price: currentHigh, date: history[i].date });
+        }
+        if (isSwingLow) {
+            swingLows.push({ index: i, price: currentLow, date: history[i].date });
+        }
+    }
+
+    return { swingHighs, swingLows };
+}
+
+/**
+ * 計算市場結構 (Market Structure)
+ * - 是否在上升趨勢 (Price > MA200)
+ * - Higher Highs & Higher Lows
+ */
+function calculateMarketStructure(history) {
+    if (!history || history.length < 20) {
+        return { isUptrend: null, hasHHHL: null, ma200: null };
+    }
+
+    // 計算 MA200 (或可用資料)
+    const closes = history.map(h => h.close || h.closePrice);
+    const maLength = Math.min(200, closes.length);
+    const ma = closes.slice(-maLength).reduce((a, b) => a + b, 0) / maLength;
+    const currentPrice = closes[closes.length - 1];
+
+    // 檢查 Higher Highs & Higher Lows
+    const recent = history.slice(-20);
+    const highs = recent.map(h => h.high || h.highPrice);
+    const lows = recent.map(h => h.low || h.lowPrice);
+
+    const firstHalfHighs = highs.slice(0, 10);
+    const secondHalfHighs = highs.slice(10);
+    const firstHalfLows = lows.slice(0, 10);
+    const secondHalfLows = lows.slice(10);
+
+    const higherHighs = Math.max(...secondHalfHighs) > Math.max(...firstHalfHighs);
+    const higherLows = Math.min(...secondHalfLows) > Math.min(...firstHalfLows);
+
+    return {
+        isUptrend: currentPrice > ma,
+        hasHHHL: higherHighs && higherLows,
+        ma200: ma
+    };
+}
+
+/**
+ * 偵測 Order Block (訂單塊) - ATR 動態化版本
  * 定義：價格劇烈移動前的最後一根反向 K 線
  */
-function detectOrderBlock(stock) {
+function detectOrderBlock(stock, atr = null) {
     const open = parseFloat(stock.openPrice || 0);
     const close = parseFloat(stock.closePrice || 0);
     const low = parseFloat(stock.lowPrice || 0);
@@ -25,13 +135,16 @@ function detectOrderBlock(stock) {
     const lowerWick = Math.min(open, close) - low;
     const upperWick = high - Math.max(open, close);
 
-    // Bullish OB: 強勢多方 (放寬條件：漲幅 > 1.5% 且實體大)
-    if (changePercent > 1.5 && bodySize > totalRange * 0.5 && upperWick < bodySize * 0.3) {
+    // 動態閾值：使用 ATR 或固定百分比
+    const threshold = atr ? atr * 1.5 : close * 0.015;
+
+    // Bullish OB: 強勢多方 (使用 ATR 判斷大實體)
+    if (bodySize > threshold && bodySize > totalRange * 0.5 && upperWick < bodySize * 0.3 && changePercent > 0) {
         return 'bullish-ob';
     }
 
     // Bearish OB: 弱勢空方
-    if (changePercent < -1.5 && bodySize > totalRange * 0.5 && lowerWick < bodySize * 0.3) {
+    if (bodySize > threshold && bodySize > totalRange * 0.5 && lowerWick < bodySize * 0.3 && changePercent < 0) {
         return 'bearish-ob';
     }
 
@@ -76,8 +189,11 @@ function detectFVG(stock) {
 
 /**
  * 偵測 Liquidity Sweep (流動性獵取 / 破底翻)
+ * Enhanced: 檢測是否掃過 Swing High/Low
+ * @param {Object} stock - 當前股票資料
+ * @param {Object} swingPoints - 可選的 Swing Points {swingHighs, swingLows}
  */
-function detectLiquiditySweep(stock) {
+function detectLiquiditySweep(stock, swingPoints = null) {
     const open = parseFloat(stock.openPrice || 0);
     const close = parseFloat(stock.closePrice || 0);
     const low = parseFloat(stock.lowPrice || 0);
@@ -91,6 +207,28 @@ function detectLiquiditySweep(stock) {
     const lowerWick = Math.min(open, close) - low;
     const upperWick = high - Math.max(open, close);
 
+    // 如果有 Swing Points，使用更精確的判斷
+    if (swingPoints && swingPoints.swingHighs && swingPoints.swingLows) {
+        const { swingHighs, swingLows } = swingPoints;
+
+        // Bearish Sweep: High > Last Swing High 但 Close < Last Swing High (假突破)
+        if (swingHighs.length > 0) {
+            const lastSwingHigh = swingHighs[swingHighs.length - 1].price;
+            if (high > lastSwingHigh && close < lastSwingHigh) {
+                return 'liquidity-sweep-bear';
+            }
+        }
+
+        // Bullish Sweep: Low < Last Swing Low 但 Close > Last Swing Low (破底翻)
+        if (swingLows.length > 0) {
+            const lastSwingLow = swingLows[swingLows.length - 1].price;
+            if (low < lastSwingLow && close > lastSwingLow) {
+                return 'liquidity-sweep-bull';
+            }
+        }
+    }
+
+    // 備用方案：傳統影線判斷
     // Bullish Sweep (破底翻): 下影線長 + 收紅
     if (lowerWick > bodySize * 1.5 && lowerWick > totalRange * 0.3 && changePercent >= 0) {
         return 'liquidity-sweep-bull';

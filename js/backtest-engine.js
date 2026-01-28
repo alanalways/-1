@@ -17,6 +17,7 @@ class BacktestEngine {
             annualReturn: 0.07,          // 預設年化報酬 (固定模擬)
             commissionRate: 0.001425,    // 手續費率 0.1425%
             taxRate: 0.003,              // 交易稅 0.3%
+            slippageRate: 0.002,         // 滑價 0.2% (買入時價格滑動)
             reinvestDividends: true,     // 股息再投入
             dipBuyStrategy: 'none',      // 逢低加碼策略: none, signal, rsi
             dipBuyMultiplier: 2,         // 加碼倍數
@@ -112,8 +113,11 @@ class BacktestEngine {
             const commission = investment * config.commissionRate;
             const netInvestment = investment - commission;
 
-            // 買入股數
-            const sharesBought = netInvestment / price;
+            // 計算滑價後的有效買入價格
+            const effectivePrice = price * (1 + config.slippageRate);
+
+            // 買入股數 (考慮滑價後價格較高，買到的股數較少)
+            const sharesBought = netInvestment / effectivePrice;
             totalShares += sharesBought;
             totalCost += investment;
 
@@ -228,6 +232,27 @@ class BacktestEngine {
         const months = config.years * 12;
         const simulations = [];
 
+        // 建立歷史漲跌幅池 (用於 Bootstrap 重抽樣)
+        const historicalReturns = [];
+        for (let i = 1; i < history.length; i++) {
+            const prev = history[i - 1];
+            const curr = history[i];
+            const prevClose = prev.adjClose || prev.close;
+            const currClose = curr.adjClose || curr.close;
+            if (prevClose > 0) {
+                historicalReturns.push((currClose - prevClose) / prevClose);
+            }
+        }
+
+        // Bootstrap 抽樣函數 (保留肥尾效應)
+        const bootstrapReturn = () => {
+            if (historicalReturns.length === 0) {
+                // 如果沒有歷史資料，使用馬可夫狀態
+                return this.normalRandom(monthlyReturn, monthlyStdDev);
+            }
+            return historicalReturns[Math.floor(Math.random() * historicalReturns.length)];
+        };
+
         // Monte Carlo 模擬
         for (let sim = 0; sim < config.monteCarloRuns; sim++) {
             let portfolio = config.initialCapital;
@@ -243,9 +268,18 @@ class BacktestEngine {
                     state = state === 'bull' ? 'bear' : 'bull';
                 }
 
-                // 生成月報酬 (常態分佈)
-                const currentState = states[state];
-                const monthlyRet = this.normalRandom(currentState.return, currentState.stdDev);
+                // 生成月報酬 (歷史重抽樣 Bootstrap - 保留肥尾效應)
+                let monthlyRet;
+                if (config.useBootstrap !== false && historicalReturns.length > 0) {
+                    // 從歷史漲跌幅池抽取
+                    monthlyRet = bootstrapReturn();
+                    // 根據當前狀態調整
+                    if (state === 'bear') monthlyRet *= 0.8;
+                } else {
+                    // 備用：常態分佈
+                    const currentState = states[state];
+                    monthlyRet = this.normalRandom(currentState.return, currentState.stdDev);
+                }
 
                 // 更新投資組合
                 portfolio = portfolio * (1 + monthlyRet) + config.monthlyInvestment;

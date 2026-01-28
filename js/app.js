@@ -244,6 +244,9 @@ async function loadMarketData() {
         state.allStocks = state.marketData.allStocks || state.marketData.recommendations || [];
         state.filteredStocks = [...state.allStocks];
 
+        // === 動態更新 Market Intelligence ===
+        updateMarketIntelligence();
+
         // Update last updated time
         if (elements.lastUpdated && state.marketData.lastUpdated) {
             elements.lastUpdated.textContent = state.marketData.lastUpdated;
@@ -254,6 +257,78 @@ async function loadMarketData() {
         console.error('Failed to load market data:', error);
         showToast('載入數據失敗，請稍後再試', 'error');
     }
+}
+
+// 動態生成 Market Intelligence 內容
+function updateMarketIntelligence() {
+    if (!state.marketData.marketIntelligence) return;
+
+    const stocks = state.allStocks;
+    const bullishCount = stocks.filter(s => s.signal === 'BULLISH').length;
+    const bearishCount = stocks.filter(s => s.signal === 'BEARISH').length;
+    const smcCount = stocks.filter(s => s.patterns?.ob || s.patterns?.fvg || s.patterns?.sweep).length;
+
+    // 計算平均漲跌幅
+    const avgChange = stocks.length > 0
+        ? (stocks.reduce((sum, s) => sum + (parseFloat(s.changePercent) || 0), 0) / stocks.length).toFixed(2)
+        : 0;
+
+    // 找出漲幅最大的產業
+    const sectorMap = new Map();
+    stocks.forEach(s => {
+        if (s.sector) {
+            if (!sectorMap.has(s.sector)) sectorMap.set(s.sector, { count: 0, change: 0 });
+            sectorMap.get(s.sector).count++;
+            sectorMap.get(s.sector).change += parseFloat(s.changePercent) || 0;
+        }
+    });
+    const hotSector = [...sectorMap.entries()]
+        .map(([name, data]) => ({ name, avgChange: data.change / data.count }))
+        .sort((a, b) => b.avgChange - a.avgChange)[0];
+
+    // 更新 marketIntelligence 陣列
+    state.marketData.marketIntelligence = [
+        {
+            icon: '📈',
+            category: '盤後總結',
+            title: `今日掃描 ${stocks.length} 檔股票`,
+            content: `看多 ${bullishCount} 檔 | 看空 ${bearishCount} 檔 | SMC 訊號 ${smcCount} 檔\n平均漲跌：${avgChange}%`,
+            stats: [
+                { label: '看多', value: bullishCount },
+                { label: '看空', value: bearishCount }
+            ]
+        },
+        {
+            icon: '📊',
+            category: '全市場掃描',
+            title: `共掃描 ${stocks.length} 檔股票`,
+            content: `看多 ${bullishCount} 檔 • 看空 ${bearishCount} 檔 • SMC 訊號 ${smcCount} 檔`,
+            stats: [
+                { label: '總數', value: stocks.length },
+                { label: 'SMC', value: smcCount }
+            ]
+        },
+        {
+            icon: '🔥',
+            category: '熱門產業',
+            title: hotSector ? `${hotSector.name} 最強` : '產業分析',
+            content: hotSector ? `${hotSector.name} 平均漲幅 ${hotSector.avgChange.toFixed(2)}%` : '計算中...',
+            stats: []
+        },
+        {
+            icon: '🌍',
+            category: '國際市場',
+            title: '國際指數即時報價',
+            content: '請切換至「國際市場」頁面查看詳細數據',
+            stats: []
+        },
+        {
+            icon: '🤖',
+            category: 'SMC 策略觀點',
+            title: `市場情緒：${bullishCount > bearishCount ? '偏多' : bullishCount < bearishCount ? '偏空' : '中性'} | SMC 訊號：${smcCount} 檔`,
+            content: `今日 SMC 策略掃描全市場，發現 ${smcCount} 檔具備機構訊號。`
+        }
+    ];
 }
 
 // === Rendering Functions ===
@@ -568,41 +643,302 @@ function showAnalysis(code) {
     if (!stock) return;
 
     if (elements.modalTitle) {
-        elements.modalTitle.textContent = `${stock.name} (${stock.code}) 深度分析`;
+        elements.modalTitle.textContent = `${stock.name} (${stock.code}) SMC 深度分析`;
     }
 
     if (elements.modalBody) {
+        // Create professional analysis layout
         elements.modalBody.innerHTML = `
-            <div style="display: flex; flex-direction: column; gap: 1rem;">
-                <div>
-                    <h4 style="margin-bottom: 0.5rem;">📊 基本資料</h4>
-                    <p>收盤價：${stock.closePrice}</p>
-                    <p>漲跌幅：${stock.changePercent?.toFixed(2)}%</p>
-                    <p>評分：${stock.score}/100</p>
-                    ${stock.peRatio ? `<p>本益比：${stock.peRatio}</p>` : ''}
-                    ${stock.dividendYield ? `<p>殖利率：${stock.dividendYield}%</p>` : ''}
+            <div class="smc-analysis-container">
+                <!-- Header Info -->
+                <div class="smc-header">
+                    <div class="smc-price-info">
+                        <span class="smc-current-price">${stock.closePrice}</span>
+                        <span class="smc-change ${parseFloat(stock.changePercent) >= 0 ? 'positive' : 'negative'}">
+                            ${parseFloat(stock.changePercent) >= 0 ? '+' : ''}${stock.changePercent?.toFixed(2)}%
+                        </span>
+                    </div>
+                    <div class="smc-signal-badge ${stock.signal?.toLowerCase() || 'neutral'}">
+                        ${stock.signal === 'BULLISH' ? '🟢 看多' : stock.signal === 'BEARISH' ? '🔴 看空' : '⚪ 中性'}
+                    </div>
                 </div>
-                <div>
-                    <h4 style="margin-bottom: 0.5rem;">🧠 SMC 分析</h4>
-                    <p>Order Block：${stock.patterns?.ob || '無訊號'}</p>
-                    <p>FVG：${stock.patterns?.fvg || '無訊號'}</p>
-                    <p>Liquidity Sweep：${stock.patterns?.sweep || '無訊號'}</p>
+                
+                <!-- Chart Container -->
+                <div class="smc-chart-wrapper">
+                    <div class="smc-chart-header">
+                        <span>📊 K 線圖表 + SMC 標記</span>
+                        <div class="smc-chart-legend">
+                            <span class="legend-item"><span style="background:#f59e0b"></span>MA5</span>
+                            <span class="legend-item"><span style="background:#3b82f6"></span>MA20</span>
+                            <span class="legend-item"><span style="background:#a855f7"></span>MA60</span>
+                        </div>
+                    </div>
+                    <div class="smc-chart-container">
+                        <canvas id="smcCandleChart"></canvas>
+                        <div class="smc-chart-loading" id="smcChartLoading">
+                            <div class="spinner"></div>
+                            <span>載入 K 線資料中...</span>
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <h4 style="margin-bottom: 0.5rem;">📝 分析觀點</h4>
+                
+                <!-- SMC Deep Dive -->
+                <div class="smc-deep-dive">
+                    <h4>🔍 SMC DEEP DIVE</h4>
+                    <div class="smc-signals-grid">
+                        <div class="smc-signal-card ${stock.patterns?.ob ? 'active' : ''}">
+                            <div class="signal-icon">🧱</div>
+                            <div class="signal-name">Order Block</div>
+                            <div class="signal-value">${stock.patterns?.ob === 'bullish-ob' ? '✅ Bullish' : stock.patterns?.ob === 'bearish-ob' ? '🔻 Bearish' : '—'}</div>
+                        </div>
+                        <div class="smc-signal-card ${stock.patterns?.fvg ? 'active' : ''}">
+                            <div class="signal-icon">🕳️</div>
+                            <div class="signal-name">FVG</div>
+                            <div class="signal-value">${stock.patterns?.fvg === 'bullish-fvg' ? '✅ Bullish' : stock.patterns?.fvg === 'bearish-fvg' ? '🔻 Bearish' : '—'}</div>
+                        </div>
+                        <div class="smc-signal-card ${stock.patterns?.sweep ? 'active' : ''}">
+                            <div class="signal-icon">🐢</div>
+                            <div class="signal-name">Liq Sweep</div>
+                            <div class="signal-value">${stock.patterns?.sweep === 'liquidity-sweep-bull' ? '✅ 破底翻' : stock.patterns?.sweep === 'liquidity-sweep-bear' ? '🔻 假突破' : '—'}</div>
+                        </div>
+                        <div class="smc-signal-card">
+                            <div class="signal-icon">📈</div>
+                            <div class="signal-name">Score</div>
+                            <div class="signal-value">${stock.score}/100</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Entry Confirmation -->
+                <div class="smc-entry-confirmation">
+                    <h4>📋 ENTRY CONFIRMATION</h4>
+                    <div class="entry-checklist" id="entryChecklist">
+                        <div class="checklist-item loading">載入中...</div>
+                    </div>
+                </div>
+                
+                <!-- Fundamentals -->
+                <div class="smc-fundamentals">
+                    <h4>📊 基本面數據</h4>
+                    <div class="fundamentals-grid">
+                        <div class="fund-item">
+                            <span class="fund-label">本益比</span>
+                            <span class="fund-value">${stock.peRatio || '—'}</span>
+                        </div>
+                        <div class="fund-item">
+                            <span class="fund-label">殖利率</span>
+                            <span class="fund-value">${stock.dividendYield ? stock.dividendYield + '%' : '—'}</span>
+                        </div>
+                        <div class="fund-item">
+                            <span class="fund-label">量比</span>
+                            <span class="fund-value">${stock.volumeRatio?.toFixed(2) || '—'}</span>
+                        </div>
+                        <div class="fund-item">
+                            <span class="fund-label">產業</span>
+                            <span class="fund-value">${stock.sector || '—'}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Analysis Text -->
+                <div class="smc-analysis-text">
+                    <h4>🧠 AI 分析觀點</h4>
                     <p>${stock.analysis || '暫無分析資料'}</p>
                 </div>
-                <div>
-                    <h4 style="margin-bottom: 0.5rem;">🏷️ 標籤</h4>
-                    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
-                        ${(stock.tags || []).map(t => `<span class="tag ${t.type}">${t.label}</span>`).join('')}
-                    </div>
+                
+                <!-- Tags -->
+                <div class="smc-tags">
+                    ${(stock.tags || []).map(t => `<span class="tag ${t.type}">${t.label}</span>`).join('')}
                 </div>
             </div>
         `;
+
+        // Fetch and render candlestick chart
+        fetchAndRenderCandleChart(code);
     }
 
     openModal();
+}
+
+// Fetch historical data and render professional candlestick chart
+async function fetchAndRenderCandleChart(code) {
+    const chartLoading = document.getElementById('smcChartLoading');
+    const entryChecklist = document.getElementById('entryChecklist');
+
+    try {
+        // Use backtest-data.js fetch function if available, else use Yahoo Finance directly
+        const symbol = code.includes('.TW') || code.includes('.TWO') ? code : code + '.TW';
+        const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=6mo`;
+
+        const response = await fetchWithCORS(url);
+        const data = await response.json();
+
+        if (data.chart?.result?.[0]) {
+            const result = data.chart.result[0];
+            const timestamps = result.timestamp || [];
+            const quotes = result.indicators?.quote?.[0] || {};
+
+            const history = timestamps.map((t, i) => ({
+                date: new Date(t * 1000).toISOString().split('T')[0],
+                open: quotes.open?.[i] || 0,
+                high: quotes.high?.[i] || 0,
+                low: quotes.low?.[i] || 0,
+                close: quotes.close?.[i] || 0,
+                volume: quotes.volume?.[i] || 0
+            })).filter(h => h.open > 0);
+
+            if (history.length > 0) {
+                renderCandlestickChart(history);
+                updateEntryChecklist(history, entryChecklist);
+            }
+        }
+    } catch (error) {
+        console.warn('Failed to fetch chart data:', error);
+        if (chartLoading) chartLoading.innerHTML = '<span style="color: var(--text-muted);">無法載入 K 線資料</span>';
+    }
+}
+
+function renderCandlestickChart(history) {
+    const chartLoading = document.getElementById('smcChartLoading');
+    if (chartLoading) chartLoading.style.display = 'none';
+
+    const ctx = document.getElementById('smcCandleChart');
+    if (!ctx) return;
+
+    // Calculate MAs
+    const closes = history.map(h => h.close);
+    const ma5 = calculateMA(closes, 5);
+    const ma20 = calculateMA(closes, 20);
+    const ma60 = calculateMA(closes, 60);
+
+    // Prepare data
+    const labels = history.map(h => h.date.slice(5)); // MM-DD format
+    const candleData = history.map(h => ({
+        x: h.date.slice(5),
+        o: h.open,
+        h: h.high,
+        l: h.low,
+        c: h.close
+    }));
+
+    // Use standard Chart.js line chart for OHLC visualization (simpler than full candlestick)
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels.slice(-60), // Last 60 days
+            datasets: [
+                {
+                    label: '收盤價',
+                    data: closes.slice(-60),
+                    borderColor: closes[closes.length - 1] > closes[closes.length - 2] ? '#10b981' : '#ef4444',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    fill: true,
+                    tension: 0.1,
+                    pointRadius: 0,
+                    borderWidth: 2
+                },
+                {
+                    label: 'MA5',
+                    data: ma5.slice(-60),
+                    borderColor: '#f59e0b',
+                    borderWidth: 1,
+                    pointRadius: 0,
+                    borderDash: []
+                },
+                {
+                    label: 'MA20',
+                    data: ma20.slice(-60),
+                    borderColor: '#3b82f6',
+                    borderWidth: 1,
+                    pointRadius: 0,
+                    borderDash: []
+                },
+                {
+                    label: 'MA60',
+                    data: ma60.slice(-60),
+                    borderColor: '#a855f7',
+                    borderWidth: 1,
+                    pointRadius: 0,
+                    borderDash: [5, 5]
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                    callbacks: {
+                        label: (ctx) => `${ctx.dataset.label}: ${ctx.raw?.toFixed(2) || '--'}`
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { color: 'rgba(255,255,255,0.05)' },
+                    ticks: { color: '#888', maxTicksLimit: 10 }
+                },
+                y: {
+                    grid: { color: 'rgba(255,255,255,0.05)' },
+                    ticks: { color: '#888' }
+                }
+            },
+            interaction: {
+                mode: 'nearest',
+                axis: 'x',
+                intersect: false
+            }
+        }
+    });
+}
+
+function calculateMA(data, period) {
+    const result = [];
+    for (let i = 0; i < data.length; i++) {
+        if (i < period - 1) {
+            result.push(null);
+        } else {
+            const sum = data.slice(i - period + 1, i + 1).reduce((a, b) => a + b, 0);
+            result.push(sum / period);
+        }
+    }
+    return result;
+}
+
+function updateEntryChecklist(history, container) {
+    if (!container || history.length < 20) return;
+
+    const closes = history.map(h => h.close);
+    const currentPrice = closes[closes.length - 1];
+    const ma20 = closes.slice(-20).reduce((a, b) => a + b, 0) / 20;
+    const ma60 = history.length >= 60 ? closes.slice(-60).reduce((a, b) => a + b, 0) / 60 : null;
+
+    // Calculate RSI
+    let gains = 0, losses = 0;
+    for (let i = closes.length - 14; i < closes.length; i++) {
+        const diff = closes[i] - closes[i - 1];
+        if (diff > 0) gains += diff;
+        else losses -= diff;
+    }
+    const rsi = losses === 0 ? 100 : 100 - (100 / (1 + gains / losses));
+
+    // Generate checklist
+    const checks = [
+        { label: 'Price > MA20', passed: currentPrice > ma20 },
+        { label: 'Price > MA60', passed: ma60 ? currentPrice > ma60 : null },
+        { label: 'RSI < 70 (not overbought)', passed: rsi < 70 },
+        { label: 'RSI > 30 (not oversold)', passed: rsi > 30 }
+    ];
+
+    container.innerHTML = checks.map(c => `
+        <div class="checklist-item ${c.passed === true ? 'passed' : c.passed === false ? 'failed' : 'neutral'}">
+            <span class="check-icon">${c.passed === true ? '✅' : c.passed === false ? '❌' : '⚪'}</span>
+            <span>${c.label}</span>
+        </div>
+    `).join('');
 }
 
 function openChart(code) {

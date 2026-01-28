@@ -1215,3 +1215,275 @@ body {
         grid-template-columns: repeat(2, 1fr);
     }
 }
+
+/* === SMC Analysis Modal === */
+.smc-analysis-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+    padding: var(--spacing-sm);
+}
+
+.smc-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: var(--spacing-md);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.smc-price-info {
+    display: flex;
+    align-items: baseline;
+    gap: var(--spacing-md);
+}
+
+.smc-current-price {
+    font-size: 2rem;
+    font-weight: 700;
+    font-family: var(--font-mono);
+}
+
+.smc-change {
+    font-size: 1.1rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: var(--radius-sm);
+}
+
+.smc-change.positive {
+    color: var(--accent-green);
+    background: var(--accent-green-dim);
+}
+
+.smc-change.negative {
+    color: var(--accent-red);
+    background: var(--accent-red-dim);
+}
+
+.smc-signal-badge {
+    padding: 8px 16px;
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.smc-signal-badge.bullish {
+    background: var(--accent-green-dim);
+    color: var(--accent-green);
+    border: 1px solid var(--accent-green);
+}
+
+.smc-signal-badge.bearish {
+    background: var(--accent-red-dim);
+    color: var(--accent-red);
+    border: 1px solid var(--accent-red);
+}
+
+.smc-signal-badge.neutral {
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+}
+
+/* Chart Wrapper */
+.smc-chart-wrapper {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    border: 1px solid var(--border-color);
+}
+
+.smc-chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-md);
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.smc-chart-legend {
+    display: flex;
+    gap: var(--spacing-md);
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.legend-item span:first-child {
+    width: 16px;
+    height: 3px;
+    border-radius: 2px;
+}
+
+.smc-chart-container {
+    position: relative;
+    height: 280px;
+}
+
+.smc-chart-loading {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    background: var(--bg-secondary);
+    color: var(--text-muted);
+}
+
+.spinner {
+    width: 30px;
+    height: 30px;
+    border: 3px solid var(--border-color);
+    border-top-color: var(--accent-blue);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+/* SMC Deep Dive */
+.smc-deep-dive h4,
+.smc-entry-confirmation h4,
+.smc-fundamentals h4,
+.smc-analysis-text h4 {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: var(--spacing-md);
+}
+
+.smc-signals-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--spacing-md);
+}
+
+.smc-signal-card {
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-md);
+    text-align: center;
+    border: 1px solid transparent;
+    transition: var(--transition-fast);
+}
+
+.smc-signal-card.active {
+    background: var(--accent-blue-dim);
+    border-color: var(--accent-blue);
+}
+
+.signal-icon {
+    font-size: 1.5rem;
+    margin-bottom: 6px;
+}
+
+.signal-name {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+}
+
+.signal-value {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* Entry Checklist */
+.entry-checklist {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+}
+
+.checklist-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+}
+
+.checklist-item.passed {
+    background: var(--accent-green-dim);
+    color: var(--accent-green);
+}
+
+.checklist-item.failed {
+    background: var(--accent-red-dim);
+    color: var(--accent-red);
+}
+
+.checklist-item.neutral {
+    color: var(--text-muted);
+}
+
+.checklist-item.loading {
+    color: var(--text-muted);
+}
+
+/* Fundamentals Grid */
+.fundamentals-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--spacing-md);
+}
+
+.fund-item {
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-sm);
+    padding: var(--spacing-md);
+    text-align: center;
+}
+
+.fund-label {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+}
+
+.fund-value {
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: var(--font-mono);
+    color: var(--accent-blue);
+}
+
+/* Analysis Text */
+.smc-analysis-text p {
+    line-height: 1.7;
+    color: var(--text-secondary);
+}
+
+/* SMC Tags */
+.smc-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .smc-signals-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .fundamentals-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .smc-chart-container {
+        height: 220px;
+    }
+}
