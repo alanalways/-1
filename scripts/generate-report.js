@@ -255,6 +255,7 @@ async function generateReport() {
     // === 6. Output Report (ALL STOCKS) ===
     const reportData = {
         lastUpdated: new Date().toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' }),
+        analysisDate: new Date().toISOString().split('T')[0], // 訊號分析日期
         totalStocksAnalyzed: allAnalyzedStocks.length,
         statistics: {
             bullish: bullishCount,
@@ -281,14 +282,47 @@ async function generateReport() {
     const outputPath = path.join(process.cwd(), 'data', 'market-data.json');
     fs.writeFileSync(outputPath, JSON.stringify(reportData, null, 2), 'utf-8');
 
+    // === 7. 生成瘦身版 stocks-lite.json (快速載入) ===
+    const liteStocks = allAnalyzedStocks.map(stock => ({
+        code: stock.code,
+        name: stock.name,
+        market: stock.market,
+        closePrice: stock.closePrice,
+        changePercent: stock.changePercent,
+        signal: stock.signal,
+        score: stock.score,
+        tags: stock.tags?.slice(0, 2) || [], // 只保留前 2 個標籤
+        peRatio: stock.peRatio,
+        dividendYield: stock.dividendYield
+    }));
+
+    const liteData = {
+        lastUpdated: reportData.lastUpdated,
+        analysisDate: reportData.analysisDate,
+        totalStocks: liteStocks.length,
+        statistics: reportData.statistics,
+        marketIntelligence: reportData.marketIntelligence,
+        internationalMarkets: reportData.internationalMarkets,
+        stocks: liteStocks
+    };
+
+    const litePath = path.join(process.cwd(), 'data', 'stocks-lite.json');
+    fs.writeFileSync(litePath, JSON.stringify(liteData, null, 2), 'utf-8');
+
+    // 計算檔案大小
+    const fullSize = (fs.statSync(outputPath).size / 1024).toFixed(1);
+    const liteSize = (fs.statSync(litePath).size / 1024).toFixed(1);
+
     console.log('\n' + '='.repeat(50));
     console.log('🎉 報告生成完成！');
     console.log(`   📊 全市場股票：${allAnalyzedStocks.length} 檔 (無限制)`);
     console.log(`   📈 看多：${bullishCount} 檔`);
     console.log(`   📉 看空：${bearishCount} 檔`);
     console.log(`   🧱 SMC 訊號：${smcCount} 檔`);
-    console.log(`   💾 已儲存至：${outputPath}`);
+    console.log(`   💾 完整版：${outputPath} (${fullSize} KB)`);
+    console.log(`   ⚡ 瘦身版：${litePath} (${liteSize} KB)`);
 }
 
 // Execute
 generateReport().catch(console.error);
+

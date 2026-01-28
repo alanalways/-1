@@ -3,6 +3,16 @@
  * Main Application JavaScript
  */
 
+// === Cloudflare CORS Proxy Configuration ===
+const PROXY_BASE_URL = 'https://stock-proxy.cmshj30326.workers.dev/';
+
+// === Real-time Price Cache ===
+const priceCache = {
+    data: new Map(),
+    lastUpdate: null,
+    THROTTLE_MS: 30000 // 30 秒節流
+};
+
 // === State Management ===
 const state = {
     currentPage: 'dashboard',
@@ -13,8 +23,10 @@ const state = {
     isLoading: true,
     currentFilter: 'all',
     currentSort: 'score',
-    searchQuery: ''
+    searchQuery: '',
+    analysisDate: null // 訊號分析日期
 };
+
 
 // === DOM Elements ===
 const elements = {
@@ -105,13 +117,13 @@ function setupAutoRefresh() {
     setInterval(() => {
         if (isTaiwanTradingHours()) {
             if (!autoRefreshInterval) {
-                console.log('📡 進入交易時段，啟動每 5 分鐘自動更新');
-                autoRefreshInterval = setInterval(refreshAllData, 5 * 60 * 1000);
-                showToast('🔄 交易時段自動更新已啟動', 'success');
+                console.log('📡 進入交易時段，啟動每 60 秒即時報價更新');
+                autoRefreshInterval = setInterval(updateVisiblePrices, 60 * 1000); // 60 秒更新即時報價
+                showToast('🔄 交易時段即時報價已啟動', 'success');
             }
         } else {
             if (autoRefreshInterval) {
-                console.log('⏸️ 離開交易時段，停止自動更新');
+                console.log('⏸️ 離開交易時段，停止即時報價更新');
                 clearInterval(autoRefreshInterval);
                 autoRefreshInterval = null;
             }
@@ -120,8 +132,8 @@ function setupAutoRefresh() {
 
     // 首次檢查
     if (isTaiwanTradingHours()) {
-        autoRefreshInterval = setInterval(refreshAllData, 5 * 60 * 1000);
-        console.log('📡 已在交易時段，自動更新每 5 分鐘');
+        autoRefreshInterval = setInterval(updateVisiblePrices, 60 * 1000);
+        console.log('📡 已在交易時段，每 60 秒更新即時報價');
     }
 }
 
@@ -254,30 +266,165 @@ function setupEventListeners() {
     });
 }
 
-// === Data Loading ===
+// === Cloudflare CORS Proxy Helper ===
+async function fetchWithCORS(url) {
+    try {
+        // 組合完整的 Proxy 請求網址
+        const targetUrl = `${PROXY_BASE_URL}?url=${encodeURIComponent(url)}`;
+        const response = await fetch(targetUrl);
+
+        if (!response.ok) {
+            throw new Error(`Proxy error: ${response.status}`);
+        }
+
+        return response;
+    } catch (error) {
+        console.error('CORS Fetch Error:', error);
+        throw error;
+    }
+}
+
+// === Data Loading (使用瘦身版 JSON 加速載入) ===
 async function loadMarketData() {
     try {
-        const response = await fetch('data/market-data.json');
-        if (!response.ok) throw new Error('Failed to load data');
+        // 優先使用瘦身版 stocks-lite.json (快速載入)
+        const response = await fetch('data/stocks-lite.json');
+        if (!response.ok) throw new Error('Failed to load lite data');
 
-        state.marketData = await response.json();
+        const liteData = await response.json();
 
-        // Load ALL stocks (全市場), not just recommendations
-        state.allStocks = state.marketData.allStocks || state.marketData.recommendations || [];
+        // 設定 state
+        state.marketData = liteData;
+        state.allStocks = liteData.stocks || [];
         state.filteredStocks = [...state.allStocks];
+        state.analysisDate = liteData.analysisDate;
 
         // === 動態更新 Market Intelligence ===
         updateMarketIntelligence();
 
-        // Update last updated time
-        if (elements.lastUpdated && state.marketData.lastUpdated) {
-            elements.lastUpdated.textContent = state.marketData.lastUpdated;
+        // Update last updated time with analysis date warning
+        if (elements.lastUpdated && liteData.lastUpdated) {
+            elements.lastUpdated.textContent = `${liteData.lastUpdated} (訊號分析：${liteData.analysisDate})`;
         }
 
-        console.log(`✅ Loaded ${state.allStocks.length} stocks (全市場)`);
+        console.log(`✅ Loaded ${state.allStocks.length} stocks (瘦身版，快速載入)`);
+
+        // 盤中時段啟動即時報價更新
+        if (isTaiwanTradingHours()) {
+            setTimeout(() => updateVisiblePrices(), 2000);
+        }
     } catch (error) {
-        console.error('Failed to load market data:', error);
-        showToast('載入數據失敗，請稍後再試', 'error');
+        console.error('Failed to load lite data, fallback to full:', error);
+
+        // Fallback: 載入完整版
+        try {
+            const fullResponse = await fetch('data/market-data.json');
+            if (fullResponse.ok) {
+                const fullData = await fullResponse.json();
+                state.marketData = fullData;
+                state.allStocks = fullData.allStocks || [];
+                state.filteredStocks = [...state.allStocks];
+                updateMarketIntelligence();
+                console.log(`✅ Fallback: Loaded ${state.allStocks.length} stocks (完整版)`);
+            }
+        } catch (fallbackError) {
+            console.error('Fallback also failed:', fallbackError);
+            showToast('載入數據失敗，請稍後再試', 'error');
+        }
+    }
+}
+
+// === 即時報價更新 (僅更新畫面上可見的股票) ===
+async function updateVisiblePrices() {
+    // 節流檢查：上次更新 < 30 秒不發請求
+    const now = Date.now();
+    if (priceCache.lastUpdate && (now - priceCache.lastUpdate) < priceCache.THROTTLE_MS) {
+        console.log('⏳ 即時報價節流中，跳過本次更新');
+        return;
+    }
+
+    // 取得畫面上前 20 檔股票
+    const visibleStocks = state.filteredStocks.slice(0, 20);
+    if (visibleStocks.length === 0) return;
+
+    console.log(`📡 更新 ${visibleStocks.length} 檔股票即時報價...`);
+
+    const symbols = visibleStocks.map(s => {
+        const code = s.code.replace('.TW', '').replace('.TWO', '');
+        return `${code}.TW`;
+    }).join(',');
+
+    try {
+        const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(visibleStocks[0].code.replace('.TW', '') + '.TW')}`;
+
+        // 逐一更新每檔股票
+        for (const stock of visibleStocks) {
+            const code = stock.code.replace('.TW', '').replace('.TWO', '');
+            const yahooSymbol = `${code}.TW`;
+
+            // 檢查快取
+            const cached = priceCache.data.get(yahooSymbol);
+            if (cached && (now - cached.timestamp) < priceCache.THROTTLE_MS) {
+                continue; // 使用快取
+            }
+
+            try {
+                const response = await fetchWithCORS(`https://query1.finance.yahoo.com/v8/finance/chart/${yahooSymbol}`);
+                const data = await response.json();
+
+                if (data.chart?.result?.[0]) {
+                    const meta = data.chart.result[0].meta;
+                    const newPrice = meta.regularMarketPrice;
+                    const prevClose = meta.previousClose || meta.chartPreviousClose;
+                    const changePercent = prevClose ? ((newPrice - prevClose) / prevClose * 100) : 0;
+
+                    // 更新快取
+                    priceCache.data.set(yahooSymbol, {
+                        price: newPrice,
+                        changePercent: changePercent.toFixed(2),
+                        timestamp: now
+                    });
+
+                    // 更新 DOM
+                    updateStockCardPrice(stock.code, newPrice, changePercent);
+
+                    // 防雷：如果跌幅 > 3% 且原訊號為看多，顯示警告
+                    if (changePercent < -3 && stock.signal === 'BULLISH') {
+                        console.warn(`⚠️ ${stock.code} ${stock.name}: 跌幅 ${changePercent.toFixed(2)}% 但訊號看多，注意風險！`);
+                    }
+                }
+            } catch (err) {
+                console.warn(`更新 ${yahooSymbol} 失敗:`, err.message);
+            }
+
+            // 避免請求過快
+            await new Promise(resolve => setTimeout(resolve, 200));
+        }
+
+        priceCache.lastUpdate = now;
+        console.log('✅ 即時報價更新完成');
+
+    } catch (error) {
+        console.error('即時報價更新失敗:', error);
+    }
+}
+
+// === 更新股票卡片價格 DOM ===
+function updateStockCardPrice(code, newPrice, changePercent) {
+    const card = document.querySelector(`[data-stock-code="${code}"]`);
+    if (!card) return;
+
+    const priceEl = card.querySelector('.stock-price');
+    const changeEl = card.querySelector('.stock-change');
+
+    if (priceEl) {
+        priceEl.textContent = `$${newPrice.toLocaleString()}`;
+    }
+
+    if (changeEl) {
+        const isPositive = changePercent >= 0;
+        changeEl.textContent = `${isPositive ? '+' : ''}${changePercent.toFixed(2)}%`;
+        changeEl.className = `stock-change ${isPositive ? 'positive' : 'negative'}`;
     }
 }
 
