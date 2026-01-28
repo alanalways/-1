@@ -264,6 +264,12 @@ async function generateReport() {
         },
         marketIntelligence,
         allStocks: allAnalyzedStocks,  // 全部股票 - 無限制
+        // 國際市場資料 (使用 Yahoo Finance)
+        internationalMarkets: {
+            usIndices: usIndices,
+            commodities: commodities,
+            twIndex: twIndex
+        },
         raw: {
             twIndex,
             usIndices,

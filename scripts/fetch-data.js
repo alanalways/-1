@@ -164,50 +164,42 @@ export async function fetchYahooQuotes(symbols) {
 
 /**
  * 從證交所取得當日所有上市股票交易資料
- * 使用 STOCK_DAY_ALL API (非交易時段也可用)
+ * 使用 STOCK_DAY_ALL API (股價) + BWIBBU_d API (基本面)
  */
 export async function fetchTWSEAllStocks() {
-    console.log('📡 正在從 TWSE 取得當日交易資料 (STOCK_DAY_ALL)...');
+    console.log('📡 正在從 TWSE 取得全部上市股票資料...');
 
     try {
-        // 使用 open_data 格式 (CSV)，非交易時段也可用
-        const response = await http.get('https://www.twse.com.tw/exchangeReport/STOCK_DAY_ALL', {
-            params: {
-                response: 'open_data'
-            },
+        // 1. 先抓股價資料 (STOCK_DAY_ALL)
+        const priceResponse = await http.get('https://www.twse.com.tw/exchangeReport/STOCK_DAY_ALL', {
+            params: { response: 'open_data' },
             timeout: 60000
         });
 
-        if (response.data) {
-            const lines = response.data.split('\n');
-            // 第一行是標題: 日期,證券代號,證券名稱,成交股數,成交金額,開盤價,最高價,最低價,收盤價,漲跌價差,成交筆數
-            const stocks = [];
+        // 2. 再抓基本面資料 (OpenAPI - 本益比、殖利率)
+        const fundResponse = await http.get('https://openapi.twse.com.tw/v1/exchangeReport/BWIBBU_d', {
+            timeout: 30000
+        });
 
+        // 解析股價資料
+        const priceMap = new Map();
+        if (priceResponse.data) {
+            const lines = priceResponse.data.split('\n');
             for (let i = 1; i < lines.length; i++) {
                 const line = lines[i].trim();
                 if (!line) continue;
 
-                // CSV 格式處理 (可能有引號)
                 const cols = line.split(',').map(c => c.replace(/"/g, '').trim());
-
-                // cols: [日期, 代號, 名稱, 成交股數, 成交金額, 開盤價, 最高價, 最低價, 收盤價, 漲跌價差, 成交筆數]
-                const dateStr = cols[0]; // 民國日期 YYYMMDD
                 const code = cols[1];
-                const name = cols[2];
-
-                // 只接受 4-6 位數字的股票代號 (過濾權證等)
                 if (!/^\d{4,6}$/.test(code)) continue;
 
-                // 解析價格 (移除逗號)
                 const parseNum = (str) => {
                     if (!str || str === '--' || str === '') return 0;
                     return parseFloat(str.replace(/,/g, '')) || 0;
                 };
 
-                stocks.push({
-                    date: dateStr,
-                    code: code,
-                    name: name,
+                priceMap.set(code, {
+                    date: cols[0],
                     volume: parseNum(cols[3]),
                     tradeValue: parseNum(cols[4]),
                     openPrice: parseNum(cols[5]),
@@ -218,19 +210,47 @@ export async function fetchTWSEAllStocks() {
                     transactions: parseNum(cols[10])
                 });
             }
-
-            console.log(`✅ TWSE STOCK_DAY_ALL 回傳 ${stocks.length} 檔上市股票`);
-
-            // 驗證 2330 台積電股價
-            const tsmc = stocks.find(s => s.code === '2330');
-            if (tsmc) {
-                console.log(`   📊 驗證: 2330 台積電 收盤價 = ${tsmc.closePrice} 元`);
-            }
-
-            return stocks;
         }
+        console.log(`   📈 股價資料: ${priceMap.size} 檔`);
+
+        // 解析基本面資料並合併
+        const stocks = [];
+        if (fundResponse.data && Array.isArray(fundResponse.data)) {
+            for (const item of fundResponse.data) {
+                const code = item.Code;
+                if (!/^\d{4,6}$/.test(code)) continue;
+
+                const priceData = priceMap.get(code) || {};
+
+                stocks.push({
+                    code: code,
+                    name: item.Name,
+                    closePrice: priceData.closePrice || 0,
+                    openPrice: priceData.openPrice || 0,
+                    highPrice: priceData.highPrice || 0,
+                    lowPrice: priceData.lowPrice || 0,
+                    volume: priceData.volume || 0,
+                    tradeValue: priceData.tradeValue || 0,
+                    change: priceData.change || 0,
+                    transactions: priceData.transactions || 0,
+                    peRatio: parseFloat(item.PEratio) || null,
+                    pbRatio: parseFloat(item.PBratio) || null,
+                    dividendYield: parseFloat(item.DividendYield) || null
+                });
+            }
+        }
+
+        console.log(`✅ TWSE 合併後共 ${stocks.length} 檔上市股票`);
+
+        // 驗證 2330 台積電
+        const tsmc = stocks.find(s => s.code === '2330');
+        if (tsmc) {
+            console.log(`   📊 驗證: 2330 台積電 收盤價 = ${tsmc.closePrice} 元, PE = ${tsmc.peRatio}`);
+        }
+
+        return stocks;
     } catch (error) {
-        console.error('TWSE STOCK_DAY_ALL API 失敗:', error.message);
+        console.error('TWSE API 失敗:', error.message);
     }
 
     return [];
@@ -238,35 +258,35 @@ export async function fetchTWSEAllStocks() {
 
 /**
  * 從櫃買中心取得當日所有上櫃股票交易資料
+ * 使用 TPEx OpenAPI
  */
 export async function fetchTPExAllStocks() {
-    console.log('📡 正在從 TPEx 取得當日上櫃交易資料...');
-
-    const today = new Date();
-    const formattedDate = `${today.getFullYear() - 1911}/${String(today.getMonth() + 1).padStart(2, '0')}/${String(today.getDate()).padStart(2, '0')}`;
+    console.log('📡 正在從 TPEx 取得全部上櫃股票資料...');
 
     try {
-        const response = await http.get('https://www.tpex.org.tw/web/stock/aftertrading/otc_quotes_no1430/stk_wn1430_result.php', {
-            params: {
-                l: 'zh-tw',
-                d: formattedDate,
-                se: 'EW'
-            }
+        // 使用用戶提供的 OpenAPI 端點
+        const response = await http.get('https://www.tpex.org.tw/openapi/v1/tpex_mainboard_peratio_analysis', {
+            timeout: 30000
         });
 
-        if (response.data && response.data.aaData) {
-            const stocks = response.data.aaData.map(row => ({
-                code: row[0],
-                name: row[1],
-                closePrice: row[2],
-                change: row[3],
-                openPrice: row[4],
-                highPrice: row[5],
-                lowPrice: row[6],
-                volume: row[7]
-            }));
+        if (response.data && Array.isArray(response.data)) {
+            const stocks = response.data
+                .filter(item => /^\d{4,6}$/.test(item.SecuritiesCompanyCode))
+                .map(item => ({
+                    code: item.SecuritiesCompanyCode,
+                    name: item.CompanyName,
+                    closePrice: parseFloat(item.ClosingPrice) || 0,
+                    peRatio: parseFloat(item.PriceEarningRatio) || null,
+                    pbRatio: parseFloat(item.PriceBookRatio) || null,
+                    dividendYield: parseFloat(item.YieldRatio) || null,
+                    openPrice: 0,
+                    highPrice: 0,
+                    lowPrice: 0,
+                    volume: 0,
+                    change: 0
+                }));
 
-            console.log(`✅ TPEx 回傳 ${stocks.length} 檔上櫃股票`);
+            console.log(`✅ TPEx OpenAPI 回傳 ${stocks.length} 檔上櫃股票`);
             return stocks;
         }
     } catch (error) {
@@ -307,36 +327,48 @@ export async function fetchTaiwanStockIndex() {
 
 export async function fetchUSStockIndices() {
     const indices = [
-        { symbol: '^DJI', name: '道瓊工業指數' },
-        { symbol: '^IXIC', name: 'NASDAQ' },
-        { symbol: '^GSPC', name: 'S&P 500' },
-        { symbol: '^SOX', name: '費城半導體' },
-        { symbol: '^VIX', name: 'VIX 恐慌指數' },
-        { symbol: 'DX-Y.NYB', name: 'DXY 美元指數' }
+        { symbol: '^DJI', name: '道瓊工業指數', displaySymbol: 'DJI' },
+        { symbol: '^IXIC', name: 'NASDAQ', displaySymbol: 'NASDAQ' },
+        { symbol: '^GSPC', name: 'S&P 500', displaySymbol: 'SPX' },
+        { symbol: '^SOX', name: '費城半導體', displaySymbol: 'SOX' },
+        { symbol: '^VIX', name: 'VIX 恐慌指數', displaySymbol: 'VIX' },
+        { symbol: 'DX-Y.NYB', name: 'DXY 美元指數', displaySymbol: 'DXY' }
     ];
 
-    const symbols = indices.map(i => i.symbol).join(',');
+    const results = [];
 
-    try {
-        const response = await http.get('https://query1.finance.yahoo.com/v7/finance/quote', {
-            params: { symbols }
-        });
-
-        if (response.data?.quoteResponse?.result) {
-            return response.data.quoteResponse.result.map(q => {
-                const indexInfo = indices.find(i => i.symbol === q.symbol);
-                return {
-                    symbol: q.symbol.replace('^', ''),
-                    name: indexInfo?.name || q.shortName,
-                    price: q.regularMarketPrice?.toFixed(2) || 'N/A',
-                    changePercent: q.regularMarketChangePercent?.toFixed(2) || '0'
-                };
+    // 使用 v8 API (不需要授權)
+    for (const index of indices) {
+        try {
+            const response = await http.get(`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(index.symbol)}`, {
+                timeout: 10000
             });
+
+            if (response.data?.chart?.result?.[0]) {
+                const meta = response.data.chart.result[0].meta;
+                const price = meta.regularMarketPrice;
+                const prevClose = meta.previousClose || meta.chartPreviousClose;
+                const change = price - prevClose;
+                const changePercent = (change / prevClose) * 100;
+
+                results.push({
+                    symbol: index.displaySymbol,
+                    name: index.name,
+                    price: price?.toFixed(2) || 'N/A',
+                    change: change?.toFixed(2) || '0',
+                    changePercent: changePercent?.toFixed(2) || '0'
+                });
+            }
+        } catch (error) {
+            console.error(`取得 ${index.name} 失敗:`, error.message);
         }
-    } catch (error) {
-        console.error('取得美股指數失敗:', error.message);
+
+        // 避免請求過快
+        await new Promise(resolve => setTimeout(resolve, 300));
     }
-    return [];
+
+    console.log(`✅ Yahoo Finance 取得 ${results.length} 個國際指數`);
+    return results;
 }
 
 export async function fetchCommodities() {
@@ -349,29 +381,41 @@ export async function fetchCommodities() {
         { symbol: 'ETH-USD', name: 'Ethereum', icon: 'Ξ' }
     ];
 
-    const symbols = commodities.map(c => c.symbol).join(',');
+    const results = [];
 
-    try {
-        const response = await http.get('https://query1.finance.yahoo.com/v7/finance/quote', {
-            params: { symbols }
-        });
-
-        if (response.data?.quoteResponse?.result) {
-            return response.data.quoteResponse.result.map(q => {
-                const info = commodities.find(c => c.symbol === q.symbol);
-                return {
-                    symbol: q.symbol,
-                    name: info?.name || q.shortName,
-                    icon: info?.icon || '💰',
-                    price: q.regularMarketPrice?.toFixed(2) || 'N/A',
-                    changePercent: q.regularMarketChangePercent?.toFixed(2) || '0'
-                };
+    // 使用 v8 API (不需要授權)
+    for (const commodity of commodities) {
+        try {
+            const response = await http.get(`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(commodity.symbol)}`, {
+                timeout: 10000
             });
+
+            if (response.data?.chart?.result?.[0]) {
+                const meta = response.data.chart.result[0].meta;
+                const price = meta.regularMarketPrice;
+                const prevClose = meta.previousClose || meta.chartPreviousClose;
+                const change = price - prevClose;
+                const changePercent = prevClose ? (change / prevClose) * 100 : 0;
+
+                results.push({
+                    symbol: commodity.symbol,
+                    name: commodity.name,
+                    icon: commodity.icon,
+                    price: price?.toFixed(2) || 'N/A',
+                    change: change?.toFixed(2) || '0',
+                    changePercent: changePercent?.toFixed(2) || '0'
+                });
+            }
+        } catch (error) {
+            console.error(`取得 ${commodity.name} 失敗:`, error.message);
         }
-    } catch (error) {
-        console.error('取得商品報價失敗:', error.message);
+
+        // 避免請求過快
+        await new Promise(resolve => setTimeout(resolve, 300));
     }
-    return [];
+
+    console.log(`✅ Yahoo Finance 取得 ${results.length} 個商品報價`);
+    return results;
 }
 
 // ========================================
