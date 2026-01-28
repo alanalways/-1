@@ -35,11 +35,11 @@ export async function fetchAllTaiwanStocks() {
         if (response.data && response.data.data) {
             const stocks = response.data.data;
 
-            // 過濾只保留一般股票 (排除 ETF、權證等)
+            // 過濾保留一般股票和 ETF (4-6 位數字)
             const filteredStocks = stocks.filter(s => {
                 const code = s.stock_id;
-                // 一般股票通常是 4 位數字
-                return /^\d{4}$/.test(code);
+                // 允許 4-6 位數股票（包含 ETF 如 0050, 00940）
+                return /^\d{4,6}$/.test(code);
             });
 
             console.log(`✅ FinMind 回傳 ${stocks.length} 個證券，過濾後 ${filteredStocks.length} 檔股票`);
