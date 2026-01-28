@@ -156,6 +156,20 @@ async function refreshAllData() {
 
 // === Global Markets Data ===
 async function loadGlobalMarkets() {
+    // 1. 優先使用 JSON 內的緩存數據 (秒開)
+    if (state.marketData?.internationalMarkets) {
+        const { usIndices, commodities } = state.marketData.internationalMarkets;
+        // 確保結構存在
+        if (!state.marketData.raw) state.marketData.raw = {};
+
+        state.marketData.raw.usIndices = usIndices || [];
+        state.marketData.raw.commodities = commodities || [];
+
+        // 立即渲染
+        renderGlobalMarkets();
+        console.log('✅ 使用 stocks-lite.json 內的國際市場數據 (秒開)');
+    }
+
     const symbols = [
         { symbol: '^DJI', name: '道瓊工業', icon: '🇺🇸' },
         { symbol: '^GSPC', name: 'S&P 500', icon: '📊' },
@@ -170,6 +184,7 @@ async function loadGlobalMarkets() {
     ];
 
     try {
+        // 背景更新 (不顯示 Loading)
         const results = await Promise.all(symbols.map(async (item) => {
             try {
                 const url = `https://query1.finance.yahoo.com/v8/finance/chart/${item.symbol}?interval=1d&range=2d`;
@@ -196,6 +211,7 @@ async function loadGlobalMarkets() {
             } catch (e) {
                 console.warn(`Failed to fetch ${item.symbol}:`, e.message);
             }
+            // 若失敗，保留原本數值或顯示 N/A
             return { ...item, price: '--', change: '0', changePercent: '0' };
         }));
 
@@ -206,9 +222,10 @@ async function loadGlobalMarkets() {
         state.marketData.raw.usIndices = results.filter(r => ['^DJI', '^GSPC', '^IXIC', '^SOX', '^N225', '000001.SS'].includes(r.symbol));
         state.marketData.raw.commodities = results.filter(r => ['GC=F', 'CL=F', 'BTC-USD', 'EURUSD=X'].includes(r.symbol));
 
-        console.log('✅ 國際市場資料已載入');
+        renderGlobalMarkets(); // 更新為最新數據
+        console.log('✅ 國際市場數據已在背景更新完成');
     } catch (error) {
-        console.error('載入國際市場失敗:', error);
+        console.error('背景更新國際市場失敗:', error);
     }
 }
 
@@ -299,8 +316,8 @@ async function loadMarketData() {
         state.filteredStocks = [...state.allStocks];
         state.analysisDate = liteData.analysisDate;
 
-        // === 動態更新 Market Intelligence ===
-        updateMarketIntelligence();
+        // === 動態更新 Market Intelligence (已改為後端生成，前端直接信任) ===
+        // updateMarketIntelligence(); // Removed
 
         // Update last updated time with analysis date warning
         if (elements.lastUpdated && liteData.lastUpdated) {
@@ -429,76 +446,8 @@ function updateStockCardPrice(code, newPrice, changePercent) {
 }
 
 // 動態生成 Market Intelligence 內容
-function updateMarketIntelligence() {
-    if (!state.marketData.marketIntelligence) return;
-
-    const stocks = state.allStocks;
-    const bullishCount = stocks.filter(s => s.signal === 'BULLISH').length;
-    const bearishCount = stocks.filter(s => s.signal === 'BEARISH').length;
-    const smcCount = stocks.filter(s => s.patterns?.ob || s.patterns?.fvg || s.patterns?.sweep).length;
-
-    // 計算平均漲跌幅
-    const avgChange = stocks.length > 0
-        ? (stocks.reduce((sum, s) => sum + (parseFloat(s.changePercent) || 0), 0) / stocks.length).toFixed(2)
-        : 0;
-
-    // 找出漲幅最大的產業
-    const sectorMap = new Map();
-    stocks.forEach(s => {
-        if (s.sector) {
-            if (!sectorMap.has(s.sector)) sectorMap.set(s.sector, { count: 0, change: 0 });
-            sectorMap.get(s.sector).count++;
-            sectorMap.get(s.sector).change += parseFloat(s.changePercent) || 0;
-        }
-    });
-    const hotSector = [...sectorMap.entries()]
-        .map(([name, data]) => ({ name, avgChange: data.change / data.count }))
-        .sort((a, b) => b.avgChange - a.avgChange)[0];
-
-    // 更新 marketIntelligence 陣列
-    state.marketData.marketIntelligence = [
-        {
-            icon: '📈',
-            category: '盤後總結',
-            title: `今日掃描 ${stocks.length} 檔股票`,
-            content: `看多 ${bullishCount} 檔 | 看空 ${bearishCount} 檔 | SMC 訊號 ${smcCount} 檔\n平均漲跌：${avgChange}%`,
-            stats: [
-                { label: '看多', value: bullishCount },
-                { label: '看空', value: bearishCount }
-            ]
-        },
-        {
-            icon: '📊',
-            category: '全市場掃描',
-            title: `共掃描 ${stocks.length} 檔股票`,
-            content: `看多 ${bullishCount} 檔 • 看空 ${bearishCount} 檔 • SMC 訊號 ${smcCount} 檔`,
-            stats: [
-                { label: '總數', value: stocks.length },
-                { label: 'SMC', value: smcCount }
-            ]
-        },
-        {
-            icon: '🔥',
-            category: '熱門產業',
-            title: hotSector ? `${hotSector.name} 最強` : '產業分析',
-            content: hotSector ? `${hotSector.name} 平均漲幅 ${hotSector.avgChange.toFixed(2)}%` : '計算中...',
-            stats: []
-        },
-        {
-            icon: '🌍',
-            category: '國際市場',
-            title: '國際指數即時報價',
-            content: '請切換至「國際市場」頁面查看詳細數據',
-            stats: []
-        },
-        {
-            icon: '🤖',
-            category: 'SMC 策略觀點',
-            title: `市場情緒：${bullishCount > bearishCount ? '偏多' : bullishCount < bearishCount ? '偏空' : '中性'} | SMC 訊號：${smcCount} 檔`,
-            content: `今日 SMC 策略掃描全市場，發現 ${smcCount} 檔具備機構訊號。`
-        }
-    ];
-}
+// 動態生成 Market Intelligence 內容 (已移除，改由後端 scripts/generate-report.js 統一計算)
+// function updateMarketIntelligence() { ... }
 
 // === Rendering Functions ===
 function renderDashboard() {

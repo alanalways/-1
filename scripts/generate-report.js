@@ -196,18 +196,55 @@ async function generateReport() {
     console.log(`   📉 看空：${bearishCount} 檔`);
     console.log(`   🧱 SMC 訊號：${smcCount} 檔`);
 
+    // === 4.1 Advance Statistics Calculation (Hot Sector & Avg Change) ===
+    let totalChange = 0;
+    const sectorStats = new Map();
+
+    allAnalyzedStocks.forEach(stock => {
+        const change = parseFloat(stock.changePercent) || 0;
+        totalChange += change;
+
+        const sector = stock.sector || '其他';
+        if (!sectorStats.has(sector)) {
+            sectorStats.set(sector, { count: 0, sum: 0 });
+        }
+        const s = sectorStats.get(sector);
+        s.count++;
+        s.sum += change;
+    });
+
+    const avgChange = allAnalyzedStocks.length > 0
+        ? (totalChange / allAnalyzedStocks.length).toFixed(2)
+        : '0.00';
+
+    let hotSector = { name: '市場數據統整中', avgChange: 0 };
+    let maxChange = -Infinity;
+
+    sectorStats.forEach((stats, name) => {
+        const sectorAvg = stats.sum / stats.count;
+        if (sectorAvg > maxChange) {
+            maxChange = sectorAvg;
+            hotSector = { name, avgChange: sectorAvg };
+        }
+    });
+
     // === 5. Build Market Intelligence ===
     const foreignFutures = futuresData.find(f => f.identity === '外資') || {};
     const foreignNetOI = foreignFutures.netOI || 'N/A';
+
+    // Ensure International Data Fallback
+    const dji = usIndices.find(i => i.symbol === 'DJI') || { changePercent: 'N/A' };
+    const ndx = usIndices.find(i => i.symbol === 'NASDAQ') || { changePercent: 'N/A' };
+    const vix = usIndices.find(i => i.symbol === 'VIX') || { changePercent: 'N/A' };
 
     const marketIntelligence = [
         {
             icon: '📈',
             category: '盤後總結',
-            title: twIndex ? `加權指數 ${twIndex.index}` : '市場數據載入中',
+            title: twIndex ? `加權指數 ${twIndex.index}` : '指數資料暫缺',
             content: twIndex
                 ? `漲跌 ${twIndex.change} • 成交 ${Math.round(parseInt(String(twIndex.amount || '0').replace(/,/g, '')) / 100000000)}億\n${String(twIndex.change || '').startsWith('-') ? '空方管控' : '多方控盤'}`
-                : '暫無資料',
+                : '無法取得證交所即時指數資料',
             stats: twIndex ? [
                 { label: '指數', value: twIndex.index, change: parseFloat(twIndex.change || 0) }
             ] : []
@@ -216,10 +253,19 @@ async function generateReport() {
             icon: '📊',
             category: '全市場掃描',
             title: `共掃描 ${allAnalyzedStocks.length} 檔股票`,
-            content: `看多 ${bullishCount} 檔 • 看空 ${bearishCount} 檔 • SMC 訊號 ${smcCount} 檔`,
+            content: `看多 ${bullishCount} 檔 • 看空 ${bearishCount} 檔\n市場平均漲跌 ${avgChange}%`,
             stats: [
                 { label: '總數', value: allAnalyzedStocks.length.toString() },
                 { label: 'SMC', value: smcCount.toString() }
+            ]
+        },
+        {
+            icon: '🔥',
+            category: '熱門產業',
+            title: `${hotSector.name} 最強`,
+            content: `${hotSector.name} 平均漲幅 ${hotSector.avgChange.toFixed(2)}%`,
+            stats: [
+                { label: '漲幅', value: hotSector.avgChange.toFixed(2) + '%' }
             ]
         },
         {
@@ -236,8 +282,8 @@ async function generateReport() {
             category: '宏觀經濟',
             title: '美股 & 國際指標',
             content: usIndices.length > 0
-                ? `DJI ${usIndices.find(i => i.symbol === 'DJI')?.changePercent}% | NDX ${usIndices.find(i => i.symbol === 'NASDAQ')?.changePercent}% | VIX ${usIndices.find(i => i.symbol === 'VIX')?.changePercent}%`
-                : '數據載入中...',
+                ? `DJI ${dji.changePercent}% | NDX ${ndx.changePercent}% | VIX ${vix.changePercent}%`
+                : '數據載入中 (API 連線...)',
             stats: usIndices.slice(0, 3).map(i => ({
                 label: i.symbol,
                 value: i.changePercent + '%',

@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026/1/29 上午3:27:09",
+  "lastUpdated": "2026/1/29 上午3:56:19",
   "analysisDate": "2026-01-28",
   "totalStocks": 1014,
   "statistics": {
@@ -12,15 +12,15 @@
     {
       "icon": "📈",
       "category": "盤後總結",
-      "title": "市場數據載入中",
-      "content": "暫無資料",
+      "title": "指數資料暫缺",
+      "content": "無法取得證交所即時指數資料",
       "stats": []
     },
     {
       "icon": "📊",
       "category": "全市場掃描",
       "title": "共掃描 1014 檔股票",
-      "content": "看多 238 檔 • 看空 254 檔 • SMC 訊號 526 檔",
+      "content": "看多 238 檔 • 看空 254 檔\n市場平均漲跌 -0.35%",
       "stats": [
         {
           "label": "總數",
@@ -29,6 +29,18 @@
         {
           "label": "SMC",
           "value": "526"
+        }
+      ]
+    },
+    {
+      "icon": "🔥",
+      "category": "熱門產業",
+      "title": "電線電纜 最強",
+      "content": "電線電纜 平均漲幅 5.01%",
+      "stats": [
+        {
+          "label": "漲幅",
+          "value": "5.01%"
         }
       ]
     },
@@ -49,22 +61,22 @@
       "icon": "🌍",
       "category": "宏觀經濟",
       "title": "美股 & 國際指標",
-      "content": "DJI 0.01% | NDX 0.19% | VIX 1.10%",
+      "content": "DJI -0.04% | NDX 0.31% | VIX 1.47%",
       "stats": [
         {
           "label": "DJI",
-          "value": "0.01%",
-          "change": 0.01
+          "value": "-0.04%",
+          "change": -0.04
         },
         {
           "label": "NASDAQ",
-          "value": "0.19%",
-          "change": 0.19
+          "value": "0.31%",
+          "change": 0.31
         },
         {
           "label": "SPX",
-          "value": "-0.04%",
-          "change": -0.04
+          "value": "-0.01%",
+          "change": -0.01
         }
       ]
     },
@@ -80,44 +92,44 @@
       {
         "symbol": "DJI",
         "name": "道瓊工業指數",
-        "price": "49008.18",
-        "change": "4.77",
-        "changePercent": "0.01"
+        "price": "48985.58",
+        "change": "-17.83",
+        "changePercent": "-0.04"
       },
       {
         "symbol": "NASDAQ",
         "name": "NASDAQ",
-        "price": "23863.37",
-        "change": "46.27",
-        "changePercent": "0.19"
+        "price": "23891.44",
+        "change": "74.35",
+        "changePercent": "0.31"
       },
       {
         "symbol": "SPX",
         "name": "S&P 500",
-        "price": "6975.89",
-        "change": "-2.71",
-        "changePercent": "-0.04"
+        "price": "6977.62",
+        "change": "-0.98",
+        "changePercent": "-0.01"
       },
       {
         "symbol": "SOX",
         "name": "費城半導體",
-        "price": "8299.83",
-        "change": "182.65",
-        "changePercent": "2.25"
+        "price": "8315.33",
+        "change": "198.15",
+        "changePercent": "2.44"
       },
       {
         "symbol": "VIX",
         "name": "VIX 恐慌指數",
-        "price": "16.53",
-        "change": "0.18",
-        "changePercent": "1.10"
+        "price": "16.59",
+        "change": "0.24",
+        "changePercent": "1.47"
       },
       {
         "symbol": "DXY",
         "name": "DXY 美元指數",
-        "price": "96.63",
-        "change": "0.42",
-        "changePercent": "0.43"
+        "price": "96.58",
+        "change": "0.37",
+        "changePercent": "0.38"
       }
     ],
     "commodities": [
@@ -125,49 +137,49 @@
         "symbol": "GC=F",
         "name": "黃金",
         "icon": "🥇",
-        "price": "5330.70",
-        "change": "210.10",
-        "changePercent": "4.10"
+        "price": "5342.70",
+        "change": "222.10",
+        "changePercent": "4.34"
       },
       {
         "symbol": "SI=F",
         "name": "白銀",
         "icon": "🥈",
-        "price": "113.23",
-        "change": "7.28",
-        "changePercent": "6.87"
+        "price": "113.86",
+        "change": "7.90",
+        "changePercent": "7.46"
       },
       {
         "symbol": "CL=F",
         "name": "原油",
         "icon": "🛢️",
-        "price": "63.21",
-        "change": "0.82",
-        "changePercent": "1.31"
+        "price": "63.16",
+        "change": "0.77",
+        "changePercent": "1.23"
       },
       {
         "symbol": "NG=F",
         "name": "天然氣",
         "icon": "🔥",
-        "price": "3.72",
-        "change": "-0.10",
-        "changePercent": "-2.72"
+        "price": "3.74",
+        "change": "-0.08",
+        "changePercent": "-2.02"
       },
       {
         "symbol": "BTC-USD",
         "name": "Bitcoin",
         "icon": "₿",
-        "price": "89425.23",
-        "change": "295.32",
-        "changePercent": "0.33"
+        "price": "89379.95",
+        "change": "250.04",
+        "changePercent": "0.28"
       },
       {
         "symbol": "ETH-USD",
         "name": "Ethereum",
         "icon": "Ξ",
-        "price": "3009.70",
-        "change": "-12.79",
-        "changePercent": "-0.42"
+        "price": "3013.50",
+        "change": "-9.00",
+        "changePercent": "-0.30"
       }
     ],
     "twIndex": null
