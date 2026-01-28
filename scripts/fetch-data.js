@@ -164,37 +164,73 @@ export async function fetchYahooQuotes(symbols) {
 
 /**
  * 從證交所取得當日所有上市股票交易資料
+ * 使用 STOCK_DAY_ALL API (非交易時段也可用)
  */
 export async function fetchTWSEAllStocks() {
-    console.log('📡 正在從 TWSE 取得當日交易資料...');
+    console.log('📡 正在從 TWSE 取得當日交易資料 (STOCK_DAY_ALL)...');
 
     try {
-        const response = await http.get('https://www.twse.com.tw/exchangeReport/MI_INDEX', {
+        // 使用 open_data 格式 (CSV)，非交易時段也可用
+        const response = await http.get('https://www.twse.com.tw/exchangeReport/STOCK_DAY_ALL', {
             params: {
-                response: 'json',
-                type: 'ALLBUT0999'
-            }
+                response: 'open_data'
+            },
+            timeout: 60000
         });
 
-        if (response.data && response.data.data9) {
-            const stocks = response.data.data9.map(row => ({
-                code: row[0],
-                name: row[1],
-                volume: row[2],
-                transactions: row[3],
-                amount: row[4],
-                openPrice: row[5],
-                highPrice: row[6],
-                lowPrice: row[7],
-                closePrice: row[8],
-                change: row[10]
-            }));
+        if (response.data) {
+            const lines = response.data.split('\n');
+            // 第一行是標題: 日期,證券代號,證券名稱,成交股數,成交金額,開盤價,最高價,最低價,收盤價,漲跌價差,成交筆數
+            const stocks = [];
 
-            console.log(`✅ TWSE 回傳 ${stocks.length} 檔上市股票`);
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line) continue;
+
+                // CSV 格式處理 (可能有引號)
+                const cols = line.split(',').map(c => c.replace(/"/g, '').trim());
+
+                // cols: [日期, 代號, 名稱, 成交股數, 成交金額, 開盤價, 最高價, 最低價, 收盤價, 漲跌價差, 成交筆數]
+                const dateStr = cols[0]; // 民國日期 YYYMMDD
+                const code = cols[1];
+                const name = cols[2];
+
+                // 只接受 4-6 位數字的股票代號 (過濾權證等)
+                if (!/^\d{4,6}$/.test(code)) continue;
+
+                // 解析價格 (移除逗號)
+                const parseNum = (str) => {
+                    if (!str || str === '--' || str === '') return 0;
+                    return parseFloat(str.replace(/,/g, '')) || 0;
+                };
+
+                stocks.push({
+                    date: dateStr,
+                    code: code,
+                    name: name,
+                    volume: parseNum(cols[3]),
+                    tradeValue: parseNum(cols[4]),
+                    openPrice: parseNum(cols[5]),
+                    highPrice: parseNum(cols[6]),
+                    lowPrice: parseNum(cols[7]),
+                    closePrice: parseNum(cols[8]),
+                    change: parseNum(cols[9]),
+                    transactions: parseNum(cols[10])
+                });
+            }
+
+            console.log(`✅ TWSE STOCK_DAY_ALL 回傳 ${stocks.length} 檔上市股票`);
+
+            // 驗證 2330 台積電股價
+            const tsmc = stocks.find(s => s.code === '2330');
+            if (tsmc) {
+                console.log(`   📊 驗證: 2330 台積電 收盤價 = ${tsmc.closePrice} 元`);
+            }
+
             return stocks;
         }
     } catch (error) {
-        console.error('TWSE API 失敗:', error.message);
+        console.error('TWSE STOCK_DAY_ALL API 失敗:', error.message);
     }
 
     return [];
@@ -457,17 +493,51 @@ export function getSectorMap() {
 // ========================================
 
 export async function fetchAllStocks() {
-    // 優先使用 TWSE + TPEx API
-    const twseStocks = await fetchTWSEAllStocks();
-    const tpexStocks = await fetchTPExAllStocks();
+    // 優先使用 TWSE + TPEx API (證交所官方資料)
+    console.log('📡 優先使用證交所 (TWSE) 與櫃買中心 (TPEx) API...');
+    let twseStocks = await fetchTWSEAllStocks();
+    let tpexStocks = await fetchTPExAllStocks();
 
     // 合併上市 + 上櫃
-    const allStocks = [
+    let allStocks = [
         ...twseStocks.map(s => ({ ...s, market: '上市' })),
         ...tpexStocks.map(s => ({ ...s, market: '上櫃' }))
     ];
 
-    console.log(`📊 合併後共 ${allStocks.length} 檔股票 (上市 ${twseStocks.length} + 上櫃 ${tpexStocks.length})`);
+    console.log(`📊 證交所合併後共 ${allStocks.length} 檔股票 (上市 ${twseStocks.length} + 上櫃 ${tpexStocks.length})`);
+
+    // 如果證交所無資料（非交易時間），使用 Yahoo Finance 備用
+    if (allStocks.length === 0) {
+        console.log('⚠️ 證交所無即時資料（可能為非交易時間），嘗試使用 Yahoo Finance 備用...');
+
+        // 從基本面資料取得股票清單
+        const fundamentals = await fetchStockFundamentals();
+        if (fundamentals && fundamentals.size > 0) {
+            const symbols = Array.from(fundamentals.keys()).map(code =>
+                code.includes('.') ? code : `${code}.TW`
+            );
+
+            // 批次取得 Yahoo Finance 報價
+            const yahooQuotes = await fetchYahooQuotes(symbols);
+
+            allStocks = Array.from(yahooQuotes.entries()).map(([symbol, data]) => ({
+                code: symbol.replace('.TW', '').replace('.TWO', ''),
+                name: data.name,
+                openPrice: data.openPrice,
+                highPrice: data.highPrice,
+                lowPrice: data.lowPrice,
+                closePrice: data.closePrice,
+                volume: data.volume,
+                change: data.change,
+                changePercent: data.changePercent,
+                peRatio: data.peRatio,
+                dividendYield: data.dividendYield,
+                market: symbol.includes('.TWO') ? '上櫃' : '上市'
+            }));
+
+            console.log(`✅ Yahoo Finance 備用取得 ${allStocks.length} 檔股票報價`);
+        }
+    }
 
     return allStocks;
 }
