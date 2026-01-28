@@ -1,39 +1,41 @@
-name: Daily Market Report Update
+
+name: Daily Stock Analysis Update
 
 on:
   schedule:
-    # UTC 07:00 = 台北時間 15:00（每個交易日收盤後）
-    - cron: '0 7 * * 1-5'
-  workflow_dispatch: # 手動觸發
-
-permissions:
-  contents: write
+    # Run at 06:00 UTC (14:00 Taipei Time)
+    - cron: '0 6 * * *'
+  workflow_dispatch: # Allow manual trigger
 
 jobs:
-  update:
+  update-data:
     runs-on: ubuntu-latest
+    
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
 
-      - name: Install dependencies
-        run: npm ci || npm install
+    - name: Install Dependencies
+      run: npm install
 
-      - name: Update market data
-        run: npm run update-data
-        env:
-          TZ: 'Asia/Taipei'
+    - name: Fetch Historical Data (TWSE)
+      run: node scripts/fetch-historical.js
 
-      - name: Commit and push changes
-        run: |
-          git config user.name 'github-actions[bot]'
-          git config user.email 'actions@github.com'
-          git add -A
-          git diff --staged --quiet || git commit -m "📊 每日市場報告更新 $(TZ='Asia/Taipei' date +'%Y-%m-%d %H:%M')"
-          git push
+    - name: Generate SMC Analysis Report
+      # Ideally this script should now READ the history files we just fetched
+      # For now, let's just run it to keep the summary alive. 
+      # Later we will upgrade it to use the new JSON history.
+      run: node scripts/generate-report.js
+
+    - name: Commit and Push Changes
+      run: |
+        git config --global user.name 'GitHub Action'
+        git config --global user.email 'action@github.com'
+        git add data/history/*.json data/stocks-lite.json
+        git commit -m "Auto-update: Daily stock history & analysis" || echo "No changes to commit"
+        git push

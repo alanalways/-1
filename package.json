@@ -11,7 +11,8 @@
     "dependencies": {
         "axios": "^1.6.0",
         "better-sqlite3": "^12.6.2",
-        "cheerio": "^1.0.0-rc.12"
+        "cheerio": "^1.0.0-rc.12",
+        "yahoo-finance2": "^3.13.0"
     },
     "devDependencies": {
         "serve": "^14.2.0"
