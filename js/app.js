@@ -46,12 +46,137 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Load data
     await loadMarketData();
 
+    // Load global markets
+    await loadGlobalMarkets();
+
     // Render UI
     renderDashboard();
 
     // Hide loading
     hideLoading();
+
+    // Setup auto-refresh during Taiwan trading hours (9:00-13:30)
+    setupAutoRefresh();
 });
+
+// === Trading Hours Auto Refresh ===
+let autoRefreshInterval = null;
+
+function isTaiwanTradingHours() {
+    const now = new Date();
+    // 台北時間 = UTC+8
+    const taiwanTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Taipei' }));
+    const hours = taiwanTime.getHours();
+    const minutes = taiwanTime.getMinutes();
+    const day = taiwanTime.getDay();
+
+    // 週一到週五
+    if (day === 0 || day === 6) return false;
+
+    // 9:00 - 13:30
+    const timeValue = hours * 60 + minutes;
+    return timeValue >= 9 * 60 && timeValue <= 13 * 60 + 30;
+}
+
+function setupAutoRefresh() {
+    // 每分鐘檢查是否在交易時段
+    setInterval(() => {
+        if (isTaiwanTradingHours()) {
+            if (!autoRefreshInterval) {
+                console.log('📡 進入交易時段，啟動每 5 分鐘自動更新');
+                autoRefreshInterval = setInterval(refreshAllData, 5 * 60 * 1000);
+                showToast('🔄 交易時段自動更新已啟動', 'success');
+            }
+        } else {
+            if (autoRefreshInterval) {
+                console.log('⏸️ 離開交易時段，停止自動更新');
+                clearInterval(autoRefreshInterval);
+                autoRefreshInterval = null;
+            }
+        }
+    }, 60 * 1000);
+
+    // 首次檢查
+    if (isTaiwanTradingHours()) {
+        autoRefreshInterval = setInterval(refreshAllData, 5 * 60 * 1000);
+        console.log('📡 已在交易時段，自動更新每 5 分鐘');
+    }
+}
+
+async function refreshAllData() {
+    console.log('🔄 自動更新資料...', new Date().toLocaleTimeString());
+    try {
+        await loadMarketData();
+        await loadGlobalMarkets();
+        renderDashboard();
+        renderGlobalMarkets();
+
+        if (elements.lastUpdated) {
+            elements.lastUpdated.textContent = new Date().toLocaleString('zh-TW');
+        }
+        showToast('✅ 資料已更新', 'success');
+    } catch (err) {
+        console.error('自動更新失敗:', err);
+    }
+}
+
+// === Global Markets Data ===
+async function loadGlobalMarkets() {
+    const symbols = [
+        { symbol: '^DJI', name: '道瓊工業', icon: '🇺🇸' },
+        { symbol: '^GSPC', name: 'S&P 500', icon: '📊' },
+        { symbol: '^IXIC', name: '那斯達克', icon: '💻' },
+        { symbol: '^SOX', name: '費半指數', icon: '🔌' },
+        { symbol: '^N225', name: '日經 225', icon: '🇯🇵' },
+        { symbol: '000001.SS', name: '上證指數', icon: '🇨🇳' },
+        { symbol: 'GC=F', name: '黃金', icon: '🥇' },
+        { symbol: 'CL=F', name: '原油', icon: '🛢️' },
+        { symbol: 'BTC-USD', name: '比特幣', icon: '₿' },
+        { symbol: 'EURUSD=X', name: '歐元/美元', icon: '💱' }
+    ];
+
+    try {
+        const results = await Promise.all(symbols.map(async (item) => {
+            try {
+                const url = `https://query1.finance.yahoo.com/v8/finance/chart/${item.symbol}?interval=1d&range=2d`;
+                const response = await fetchWithCORS(url);
+                const data = await response.json();
+
+                if (data.chart?.result?.[0]) {
+                    const result = data.chart.result[0];
+                    const meta = result.meta;
+                    const quotes = result.indicators?.quote?.[0] || {};
+
+                    const currentPrice = meta.regularMarketPrice || quotes.close?.[quotes.close.length - 1] || 0;
+                    const prevClose = meta.previousClose || meta.chartPreviousClose || currentPrice;
+                    const change = currentPrice - prevClose;
+                    const changePercent = prevClose ? (change / prevClose * 100) : 0;
+
+                    return {
+                        ...item,
+                        price: currentPrice.toLocaleString(undefined, { maximumFractionDigits: 2 }),
+                        change: change.toFixed(2),
+                        changePercent: changePercent.toFixed(2)
+                    };
+                }
+            } catch (e) {
+                console.warn(`Failed to fetch ${item.symbol}:`, e.message);
+            }
+            return { ...item, price: '--', change: '0', changePercent: '0' };
+        }));
+
+        // 儲存到 state
+        if (!state.marketData) state.marketData = {};
+        if (!state.marketData.raw) state.marketData.raw = {};
+
+        state.marketData.raw.usIndices = results.filter(r => ['^DJI', '^GSPC', '^IXIC', '^SOX', '^N225', '000001.SS'].includes(r.symbol));
+        state.marketData.raw.commodities = results.filter(r => ['GC=F', 'CL=F', 'BTC-USD', 'EURUSD=X'].includes(r.symbol));
+
+        console.log('✅ 國際市場資料已載入');
+    } catch (error) {
+        console.error('載入國際市場失敗:', error);
+    }
+}
 
 // === Event Listeners Setup ===
 function setupEventListeners() {
