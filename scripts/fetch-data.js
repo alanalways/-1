@@ -304,17 +304,77 @@ export async function fetchTaiwanStockIndex() {
     try {
         const response = await http.get('https://www.twse.com.tw/exchangeReport/MI_INDEX?response=json&type=IND');
 
-        if (response.data && response.data.data1) {
-            const indexData = response.data.data1.find(row => row[0] === '發行量加權股價指數');
-            if (indexData) {
-                return {
-                    name: '加權指數',
-                    index: indexData[1],
-                    change: indexData[2],
-                    amount: response.data.data5?.[0]?.[2] || 'N/A'
-                };
+        let indexData = null;
+        let amount = 'N/A';
+
+        // Case 1: New API format (tables)
+        if (response.data && response.data.tables) {
+            // Find table with index data
+            for (const table of response.data.tables) {
+                if (table.data) {
+                    const row = table.data.find(r => r[0] && r[0].includes('發行量加權股價指數'));
+                    if (row) {
+                        indexData = row;
+                        break;
+                    }
+                }
             }
+            // Try to find volume/amount if possible (usually in another table or field), 
+            // but for now let's focus on the index value. 
+            // MI_INDEX 'tables' usually splits indices and other stats.
         }
+        // Case 2: Old API format (data1)
+        else if (response.data && response.data.data1) {
+            indexData = response.data.data1.find(row => row[0] === '發行量加權股價指數');
+            amount = response.data.data5?.[0]?.[2] || 'N/A';
+        }
+
+        if (indexData) {
+            // 解析資料：通常格式 [指數名稱, 指數, 漲跌(+/-), 漲跌點數, 漲跌百分比]
+            // Debug data showed: ['發行量加權股價指數', '23,xxx.xx', '<p...>', '123.45', ...]
+
+            const indexValue = indexData[1];
+
+            // 嘗試解析漲跌
+            // 邏輯: 
+            // 1. 如果第3欄是純符號 (+/-)，則第4欄是數值
+            // 2. 如果第3欄是 HTML (<p style='color:green'>-</p>)，則第4欄是數值
+            // 3. 如果第3欄是數值，可能沒有符號欄
+
+            let sign = '';
+            let changeVal = '';
+
+            // 檢查 column 2 (index 2)
+            const col2 = indexData[2] || '';
+            const col3 = indexData[3] || '';
+
+            if (col2.includes('-') || col2.includes('green')) {
+                sign = '-';
+            } else if (col2.includes('+') || col2.includes('red')) {
+                sign = ''; // 正數不強制加號，或可加 '+'
+            }
+
+            // 如果 col2 看起來不是數值（是符號或 HTML），那數值在 col3
+            if (isNaN(parseFloat(col2.replace(/,/g, ''))) || col2.includes('<')) {
+                changeVal = col3;
+            } else {
+                changeVal = col2; // col2 就是數值
+            }
+
+            // 組合最終變動值
+            let finalChange = sign + changeVal;
+
+            // 如果解析失敗，至少回傳指數
+            if (!changeVal) finalChange = '0';
+
+            return {
+                name: '加權指數',
+                index: indexValue,
+                change: finalChange,
+                amount: amount
+            };
+        }
+
     } catch (error) {
         console.error('取得台股指數失敗:', error.message);
     }

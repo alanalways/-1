@@ -333,13 +333,21 @@ async function generateReport() {
         code: stock.code,
         name: stock.name,
         market: stock.market,
+        openPrice: stock.openPrice,
+        highPrice: stock.highPrice,
+        lowPrice: stock.lowPrice,
         closePrice: stock.closePrice,
+        volume: stock.volume,
+        changeVal: stock.changeVal,
         changePercent: stock.changePercent,
         signal: stock.signal,
         score: stock.score,
-        tags: stock.tags?.slice(0, 2) || [], // 只保留前 2 個標籤
+        tags: stock.tags?.slice(0, 3) || [], // 保留前 3 個標籤
         peRatio: stock.peRatio,
-        dividendYield: stock.dividendYield
+        dividendYield: stock.dividendYield,
+        sector: stock.sector,
+        analysis: stock.analysis,
+        patterns: stock.patterns // 需要 pattern data 顯示 icon
     }));
 
     const liteData = {
