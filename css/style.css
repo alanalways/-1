@@ -98,6 +98,76 @@ body {
     pointer-events: none;
 }
 
+/* Loading Progress Bar */
+.loading-progress-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-lg);
+    min-width: 320px;
+}
+
+.loading-logo {
+    font-size: 4rem;
+    animation: bounce 1.5s ease-in-out infinite;
+}
+
+@keyframes bounce {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.loading-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    background: var(--gradient-blue);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.loading-progress-bar {
+    width: 100%;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.loading-progress-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--gradient-blue);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+}
+
+.loading-progress-info {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    font-size: 0.9rem;
+}
+
+.loading-percent {
+    color: var(--accent-blue);
+    font-weight: 600;
+    font-family: var(--font-mono);
+}
+
+.loading-step {
+    color: var(--text-muted);
+}
+
 .loading-spinner-container {
     display: flex;
     flex-direction: column;
@@ -1870,4 +1940,567 @@ body {
         flex-wrap: wrap;
         gap: var(--spacing-sm);
     }
+}
+
+/* ============================================
+   AI Analysis Section Styles
+   ============================================ */
+
+.ai-analysis-section {
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
+    padding: var(--spacing-lg);
+    margin-top: var(--spacing-lg);
+}
+
+.ai-section-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-lg);
+}
+
+.ai-section-header h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+/* Health Score Gauge */
+.ai-health-score {
+    display: flex;
+    gap: var(--spacing-lg);
+    padding: var(--spacing-md);
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--spacing-lg);
+}
+
+.health-gauge-container {
+    flex-shrink: 0;
+    width: 120px;
+}
+
+.health-gauge {
+    width: 100%;
+    height: auto;
+}
+
+.health-analysis {
+    flex: 1;
+}
+
+.analysis-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: var(--radius-sm);
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: var(--spacing-sm);
+}
+
+.analysis-badge.positive {
+    background: var(--accent-green-dim);
+    color: var(--accent-green);
+}
+
+.analysis-badge.neutral {
+    background: rgba(245, 158, 11, 0.15);
+    color: var(--accent-yellow);
+}
+
+.analysis-badge.negative {
+    background: var(--accent-red-dim);
+    color: var(--accent-red);
+}
+
+.analysis-text {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+/* Quantitative Rating */
+.ai-quantitative {
+    padding: var(--spacing-md);
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--spacing-lg);
+}
+
+.quant-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-md);
+}
+
+.quant-label {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.quant-direction {
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: var(--radius-sm);
+}
+
+.quant-direction.bullish {
+    background: var(--accent-green-dim);
+    color: var(--accent-green);
+}
+
+.quant-direction.bearish {
+    background: var(--accent-red-dim);
+    color: var(--accent-red);
+}
+
+.quant-bar-container {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.quant-bar-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    min-width: 30px;
+}
+
+.quant-bar-label.right {
+    text-align: right;
+}
+
+.quant-bar {
+    flex: 1;
+    height: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    position: relative;
+    overflow: hidden;
+}
+
+.quant-bar-fill {
+    height: 100%;
+    border-radius: 6px;
+    transition: width 0.5s ease;
+}
+
+.quant-bar-marker {
+    position: absolute;
+    top: -3px;
+    width: 4px;
+    height: 18px;
+    background: white;
+    border-radius: 2px;
+    transform: translateX(-50%);
+    box-shadow: 0 0 6px rgba(255, 255, 255, 0.5);
+}
+
+/* Dividend History */
+.ai-dividend-history {
+    padding: var(--spacing-md);
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--spacing-lg);
+}
+
+.dividend-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-md);
+}
+
+.dividend-title {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.dividend-info {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.dividend-bars {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.dividend-bar-row {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.dividend-year {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    min-width: 40px;
+}
+
+.dividend-bar-group {
+    flex: 1;
+    display: flex;
+    gap: 2px;
+    height: 16px;
+}
+
+.dividend-bar {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+.dividend-bar.cash {
+    background: var(--accent-green);
+}
+
+.dividend-bar.stock {
+    background: var(--accent-blue);
+}
+
+.dividend-value {
+    font-size: 0.75rem;
+    font-family: var(--font-mono);
+    color: var(--text-secondary);
+    min-width: 40px;
+    text-align: right;
+}
+
+.dividend-legend {
+    display: flex;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-sm);
+    padding-top: var(--spacing-sm);
+    border-top: 1px solid var(--border-subtle);
+}
+
+/* Entry Prediction */
+.ai-entry-prediction {
+    padding: var(--spacing-md);
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: var(--radius-md);
+}
+
+.prediction-header {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+}
+
+.prediction-header h5 {
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin: 0;
+}
+
+.prediction-controls {
+    display: flex;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+}
+
+.prediction-select-group {
+    flex: 1;
+}
+
+.prediction-select-group label {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+}
+
+.prediction-select {
+    width: 100%;
+    padding: 8px 12px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-size: 0.85rem;
+}
+
+.prediction-result {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-md);
+}
+
+.prediction-price-box {
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-sm);
+    padding: var(--spacing-md);
+    text-align: center;
+    border: 1px solid var(--border-subtle);
+}
+
+.prediction-label {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+}
+
+.prediction-price {
+    display: block;
+    font-size: 1.3rem;
+    font-weight: 700;
+    font-family: var(--font-mono);
+    color: var(--text-primary);
+}
+
+.prediction-price.positive {
+    color: var(--accent-green);
+}
+
+.prediction-price.negative {
+    color: var(--accent-red);
+}
+
+.prediction-unit {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+}
+
+/* Simulator Dividend Checkbox */
+.sim-checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    cursor: pointer;
+}
+
+.sim-checkbox-label input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--accent-green);
+}
+
+.sim-param-hint {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+
+/* Responsive AI Section */
+@media (max-width: 768px) {
+    .ai-health-score {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .prediction-controls {
+        flex-direction: column;
+    }
+
+    .prediction-result {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ============================================
+   Investment Quiz Styles
+   ============================================ */
+
+.quiz-modal {
+    background: var(--bg-card);
+    width: 90%;
+    max-width: 600px;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    position: relative;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.quiz-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-lg);
+    border-bottom: 1px solid var(--border-color);
+    background: var(--bg-secondary);
+}
+
+.quiz-header h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.quiz-body {
+    padding: var(--spacing-xl);
+    flex: 1;
+    overflow-y: auto;
+}
+
+.quiz-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: var(--spacing-lg);
+    animation: fadeIn 0.3s ease;
+}
+
+.quiz-intro-icon,
+.result-icon {
+    font-size: 4rem;
+    margin-bottom: var(--spacing-sm);
+    animation: bounce 2s infinite;
+}
+
+.quiz-btn {
+    padding: 12px 30px;
+    border-radius: var(--radius-md);
+    border: none;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.quiz-btn.primary {
+    background: var(--gradient-blue);
+    color: white;
+    box-shadow: var(--shadow-glow-blue);
+}
+
+.quiz-btn.primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+}
+
+/* Question Step */
+.quiz-progress {
+    width: 100%;
+    height: 6px;
+    background: var(--bg-tertiary);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: var(--spacing-sm);
+}
+
+.quiz-progress-bar {
+    height: 100%;
+    width: 0%;
+    background: var(--gradient-green);
+    transition: width 0.3s ease;
+}
+
+.quiz-question-number {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.quiz-question-text {
+    font-size: 1.3rem;
+    line-height: 1.5;
+    margin-bottom: var(--spacing-lg);
+}
+
+.quiz-options {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.quiz-option {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    padding: 15px 20px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    text-align: left;
+    transition: var(--transition-fast);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.quiz-option:hover {
+    background: var(--bg-hover);
+    border-color: var(--accent-blue);
+    transform: translateX(5px);
+}
+
+.quiz-option-letter {
+    width: 28px;
+    height: 28px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+/* Result Step */
+.result-header {
+    margin-bottom: var(--spacing-md);
+}
+
+.result-label {
+    display: block;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-bottom: 4px;
+}
+
+.result-type {
+    font-size: 2rem;
+    background: var(--gradient-blue);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.result-desc {
+    color: var(--text-secondary);
+    max-width: 80%;
+    margin: 0 auto;
+}
+
+.result-tags {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin: var(--spacing-md) 0;
+}
+
+.result-tag {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+}
+
+.result-recommendation {
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    width: 100%;
+    text-align: left;
+}
+
+.result-recommendation h5 {
+    color: var(--accent-green);
+    margin-bottom: 8px;
+}
+
+.result-recommendation p {
+    font-size: 0.9rem;
+    margin: 0;
 }

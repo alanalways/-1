@@ -34,64 +34,63 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 function initElements() {
-    elements.symbolSearch = document.getElementById('symbolSearch');
-    elements.searchResults = document.getElementById('searchResults');
-    elements.selectedSymbol = document.getElementById('selectedSymbol');
-    elements.symbolName = document.getElementById('symbolName');
-    elements.symbolCode = document.getElementById('symbolCode');
-    elements.symbolIcon = document.getElementById('symbolIcon');
+    elements.symbolSearch = document.getElementById('simSymbolSearch');
+    elements.searchResults = document.getElementById('simSearchResults');
+    elements.selectedSymbol = document.getElementById('simSelectedSymbol');
+    elements.symbolName = document.getElementById('simSymbolName');
+    elements.symbolCode = document.getElementById('simSymbolCode');
+    elements.symbolIcon = document.getElementById('simSymbolIcon');
 
-    elements.modeTabs = document.querySelectorAll('.mode-tab');
-    elements.runButton = document.getElementById('runButton');
+    elements.modeTabs = document.querySelectorAll('.sim-mode-tab');
+    elements.runButton = document.getElementById('simRunButton');
 
-    elements.initialCapital = document.getElementById('initialCapital');
-    elements.monthlyInvestment = document.getElementById('monthlyInvestment');
-    elements.years = document.getElementById('years');
-    elements.yearsValue = document.getElementById('yearsValue');
-    elements.annualReturn = document.getElementById('annualReturn');
-    elements.annualReturnValue = document.getElementById('annualReturnValue');
-    elements.annualReturnGroup = document.getElementById('annualReturnGroup');
+    elements.initialCapital = document.getElementById('simInitialCapital');
+    elements.monthlyInvestment = document.getElementById('simMonthlyInvestment');
+    elements.years = document.getElementById('simYears');
+    elements.yearsValue = document.getElementById('simYearsValue');
+    elements.annualReturn = document.getElementById('simAnnualReturn');
+    elements.annualReturnValue = document.getElementById('simAnnualReturnValue');
+    elements.annualReturnGroup = document.getElementById('simAnnualReturnGroup');
 
     // 日期範圍
-    elements.startDate = document.getElementById('startDate');
-    elements.endDate = document.getElementById('endDate');
-    elements.dateRangeGroup = document.getElementById('dateRangeGroup');
+    elements.startDate = document.getElementById('simStartDate');
+    elements.endDate = document.getElementById('simEndDate');
+    elements.dateRangeGroup = document.getElementById('simDateRangeGroup');
 
     // 分時段投資
-    elements.usePhases = document.getElementById('usePhases');
-    elements.investmentPhases = document.getElementById('investmentPhases');
-    elements.phaseList = document.getElementById('phaseList');
-    elements.addPhase = document.getElementById('addPhase');
-    elements.fixedMonthlyGroup = document.getElementById('fixedMonthlyGroup');
+    elements.usePhases = document.getElementById('simUsePhases');
+    elements.investmentPhases = document.getElementById('simInvestmentPhases');
+    elements.phaseList = document.getElementById('simPhaseList');
+    elements.addPhase = document.getElementById('simAddPhase');
+    elements.fixedMonthlyGroup = document.getElementById('simFixedMonthlyGroup');
 
-    elements.commissionRate = document.getElementById('commissionRate');
-    elements.taxRate = document.getElementById('taxRate');
-    elements.dipBuyStrategy = document.getElementById('dipBuyStrategy');
-    elements.rsiThreshold = document.getElementById('rsiThreshold');
-    elements.rsiThresholdGroup = document.getElementById('rsiThresholdGroup');
-    elements.reinvestDividends = document.getElementById('reinvestDividends');
+    elements.commissionRate = document.getElementById('simCommissionRate');
+    elements.taxRate = document.getElementById('simTaxRate');
+    elements.dipBuyStrategy = document.getElementById('simDipBuyStrategy');
+    elements.rsiThreshold = document.getElementById('simRsiThreshold');
+    elements.rsiThresholdGroup = document.getElementById('simRsiThresholdGroup');
+    elements.reinvestDividends = document.getElementById('simIncludeDividends');
 
-    elements.advancedToggle = document.getElementById('advancedToggle');
-    elements.advancedContent = document.getElementById('advancedContent');
+    elements.advancedToggle = document.getElementById('simAdvancedToggle');
+    elements.advancedContent = document.getElementById('simAdvancedContent');
 
-    elements.chartTitle = document.getElementById('chartTitle');
-    elements.chartCanvas = document.getElementById('mainChart');
-    elements.chartLegend = document.getElementById('chartLegend');
-    elements.loadingOverlay = document.getElementById('loadingOverlay');
-    elements.resetZoom = document.getElementById('resetZoom');
-    elements.downloadCSV = document.getElementById('downloadCSV');
+    elements.chartTitle = document.getElementById('simChartTitle');
+    elements.chartCanvas = document.getElementById('simMainChart');
+    elements.chartLegend = document.getElementById('simChartLegend');
+    elements.loadingOverlay = document.getElementById('simLoading');
+    elements.resetZoom = document.getElementById('simResetZoom');
+    elements.downloadCSV = document.getElementById('simDownloadCSV');
 
-    elements.statsGrid = document.getElementById('statsGrid');
-    elements.statFinalValue = document.getElementById('statFinalValue');
-    elements.statTotalReturn = document.getElementById('statTotalReturn');
-    elements.statCAGR = document.getElementById('statCAGR');
-    elements.statMaxDrawdown = document.getElementById('statMaxDrawdown');
-    elements.statSharpe = document.getElementById('statSharpe');
-    elements.statDividends = document.getElementById('statDividends');
+    elements.statFinalValue = document.getElementById('simStatFinalValue');
+    elements.statTotalReturn = document.getElementById('simStatTotalReturn');
+    elements.statCAGR = document.getElementById('simStatCAGR');
+    elements.statMaxDrawdown = document.getElementById('simStatMaxDrawdown');
+    elements.statSharpe = document.getElementById('simStatSharpe');
+    elements.statDividends = document.getElementById('simStatDividends');
 
-    elements.currencyBtns = document.querySelectorAll('.currency-btn');
-    elements.lastUpdated = document.getElementById('lastUpdated');
-    elements.toast = document.getElementById('toast');
+    elements.currencyBtns = document.querySelectorAll('.currency-btn'); // Assuming global or add sim-
+    elements.lastUpdated = document.getElementById('lastUpdated'); // Global
+    elements.toast = document.getElementById('toast'); // Global
 
     // 設定預設日期範圍
     const today = new Date();

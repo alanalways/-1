@@ -14,11 +14,18 @@
 </head>
 
 <body>
-    <!-- Loading Overlay -->
+    <!-- Loading Overlay with Progress Bar -->
     <div class="loading-overlay" id="loadingOverlay">
-        <div class="loading-spinner-container">
-            <div class="loading-spinner"></div>
-            <p class="loading-text">載入市場數據中...</p>
+        <div class="loading-progress-container">
+            <div class="loading-logo">🚀</div>
+            <h2 class="loading-title">Discover Latest</h2>
+            <div class="loading-progress-bar">
+                <div class="loading-progress-fill" id="loadingProgressFill"></div>
+            </div>
+            <div class="loading-progress-info">
+                <span class="loading-percent" id="loadingPercent">0%</span>
+                <span class="loading-step" id="loadingStep">初始化中...</span>
+            </div>
         </div>
     </div>
 
@@ -298,6 +305,42 @@
                                 <input type="range" id="simAnnualReturn" min="1" max="30" value="7">
                             </div>
 
+                            <!-- 含息回測選項 -->
+                            <div class="sim-param-group">
+                                <label class="sim-checkbox-label">
+                                    <input type="checkbox" id="simIncludeDividends" checked>
+                                    <span class="checkbox-custom"></span>
+                                    💰 含息回測（配息再投資）
+                                </label>
+                                <p class="sim-param-hint">將配息自動再投入買進股票</p>
+                            </div>
+
+                            <!-- 進階設定 -->
+                            <div class="sim-advanced-section">
+                                <button class="sim-advanced-toggle" id="simAdvancedToggle">▼ 交易成本與進階設定</button>
+                                <div class="sim-advanced-content" id="simAdvancedContent">
+                                    <div class="sim-param-group">
+                                        <label>手續費率 (%)</label>
+                                        <input type="number" id="simCommissionRate" value="0.1425" step="0.0001">
+                                    </div>
+                                    <div class="sim-param-group">
+                                        <label>交易稅率 (%)</label>
+                                        <input type="number" id="simTaxRate" value="0.3" step="0.001">
+                                    </div>
+                                    <div class="sim-param-group">
+                                        <label>逢低加碼策略</label>
+                                        <select id="simDipBuyStrategy">
+                                            <option value="none">不加碼</option>
+                                            <option value="rsi">RSI 低檔加碼</option>
+                                        </select>
+                                    </div>
+                                    <div class="sim-param-group" id="simRsiThresholdGroup" style="display: none;">
+                                        <label>RSI 閾值 (< 30)</label>
+                                                <input type="number" id="simRsiThreshold" value="30">
+                                    </div>
+                                </div>
+                            </div>
+
                             <button class="sim-run-btn" id="simRunButton" disabled>🚀 開始模擬</button>
                         </div>
 
@@ -366,6 +409,56 @@
             </div>
             <div class="modal-body" id="modalBody">
                 <!-- Content injected by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Investment Quiz Modal -->
+    <div class="modal-overlay" id="quizModalOverlay">
+        <div class="quiz-modal">
+            <div class="quiz-header">
+                <h3>🧬 投資屬性分析測驗</h3>
+                <button class="modal-close" id="quizClose">✕</button>
+            </div>
+            <div class="quiz-body" id="quizBody">
+                <!-- Step 1: Intro -->
+                <div class="quiz-step active" id="quizIntro">
+                    <div class="quiz-intro-icon">🔮</div>
+                    <h4>你是哪種投資人？</h4>
+                    <p>透過 10 道簡單問題，AI 將分析你的投資人格與風險屬性，並推薦適合你的投資策略。</p>
+                    <button class="quiz-btn primary" onclick="startQuiz()">開始測驗</button>
+                </div>
+
+                <!-- Step 2: Questions -->
+                <div class="quiz-step hidden" id="quizQuestionContainer">
+                    <div class="quiz-progress">
+                        <div class="quiz-progress-bar" id="quizProgress"></div>
+                    </div>
+                    <div class="quiz-question-number">Question <span id="qCurrent">1</span>/10</div>
+                    <h4 class="quiz-question-text" id="qText">題目載入中...</h4>
+                    <div class="quiz-options" id="qOptions">
+                        <!-- Options injected by JS -->
+                    </div>
+                </div>
+
+                <!-- Step 3: Result -->
+                <div class="quiz-step hidden" id="quizResult">
+                    <div class="result-header">
+                        <span class="result-label">你的投資人格是</span>
+                        <h2 class="result-type" id="resultType">--</h2>
+                    </div>
+                    <div class="result-icon" id="resultIcon">🦁</div>
+                    <p class="result-desc" id="resultDesc">--</p>
+
+                    <div class="result-tags" id="resultTags"></div>
+
+                    <div class="result-recommendation">
+                        <h5>💡 投資建議</h5>
+                        <p id="resultAdvice">--</p>
+                    </div>
+
+                    <button class="quiz-btn primary" onclick="closeQuizModal()">開始探索市場</button>
+                </div>
             </div>
         </div>
     </div>
