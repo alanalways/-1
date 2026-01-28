@@ -777,22 +777,27 @@ function showAnalysis(code) {
                     <div class="smc-signals-row">
                         <div class="smc-mini-card ${stock.patterns?.ob ? 'active' : ''}">
                             <span class="mini-icon">🧱</span>
-                            <span class="mini-label">OB (訂單塊)</span>
+                            <span class="mini-label">${stock.signal === 'BULLISH' ? 'Bullish OB (看漲訂單塊)' : stock.signal === 'BEARISH' ? 'Bearish OB (看跌訂單塊)' : 'Order Block (訂單塊)'}</span>
                             <span class="mini-value">${stock.patterns?.ob ? '✓' : '—'}</span>
                         </div>
                         <div class="smc-mini-card ${stock.patterns?.fvg ? 'active' : ''}">
                             <span class="mini-icon">🕳️</span>
-                            <span class="mini-label">FVG (公平價值缺口)</span>
+                            <span class="mini-label">${stock.signal === 'BULLISH' ? 'Bullish FVG (看漲公平價值缺口)' : stock.signal === 'BEARISH' ? 'Bearish FVG (看跌公平價值缺口)' : 'FVG (公平價值缺口)'}</span>
                             <span class="mini-value">${stock.patterns?.fvg ? '✓' : '—'}</span>
                         </div>
                         <div class="smc-mini-card ${stock.patterns?.sweep ? 'active' : ''}">
                             <span class="mini-icon">🐢</span>
-                            <span class="mini-label">Sweep (流動性掃蕩)</span>
+                            <span class="mini-label">Liquidity Sweep (流動性掃蕩)</span>
                             <span class="mini-value">${stock.patterns?.sweep ? '✓' : '—'}</span>
+                        </div>
+                        <div class="smc-mini-card ${stock.mss ? 'active' : ''}">
+                            <span class="mini-icon">🔄</span>
+                            <span class="mini-label">MSS (市場結構轉換)</span>
+                            <span class="mini-value">${stock.mss ? '✓' : '—'}</span>
                         </div>
                         <div class="smc-mini-card score">
                             <span class="mini-icon">📊</span>
-                            <span class="mini-label">Score (評分)</span>
+                            <span class="mini-label">SMC Score (評分)</span>
                             <span class="mini-value">${stock.score}/100</span>
                         </div>
                     </div>
@@ -855,6 +860,61 @@ function showAnalysis(code) {
                                 <div class="quant-bar-marker" style="left: ${stock.score}%"></div>
                             </div>
                             <span class="quant-bar-label right">看漲</span>
+                        </div>
+                    </div>
+
+                    <!-- 資產配置建議 -->
+                    <div class="ai-asset-allocation">
+                        <div class="allocation-header">
+                            <span class="allocation-title">📊 資產類別配置分析</span>
+                            <span class="allocation-subtitle">建議配置</span>
+                        </div>
+                        <div class="allocation-toggle">
+                            <span class="toggle-label">風險配置（持股）</span>
+                            <div class="toggle-buttons">
+                                <button class="toggle-btn active" data-mode="conservative">穩健派</button>
+                                <button class="toggle-btn" data-mode="aggressive">大膽派</button>
+                            </div>
+                        </div>
+                        <div class="allocation-caution">
+                            <span class="caution-icon">⚠️</span>
+                            <span>若是以穩健配置為主「穩健派」，適合不喜歡短期波動的投資者</span>
+                        </div>
+                        <div class="allocation-chart" id="allocationChart">
+                            <div class="allocation-bar-row">
+                                <span class="allocation-label">股票</span>
+                                <div class="allocation-bar-group">
+                                    <div class="allocation-bar stock" style="width: ${stock.score >= 70 ? '80' : stock.score >= 40 ? '60' : '40'}%"></div>
+                                </div>
+                                <span class="allocation-value">${stock.score >= 70 ? '80' : stock.score >= 40 ? '60' : '40'}%</span>
+                            </div>
+                            <div class="allocation-bar-row">
+                                <span class="allocation-label">債券</span>
+                                <div class="allocation-bar-group">
+                                    <div class="allocation-bar bond" style="width: ${stock.score >= 70 ? '10' : stock.score >= 40 ? '25' : '35'}%"></div>
+                                </div>
+                                <span class="allocation-value">${stock.score >= 70 ? '10' : stock.score >= 40 ? '25' : '35'}%</span>
+                            </div>
+                            <div class="allocation-bar-row">
+                                <span class="allocation-label">現金</span>
+                                <div class="allocation-bar-group">
+                                    <div class="allocation-bar cash" style="width: ${stock.score >= 70 ? '5' : stock.score >= 40 ? '10' : '20'}%"></div>
+                                </div>
+                                <span class="allocation-value">${stock.score >= 70 ? '5' : stock.score >= 40 ? '10' : '20'}%</span>
+                            </div>
+                            <div class="allocation-bar-row">
+                                <span class="allocation-label">其他</span>
+                                <div class="allocation-bar-group">
+                                    <div class="allocation-bar other" style="width: ${stock.score >= 70 ? '5' : '5'}%"></div>
+                                </div>
+                                <span class="allocation-value">5%</span>
+                            </div>
+                        </div>
+                        <div class="allocation-legend">
+                            <span class="legend-item"><span class="dot" style="background:#10b981"></span>股票</span>
+                            <span class="legend-item"><span class="dot" style="background:#3b82f6"></span>債券</span>
+                            <span class="legend-item"><span class="dot" style="background:#f59e0b"></span>現金</span>
+                            <span class="legend-item"><span class="dot" style="background:#a855f7"></span>其他</span>
                         </div>
                     </div>
 

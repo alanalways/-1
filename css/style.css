@@ -2504,3 +2504,148 @@ body {
     font-size: 0.9rem;
     margin: 0;
 }
+
+/* === Asset Allocation Styles === */
+.ai-asset-allocation {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-lg);
+    margin-top: var(--spacing-md);
+}
+
+.allocation-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-md);
+}
+
+.allocation-title {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.allocation-subtitle {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.allocation-toggle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-md);
+}
+
+.toggle-label {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.toggle-buttons {
+    display: flex;
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    padding: 3px;
+    border: 1px solid var(--border-color);
+}
+
+.toggle-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: var(--transition-fast);
+    font-size: 0.85rem;
+}
+
+.toggle-btn.active {
+    background: var(--accent-blue);
+    color: white;
+}
+
+.toggle-btn:hover:not(.active) {
+    color: var(--text-primary);
+}
+
+.allocation-caution {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: var(--radius-sm);
+    margin-bottom: var(--spacing-md);
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.caution-icon {
+    font-size: 1rem;
+}
+
+.allocation-chart {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+}
+
+.allocation-bar-row {
+    display: grid;
+    grid-template-columns: 60px 1fr 50px;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.allocation-label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.allocation-bar-group {
+    height: 20px;
+    background: var(--bg-card);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.allocation-bar {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.5s ease-out;
+}
+
+.allocation-bar.stock {
+    background: linear-gradient(90deg, #10b981, #22c55e);
+}
+
+.allocation-bar.bond {
+    background: linear-gradient(90deg, #3b82f6, #60a5fa);
+}
+
+.allocation-bar.cash {
+    background: linear-gradient(90deg, #f59e0b, #fbbf24);
+}
+
+.allocation-bar.other {
+    background: linear-gradient(90deg, #a855f7, #c084fc);
+}
+
+.allocation-value {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    text-align: right;
+}
+
+.allocation-legend {
+    display: flex;
+    gap: var(--spacing-md);
+    justify-content: center;
+    flex-wrap: wrap;
+}
