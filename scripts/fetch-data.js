@@ -668,37 +668,10 @@ export async function fetchAllStocks() {
 
     console.log(`📊 證交所合併後共 ${allStocks.length} 檔股票 (上市 ${twseStocks.length} + 上櫃 ${tpexStocks.length})`);
 
-    // 如果證交所無資料（非交易時間），使用 Yahoo Finance 備用
+    // [嚴格模式] 若官方 API 無資料，直接回傳空陣列 (不使用 Yahoo 備用)
     if (allStocks.length === 0) {
-        console.log('⚠️ 證交所無即時資料（可能為非交易時間），嘗試使用 Yahoo Finance 備用...');
-
-        // 從基本面資料取得股票清單
-        const fundamentals = await fetchStockFundamentals();
-        if (fundamentals && fundamentals.size > 0) {
-            const symbols = Array.from(fundamentals.keys()).map(code =>
-                code.includes('.') ? code : `${code}.TW`
-            );
-
-            // 批次取得 Yahoo Finance 報價
-            const yahooQuotes = await fetchYahooQuotes(symbols);
-
-            allStocks = Array.from(yahooQuotes.entries()).map(([symbol, data]) => ({
-                code: symbol.replace('.TW', '').replace('.TWO', ''),
-                name: data.name,
-                openPrice: data.openPrice,
-                highPrice: data.highPrice,
-                lowPrice: data.lowPrice,
-                closePrice: data.closePrice,
-                volume: data.volume,
-                change: data.change,
-                changePercent: data.changePercent,
-                peRatio: data.peRatio,
-                dividendYield: data.dividendYield,
-                market: symbol.includes('.TWO') ? '上櫃' : '上市'
-            }));
-
-            console.log(`✅ Yahoo Finance 備用取得 ${allStocks.length} 檔股票報價`);
-        }
+        console.warn('⚠️ 警告：無法從證交所/櫃買中心取得資料 (可能為非交易時間或 API 維護中)');
+        console.warn('🚫 嚴格模式：不使用 Yahoo Finance 作為備用來源，此次更新將中止。');
     }
 
     return allStocks;

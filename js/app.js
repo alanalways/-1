@@ -650,19 +650,31 @@ function applyFiltersAndSort() {
     }
 
     state.filteredStocks = stocks;
+    visibleStockCount = 50; // [新增] 重置分頁計數
     renderStockCards();
+}
+
+// [新增] 分頁狀態
+let visibleStockCount = 50;
+const STOCK_BATCH_SIZE = 50;
+
+function loadMoreStocks() {
+    visibleStockCount += STOCK_BATCH_SIZE;
+    renderStockCards(true); // true = append mode (not used here, we re-render slice)
 }
 
 function renderStockCards() {
     const container = elements.stockCards;
     if (!container) return;
 
+    const totalStocks = state.filteredStocks || [];
+
     // Update count
     if (elements.stockCount) {
-        elements.stockCount.textContent = `顯示 ${state.filteredStocks.length} 檔`;
+        elements.stockCount.textContent = `顯示 ${Math.min(visibleStockCount, totalStocks.length)} / ${totalStocks.length} 檔`;
     }
 
-    if (state.filteredStocks.length === 0) {
+    if (totalStocks.length === 0) {
         container.innerHTML = `
             <div class="watchlist-empty">
                 <div class="empty-icon">🔍</div>
@@ -673,7 +685,34 @@ function renderStockCards() {
         return;
     }
 
-    container.innerHTML = state.filteredStocks.map((stock, index) => createStockCard(stock, index)).join('');
+    // [優化] 分頁渲染：只渲染前 visibleStockCount 筆
+    // 當搜尋時，重置顯示數量 (這部分邏輯放在 applyFiltersAndSort)
+    const visibleStocks = totalStocks.slice(0, visibleStockCount);
+
+    container.innerHTML = visibleStocks.map((stock, index) => createStockCard(stock, index)).join('');
+
+    // [新增] "載入更多" 按鈕
+    if (visibleStocks.length < totalStocks.length) {
+        const loadMoreContainer = document.createElement('div');
+        loadMoreContainer.className = 'load-more-container';
+        loadMoreContainer.style.textAlign = 'center';
+        loadMoreContainer.style.marginTop = '20px';
+
+        const loadMoreBtn = document.createElement('button');
+        loadMoreBtn.className = 'btn primary';
+        loadMoreBtn.innerHTML = `👇 載入更多 (${totalStocks.length - visibleStocks.length} 檔)`;
+        loadMoreBtn.onclick = () => {
+            loadMoreBtn.textContent = '載入中...';
+            // 使用 setTimeout 讓 UI 先更新 Loading 文字
+            setTimeout(() => {
+                visibleStockCount += STOCK_BATCH_SIZE;
+                renderStockCards();
+            }, 50);
+        };
+
+        loadMoreContainer.appendChild(loadMoreBtn);
+        container.appendChild(loadMoreContainer);
+    }
 
     // Add event listeners to action buttons
     container.querySelectorAll('.action-btn').forEach(btn => {
@@ -693,6 +732,16 @@ function renderStockCards() {
                     openChart(code);
                     break;
             }
+        });
+    });
+
+    // Add click event to card
+    container.querySelectorAll('.stock-card').forEach(card => {
+        card.addEventListener('click', (e) => {
+            // Prevent click if clicking button inside card
+            if (e.target.closest('.action-btn')) return;
+            const code = card.dataset.stockCode;
+            showAnalysis(code); // Changed from showStockDetail to showAnalysis for consistency
         });
     });
 }
@@ -876,22 +925,52 @@ function navigateTo(page) {
 
 // === Actions ===
 function toggleFavorite(code, btn) {
+    const icon = btn.querySelector('.btn-icon') || btn;
     const index = state.watchlist.indexOf(code);
+    const isAdding = index === -1;
 
-    if (index > -1) {
-        state.watchlist.splice(index, 1);
-        btn.classList.remove('favorited');
-        btn.innerHTML = '☆';
-        showToast(`${code} 已從自選清單移除`);
-    } else {
+    if (isAdding) {
         state.watchlist.push(code);
         btn.classList.add('favorited');
-        btn.innerHTML = '⭐';
-        showToast(`${code} 已加入自選清單`);
+        if (icon) icon.innerHTML = '⭐';
+        showToast(`已加入自選: ${code}`);
+    } else {
+        state.watchlist = state.watchlist.filter(c => c !== code);
+        btn.classList.remove('favorited');
+        if (icon) icon.innerHTML = '☆';
+        showToast(`已移除自選: ${code}`);
+
+        // [修復] 如果在自選清單頁面，立即移除 DOM 元素
+        if (state.currentPage === 'watchlist') {
+            const card = document.querySelector(`#watchlistCards .stock-card[data-stock-code="${code}"]`);
+            if (card) {
+                // 視覺回饋：先透明再移除
+                card.style.transition = 'all 0.3s ease';
+                card.style.opacity = '0';
+                card.style.transform = 'scale(0.9)';
+                setTimeout(() => {
+                    card.remove();
+                    // 檢查是否為空
+                    const remaining = document.querySelectorAll('#watchlistCards .stock-card');
+                    if (remaining.length === 0) {
+                        if (elements.watchlistEmpty) elements.watchlistEmpty.style.display = 'flex';
+                    }
+                }, 300);
+            }
+        }
     }
 
     // Save to localStorage
     localStorage.setItem('watchlist', JSON.stringify(state.watchlist));
+
+    // Update dashboard buttons if visible
+    document.querySelectorAll(`.action-btn[data-action="favorite"][data-code="${code}"]`).forEach(otherBtn => {
+        if (otherBtn !== btn) {
+            otherBtn.classList.toggle('favorited', isAdding);
+            const otherIcon = otherBtn.querySelector('.btn-icon') || otherBtn;
+            if (otherIcon) otherIcon.innerHTML = isAdding ? '⭐' : '☆';
+        }
+    });
 }
 
 function showAnalysis(code) {
