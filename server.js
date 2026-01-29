@@ -97,6 +97,119 @@ app.use('/api/yahoo', async (req, res) => {
 });
 
 
+// ========================================
+// Gemini AI 分析端點
+// ========================================
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyAGlx-c3fMJvX-q12kolNfXHfV18dew_yc';
+const GEMINI_MODELS = [
+    'gemini-3-flash-preview',           // 優先使用 (Free tier: 5-10 RPM, 250K TPM)
+    'gemini-2.5-flash-preview-09-2025'  // 備用 (Free tier: 10 RPM, 250K TPM, 250 RPD)
+];
+
+// 記錄上次請求時間 (簡易 rate limiting)
+let lastGeminiRequest = 0;
+const MIN_REQUEST_INTERVAL = 6500; // 6.5 秒間隔 (約 10 RPM)
+
+async function callGeminiAPI(prompt, modelIndex = 0) {
+    const model = GEMINI_MODELS[modelIndex];
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
+
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: prompt }] }],
+                generationConfig: {
+                    temperature: 0.7,
+                    maxOutputTokens: 1024,
+                    topP: 0.9
+                }
+            })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            // 429 = Rate Limit, 嘗試下一個模型
+            if (response.status === 429 && modelIndex < GEMINI_MODELS.length - 1) {
+                console.warn(`⚠️ ${model} rate limited, trying fallback...`);
+                return callGeminiAPI(prompt, modelIndex + 1);
+            }
+            throw new Error(errorData.error?.message || `HTTP ${response.status}`);
+        }
+
+        const data = await response.json();
+        return {
+            success: true,
+            model,
+            content: data.candidates?.[0]?.content?.parts?.[0]?.text || '分析生成失敗'
+        };
+    } catch (error) {
+        console.error(`Gemini API Error (${model}):`, error.message);
+
+        // Fallback to next model
+        if (modelIndex < GEMINI_MODELS.length - 1) {
+            return callGeminiAPI(prompt, modelIndex + 1);
+        }
+
+        return { success: false, error: error.message };
+    }
+}
+
+app.get('/api/ai-analysis', async (req, res) => {
+    const { code, name, price, sector, changePercent, score, signal } = req.query;
+
+    if (!code) {
+        return res.status(400).json({ error: '缺少股票代碼' });
+    }
+
+    // Simple rate limiting
+    const now = Date.now();
+    if (now - lastGeminiRequest < MIN_REQUEST_INTERVAL) {
+        return res.status(429).json({
+            error: '請求過快，請稍後再試',
+            retryAfter: Math.ceil((MIN_REQUEST_INTERVAL - (now - lastGeminiRequest)) / 1000)
+        });
+    }
+    lastGeminiRequest = now;
+
+    const prompt = `你是一位專業的台灣股市分析師，請用繁體中文提供以下股票的簡報分析：
+
+股票資訊：
+- 代碼：${code}
+- 名稱：${name || '未知'}
+- 收盤價：${price || '未知'} 元
+- 產業：${sector || '未知'}
+- 今日漲跌：${changePercent || 0}%
+- SMC 評分：${score || 50}/100
+- 訊號：${signal || 'NEUTRAL'}
+
+請提供：
+1. 📊 公司簡介（2-3 句）
+2. 💡 投資亮點（3 個重點）
+3. ⚠️ 風險提示（2-3 個注意事項）
+4. 🎯 操作建議（進場/觀望/迴避）
+
+注意：回覆需簡潔專業，總長度控制在 300 字內。不要使用 Markdown 格式，使用純文字和 Emoji。`;
+
+    const result = await callGeminiAPI(prompt);
+
+    if (result.success) {
+        res.json({
+            success: true,
+            model: result.model,
+            analysis: result.content,
+            stockCode: code
+        });
+    } else {
+        res.status(500).json({
+            success: false,
+            error: result.error || 'AI 分析失敗',
+            stockCode: code
+        });
+    }
+});
+
 
 
 // === API Proxy 端點 ===

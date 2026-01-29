@@ -1320,6 +1320,9 @@ function showAnalysis(code) {
 
         // [修復] Setup AI prediction dropdown event handlers
         setupPredictionControls(stock);
+
+        // [新增] Setup AI 介紹股簡報按鈕
+        setupAIAnalysisButton(stock);
     }
 
     openModal();
@@ -1386,6 +1389,68 @@ function setupPredictionControls(stock) {
     aiTypeSelect.addEventListener('change', updatePrediction);
 }
 
+// ============================================
+// AI 介紹股簡報 (Gemini API 整合)
+// ============================================
+function setupAIAnalysisButton(stock) {
+    const btn = document.getElementById('aiAnalysisBtn');
+    if (!btn) return;
+
+    btn.addEventListener('click', async () => {
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '⏳ 分析中...';
+        btn.disabled = true;
+
+        try {
+            const params = new URLSearchParams({
+                code: stock.code,
+                name: stock.name || '',
+                price: stock.closePrice || stock.price || '',
+                sector: stock.sector || '',
+                changePercent: stock.changePercent || '',
+                score: stock.score || 50,
+                signal: stock.signal || 'NEUTRAL'
+            });
+
+            const response = await fetch(`/api/ai-analysis?${params}`);
+            const data = await response.json();
+
+            if (data.success) {
+                // 建立或更新 AI 結果區域
+                let resultDiv = document.getElementById('aiAnalysisResult');
+                if (!resultDiv) {
+                    resultDiv = document.createElement('div');
+                    resultDiv.id = 'aiAnalysisResult';
+                    resultDiv.className = 'ai-analysis-result';
+                    // 插入到 AI 區塊上方
+                    const aiSection = document.querySelector('.ai-analysis-section');
+                    if (aiSection) {
+                        aiSection.insertBefore(resultDiv, aiSection.firstChild.nextSibling);
+                    }
+                }
+
+                resultDiv.innerHTML = `
+                    <div class="ai-result-header">
+                        <span class="ai-result-icon">🤖</span>
+                        <span class="ai-result-title">Gemini AI 分析</span>
+                        <span class="ai-result-model">${data.model}</span>
+                    </div>
+                    <div class="ai-result-content">${data.analysis.replace(/\n/g, '<br>')}</div>
+                `;
+
+                console.log(`✅ AI 分析完成 (${data.model}):`, data.stockCode);
+            } else {
+                throw new Error(data.error || 'AI 分析失敗');
+            }
+        } catch (error) {
+            console.error('AI 分析錯誤:', error);
+            alert(`AI 分析失敗: ${error.message}`);
+        } finally {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+    });
+}
 // ============================================
 // Allocation Toggle (存股派/大膽派) Logic
 // ============================================
