@@ -1535,10 +1535,10 @@ async function loadTradingViewWidget(symbol) {
         console.warn('Yahoo Finance API failed:', e);
     }
 
-    // === Strategy 4: Final fallback - simulated data ===
-    console.log(`📊 Using simulated data for ${cleanCode}`);
-    if (loading) loading.innerHTML = '<span style="color: var(--accent-yellow);">📊 顯示模擬趨勢...</span>';
-    setTimeout(() => renderFallbackChart(container, symbol), 500);
+    // === No fallback - show error (禁止模擬數據) ===
+    console.log(`⚠️ No data available for ${cleanCode}`);
+    if (loading) loading.innerHTML = '<span style="color: var(--accent-red);">⚠️ 無法載入歷史數據</span>';
+    container.innerHTML = '<div class="no-data-message" style="text-align:center;padding:40px;color:#888;">📊 暫無歷史走勢資料<br><small>無法從 API 取得數據</small></div>';
 }
 
 
@@ -1715,40 +1715,7 @@ function renderSelfBuiltChart(container, chartData, symbol) {
 }
 
 
-function renderFallbackChart(container, symbol) {
-    // Generate simulated OHLC data when API fails
-    const today = new Date();
-    const chartData = [];
-    let price = 100 + Math.random() * 50;
-
-    for (let i = 60; i >= 0; i--) {
-        const date = new Date(today);
-        date.setDate(date.getDate() - i);
-
-        // Generate realistic OHLC data
-        const volatility = 2 + Math.random() * 2;
-        const open = price;
-        const direction = Math.random() - 0.48;
-        const close = open + direction * volatility;
-        const high = Math.max(open, close) + Math.random() * volatility * 0.5;
-        const low = Math.min(open, close) - Math.random() * volatility * 0.5;
-
-        chartData.push({
-            date: date.toLocaleDateString('zh-TW', { month: 'short', day: 'numeric' }),
-            open: Math.max(open, 20),
-            high: Math.max(high, 20),
-            low: Math.max(low, 20),
-            close: Math.max(close, 20)
-        });
-
-        price = close;
-    }
-
-    renderSelfBuiltChart(container, chartData, symbol);
-    const loading = document.getElementById('tvLoading');
-    if (loading) loading.style.display = 'none';
-}
-
+// === renderFallbackChart 已移除 (禁止模擬數據) ===
 
 // Format large numbers
 function formatNumber(num) {

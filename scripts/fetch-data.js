@@ -302,14 +302,29 @@ export async function fetchTPExAllStocks() {
 
 export async function fetchTaiwanStockIndex() {
     try {
+        // 1. 獲取指數資料
         const response = await http.get('https://www.twse.com.tw/exchangeReport/MI_INDEX?response=json&type=IND');
 
-        let indexData = null;
+        // 2. 獲取成交金額 (使用 FMTQIK API)
         let amount = 'N/A';
+        try {
+            const volumeResponse = await http.get('https://www.twse.com.tw/exchangeReport/FMTQIK?response=json');
+            if (volumeResponse.data && volumeResponse.data.data && volumeResponse.data.data.length > 0) {
+                // FMTQIK 回傳今日成交資訊，格式: [日期, 成交股數, 成交金額, 成交筆數, ...]
+                const todayData = volumeResponse.data.data[volumeResponse.data.data.length - 1];
+                if (todayData && todayData[2]) {
+                    amount = todayData[2]; // 成交金額
+                    console.log(`   💰 成交金額: ${amount}`);
+                }
+            }
+        } catch (volError) {
+            console.warn('FMTQIK API 失敗，嘗試備用來源:', volError.message);
+        }
+
+        let indexData = null;
 
         // Case 1: New API format (tables)
         if (response.data && response.data.tables) {
-            // Find table with index data
             for (const table of response.data.tables) {
                 if (table.data) {
                     const row = table.data.find(r => r[0] && r[0].includes('發行量加權股價指數'));
@@ -319,78 +334,39 @@ export async function fetchTaiwanStockIndex() {
                     }
                 }
             }
-
-            // Try to find volume/amount from stat field or other tables
-            if (response.data.stat) {
-                // Sometimes stat contains market summary
-                const statMatch = response.data.stat.match(/成交金額[：:]?\s*([\d,]+)/);
-                if (statMatch) {
-                    amount = statMatch[1];
-                }
-            }
-
-            // Try to extract from tables (look for "成交金額" field)
-            for (const table of response.data.tables) {
-                if (table.title && table.title.includes('成交')) {
-                    if (table.data && table.data[0]) {
-                        // Try to find the amount value
-                        for (let i = 0; i < table.data[0].length; i++) {
-                            const val = table.data[0][i];
-                            if (val && /^[\d,]+$/.test(val.replace(/,/g, '').trim())) {
-                                const numVal = parseInt(val.replace(/,/g, ''));
-                                if (numVal > 10000000000) { // > 100億，很可能是成交金額
-                                    amount = val;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
         }
         // Case 2: Old API format (data1)
         else if (response.data && response.data.data1) {
             indexData = response.data.data1.find(row => row[0] === '發行量加權股價指數');
-            amount = response.data.data5?.[0]?.[2] || 'N/A';
+            // 舊格式可能在 data5 有成交金額
+            if (amount === 'N/A' && response.data.data5?.[0]?.[2]) {
+                amount = response.data.data5[0][2];
+            }
         }
 
         if (indexData) {
-            // 解析資料：通常格式 [指數名稱, 指數, 漲跌(+/-), 漲跌點數, 漲跌百分比]
-            // Debug data showed: ['發行量加權股價指數', '23,xxx.xx', '<p...>', '123.45', ...]
-
             const indexValue = indexData[1];
 
-            // 嘗試解析漲跌
-            // 邏輯: 
-            // 1. 如果第3欄是純符號 (+/-)，則第4欄是數值
-            // 2. 如果第3欄是 HTML (<p style='color:green'>-</p>)，則第4欄是數值
-            // 3. 如果第3欄是數值，可能沒有符號欄
-
+            // 解析漲跌
             let sign = '';
             let changeVal = '';
-
-            // 檢查 column 2 (index 2)
             const col2 = indexData[2] || '';
             const col3 = indexData[3] || '';
 
             if (col2.includes('-') || col2.includes('green')) {
                 sign = '-';
-            } else if (col2.includes('+') || col2.includes('red')) {
-                sign = ''; // 正數不強制加號，或可加 '+'
             }
 
-            // 如果 col2 看起來不是數值（是符號或 HTML），那數值在 col3
             if (isNaN(parseFloat(col2.replace(/,/g, ''))) || col2.includes('<')) {
                 changeVal = col3;
             } else {
-                changeVal = col2; // col2 就是數值
+                changeVal = col2;
             }
 
-            // 組合最終變動值
             let finalChange = sign + changeVal;
-
-            // 如果解析失敗，至少回傳指數
             if (!changeVal) finalChange = '0';
+
+            console.log(`   📊 加權指數: ${indexValue}, 漲跌: ${finalChange}`);
 
             return {
                 name: '加權指數',
