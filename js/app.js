@@ -1315,14 +1315,17 @@ function showAnalysis(code) {
         // Render related stocks graph
         renderRelatedStocksGraph(stock);
 
-        // Setup toggle button event delegation for 存股派/大膽派
-        setupAllocationToggle(stock);
+        // [重要] 延遲綁定事件，確保 DOM 元素已完全渲染
+        setTimeout(() => {
+            // Setup toggle button event delegation for 存股派/大膽派
+            setupAllocationToggle(stock);
 
-        // [修復] Setup AI prediction dropdown event handlers
-        setupPredictionControls(stock);
+            // Setup AI prediction dropdown event handlers
+            setupPredictionControls(stock);
 
-        // [新增] Setup AI 介紹股簡報按鈕
-        setupAIAnalysisButton(stock);
+            // Setup AI 介紹股簡報按鈕 (Gemini API)
+            setupAIAnalysisButton(stock);
+        }, 100);
     }
 
     openModal();
