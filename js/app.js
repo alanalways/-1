@@ -62,13 +62,15 @@ const initApp = async () => {
         await loadMarketData();
         updateLoadingProgress(60, '分析 SMC 訊號...');
 
-        // Load global markets
-        updateLoadingProgress(75, '載入國際市場...');
-        await loadGlobalMarkets();
-
-        // Render UI
-        updateLoadingProgress(90, '渲染界面...');
+        // Render UI immediately (First Contentful Paint)
+        updateLoadingProgress(80, '渲染界面...');
         renderDashboard();
+
+        // Load global markets in background (Non-blocking)
+        updateLoadingProgress(90, '載入國際市場...');
+        // 不使用 await，讓它在背景跑，或者使用 await 但因為 UI 已渲染所以沒差 (用戶說要放到 renderDashboard 之後)
+        // 但為了確保進度條正確，這裡還是 await 比較好，因為 renderDashboard 已經跑了，使用者看得到東西
+        await loadGlobalMarkets();
 
         // Hide loading
         updateLoadingProgress(100, '完成！');
