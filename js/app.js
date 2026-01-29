@@ -50,34 +50,50 @@ const elements = {
     pageTitle: document.getElementById('pageTitle')
 };
 
-// === Initialization ===
+// === Initialization Supabase (MUST be before initApp) ===
+let supabase = null;
+if (typeof window.supabase !== 'undefined' && typeof CONFIG !== 'undefined') {
+    supabase = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
+    console.log('✅ Supabase initialized');
+} else {
+    console.warn('⚠️ Supabase client not found or CONFIG missing, will use local JSON fallback');
+}
+
 // === Initialization ===
 const initApp = async () => {
-    console.log('🚀 Discover Latest initializing...');
+    try {
+        console.log('🚀 Discover Latest initializing...');
 
-    // Setup event listeners
-    setupEventListeners();
-    updateLoadingProgress(10, '初始化完成');
+        // Setup event listeners
+        setupEventListeners();
+        updateLoadingProgress(10, '初始化完成');
 
-    // Load data
-    updateLoadingProgress(20, '載入市場數據...');
-    await loadMarketData();
-    updateLoadingProgress(60, '分析 SMC 訊號...');
+        // Load data
+        updateLoadingProgress(20, '載入市場數據...');
+        await loadMarketData();
+        updateLoadingProgress(60, '分析 SMC 訊號...');
 
-    // Load global markets
-    updateLoadingProgress(75, '載入國際市場...');
-    await loadGlobalMarkets();
+        // Load global markets
+        updateLoadingProgress(75, '載入國際市場...');
+        await loadGlobalMarkets();
 
-    // Render UI
-    updateLoadingProgress(90, '渲染界面...');
-    renderDashboard();
+        // Render UI
+        updateLoadingProgress(90, '渲染界面...');
+        renderDashboard();
 
-    // Hide loading
-    updateLoadingProgress(100, '完成！');
-    setTimeout(hideLoading, 300);
+        // Hide loading
+        updateLoadingProgress(100, '完成！');
+        setTimeout(hideLoading, 300);
 
-    // Setup auto-refresh during Taiwan trading hours (9:00-13:30)
-    setupAutoRefresh();
+        // Setup auto-refresh during Taiwan trading hours (9:00-13:30)
+        setupAutoRefresh();
+
+    } catch (error) {
+        console.error('❌ App initialization failed:', error);
+        // 即使初始化失敗也要隱藏 Loading 並顯示錯誤
+        hideLoading();
+        showToast('初始化失敗: ' + error.message, 'error');
+    }
 };
 
 if (document.readyState === 'loading') {
@@ -311,14 +327,7 @@ async function fetchWithCORS(url) {
     }
 }
 
-// === Initialization Supabase ===
-let supabase = null;
-if (typeof window.supabase !== 'undefined' && typeof CONFIG !== 'undefined') {
-    supabase = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
-    console.log('✅ Supabase initialized');
-} else {
-    console.warn('⚠️ Supabase client not found or CONFIG missing');
-}
+// (Supabase initialization moved to top of file, before initApp)
 
 // === Data Loading ===
 async function loadMarketData() {
