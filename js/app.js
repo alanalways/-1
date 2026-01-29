@@ -300,18 +300,29 @@ function setupEventListeners() {
     });
 }
 
-// === CORS Proxy Helper (使用 codetabs 公開 proxy) ===
+// === CORS Proxy Helper ===
 async function fetchWithCORS(url) {
+    // 判斷是否為 Yahoo Finance URL
+    if (url.includes('yahoo.com')) {
+        // 使用我們自己的 Server Proxy
+        const targetPath = new URL(url).pathname;
+        const query = new URL(url).search;
+        return fetch(`/api/yahoo${targetPath}${query}`);
+    }
+
+    // 判斷是否為 TWSE URL
+    if (url.includes('twse.com.tw')) {
+        const targetPath = new URL(url).pathname;
+        const query = new URL(url).search;
+        return fetch(`/api/twse${targetPath}${query}`);
+    }
+
+    // 其他來源使用 codetabs (備用)
     try {
-        // 使用穩定的公開 CORS proxy
         const proxyUrl = 'https://api.codetabs.com/v1/proxy?quest=';
         const targetUrl = `${proxyUrl}${encodeURIComponent(url)}`;
         const response = await fetch(targetUrl);
-
-        if (!response.ok) {
-            throw new Error(`Proxy error: ${response.status}`);
-        }
-
+        if (!response.ok) throw new Error(`Proxy error: ${response.status}`);
         return response;
     } catch (error) {
         console.error('CORS Fetch Error:', error);
@@ -319,7 +330,81 @@ async function fetchWithCORS(url) {
     }
 }
 
-// (Supabase initialization moved to top of file, before initApp)
+
+// === Stock Card Factory ===
+
+function createStockCard(stock, index) {
+    const isFavorited = state.watchlist.includes(stock.code);
+    const changeClass = stock.changePercent > 0 ? 'positive' : (stock.changePercent < 0 ? 'negative' : '');
+
+    // [新增] 自動補全 SMC Tags (若 patterns 有值但 tags 沒寫)
+    let displayTags = [...(stock.tags || [])];
+    if (stock.patterns) {
+        if (stock.patterns.ob && !displayTags.find(t => t.type === 'smc-ob'))
+            displayTags.push({ type: 'smc-ob', label: 'OB 訂單塊' });
+        if (stock.patterns.fvg && !displayTags.find(t => t.type === 'smc-fvg'))
+            displayTags.push({ type: 'smc-fvg', label: 'FVG 缺口' });
+        if (stock.patterns.sweep && !displayTags.find(t => t.type === 'smc-liq'))
+            displayTags.push({ type: 'smc-liq', label: '流動性掃取' });
+    }
+
+    // Generate tags HTML
+    const tagsHtml = displayTags.map(tag => {
+        let className = 'tag';
+        if (tag.type === 'bullish') className += ' bullish';
+        else if (tag.type === 'bearish') className += ' bearish';
+        else if (tag.type === 'neutral') className += ' neutral';
+        else if (tag.type === 'smc-ob') className += ' smc-ob';
+        else if (tag.type === 'smc-fvg') className += ' smc-fvg';
+        else if (tag.type === 'smc-liq') className += ' smc-liq';
+        else if (tag.type === 'wyckoff') className += ' wyckoff';
+
+        return `<span class="${className}">${tag.label}</span>`;
+    }).join('');
+
+    return `
+        <div class="stock-card" data-stock-code="${stock.code}" style="animation-delay: ${index * 0.05}s">
+                <div class="stock-card-info">
+                    <span class="stock-code">${stock.code || 'N/A'}</span>
+                    <span class="stock-name">${stock.name || 'Unknown'}</span>
+                </div>
+                <div class="stock-card-actions">
+                    <button class="action-btn ${isFavorited ? 'favorited' : ''}" data-action="favorite" data-code="${stock.code}" title="加入自選">
+                        ${isFavorited ? '⭐' : '☆'}
+                    </button>
+                    <button class="action-btn" data-action="analyze" data-code="${stock.code}" title="深度分析">
+                        📊
+                    </button>
+                    <button class="action-btn" data-action="chart" data-code="${stock.code}" title="開啟走勢圖">
+                        📈
+                    </button>
+                </div>
+            </div>
+            <div class="stock-card-stats">
+                <div class="stock-stat">
+                    <span class="stock-stat-label">收盤價</span>
+                    <span class="stock-stat-value">${stock.closePrice || 'N/A'}</span>
+                </div>
+                <div class="stock-stat">
+                    <span class="stock-stat-label">漲跌幅</span>
+                    <span class="stock-stat-value ${changeClass}">${stock.changePercent > 0 ? '+' : ''}${stock.changePercent?.toFixed(2) || 0}%</span>
+                </div>
+                <div class="stock-stat">
+                    <span class="stock-stat-label">評分</span>
+                    <span class="stock-stat-value">${stock.score || 'N/A'}</span>
+                </div>
+                ${stock.peRatio ? `
+                <div class="stock-stat">
+                    <span class="stock-stat-label">本益比</span>
+                    <span class="stock-stat-value">${stock.peRatio}</span>
+                </div>
+                ` : ''}
+            </div>
+            <div class="stock-card-analysis">${stock.analysis || '分析資料載入中...'}</div>
+            <div class="stock-card-tags">${tagsHtml}</div>
+        </div>
+    `;
+}
 
 // === Data Loading ===
 // [修改] 改為呼叫 Server API
@@ -2084,6 +2169,17 @@ function renderSelfBuiltChart(container, chartData, symbol) {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
+                zoom: {
+                    zoom: {
+                        wheel: { enabled: true },
+                        pinch: { enabled: true },
+                        mode: 'x',
+                    },
+                    pan: {
+                        enabled: true,
+                        mode: 'x',
+                    }
+                },
                 legend: {
                     display: true,
                     position: 'top',
