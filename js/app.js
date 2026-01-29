@@ -940,23 +940,11 @@ function toggleFavorite(code, btn) {
         if (icon) icon.innerHTML = '☆';
         showToast(`已移除自選: ${code}`);
 
-        // [修復] 如果在自選清單頁面，立即移除 DOM 元素
+        // [修復] 如果在自選清單頁面，立即重新渲染整個清單以確保同步
         if (state.currentPage === 'watchlist') {
-            const card = document.querySelector(`#watchlistCards .stock-card[data-stock-code="${code}"]`);
-            if (card) {
-                // 視覺回饋：先透明再移除
-                card.style.transition = 'all 0.3s ease';
-                card.style.opacity = '0';
-                card.style.transform = 'scale(0.9)';
-                setTimeout(() => {
-                    card.remove();
-                    // 檢查是否為空
-                    const remaining = document.querySelectorAll('#watchlistCards .stock-card');
-                    if (remaining.length === 0) {
-                        if (elements.watchlistEmpty) elements.watchlistEmpty.style.display = 'flex';
-                    }
-                }, 300);
-            }
+            console.log('🔄 Watchlist item removed, refreshing list...');
+            // 使用 renderWatchlist() 而非手動移除 DOM，確保 Empty State 正確顯示
+            renderWatchlist();
         }
     }
 

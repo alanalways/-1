@@ -105,7 +105,6 @@ app.get('/api/data/stocks', async (req, res) => {
     try {
         const stocks = await getStocks();
         if (!stocks || stocks.length === 0) {
-            // 如果資料庫是空的，嘗試讀取本地備份 (或是回傳空陣列)
             return res.status(404).json({ error: '目前沒有資料' });
         }
         res.json(stocks);
