@@ -52,6 +52,60 @@ export async function runDailyUpdate() {
             // 儲存股票數據
             await supabaseClient.saveStocks(analyzedStocks);
 
+            // [新增] 生成 Market Intelligence (與 generate-report.js 保持一致)
+            let totalChange = 0;
+            const sectorStats = {};
+            analyzedStocks.forEach(s => {
+                const change = parseFloat(s.changePercent || 0);
+                totalChange += change;
+                const sector = s.industry || '其他';
+                if (!sectorStats[sector]) sectorStats[sector] = { sum: 0, count: 0 };
+                sectorStats[sector].sum += change;
+                sectorStats[sector].count++;
+            });
+
+            const avgChange = analyzedStocks.length > 0 ? (totalChange / analyzedStocks.length).toFixed(2) : '0.00';
+            let hotSector = { name: '分析中', avgChange: 0 };
+            let maxChange = -Infinity;
+
+            for (const [name, stats] of Object.entries(sectorStats)) {
+                const avg = stats.sum / stats.count;
+                if (avg > maxChange) {
+                    maxChange = avg;
+                    hotSector = { name, avgChange: avg };
+                }
+            }
+
+            const dji = usIndices.find(i => i.symbol === 'DJI') || { changePercent: '0.00' };
+            const ndx = usIndices.find(i => i.symbol === 'NASDAQ') || { changePercent: '0.00' };
+
+            const marketIntelligence = [
+                {
+                    icon: '📊',
+                    category: '全市場掃描',
+                    title: `共掃描 ${analyzedStocks.length} 檔`,
+                    content: `看多 ${analyzedStocks.filter(s => s.signal === 'BULLISH').length} 檔 • 看空 ${analyzedStocks.filter(s => s.signal === 'BEARISH').length} 檔\n平均漲跌 ${avgChange}%`
+                },
+                {
+                    icon: '🔥',
+                    category: '熱門產業',
+                    title: `${hotSector.name} 最強`,
+                    content: `${hotSector.name} 平均漲幅 ${hotSector.avgChange.toFixed(2)}%`
+                },
+                {
+                    icon: '🌍',
+                    category: '國際市場',
+                    title: '美股連動',
+                    content: `道瓊 ${dji.changePercent}% | 那斯達克 ${ndx.changePercent}%`
+                },
+                {
+                    icon: '🤖',
+                    category: 'AI 觀點',
+                    title: '趨勢分析',
+                    content: 'SMC 機構單與市場情緒綜合分析。'
+                }
+            ];
+
             // 儲存市場摘要
             const marketSummary = {
                 taiex: twIndex,
@@ -59,7 +113,8 @@ export async function runDailyUpdate() {
                 commodities,
                 totalStocks: analyzedStocks.length,
                 bullishCount: analyzedStocks.filter(s => s.signal === 'BULLISH').length,
-                bearishCount: analyzedStocks.filter(s => s.signal === 'BEARISH').length
+                bearishCount: analyzedStocks.filter(s => s.signal === 'BEARISH').length,
+                marketIntelligence // [新增] 寫入此欄位
             };
             await supabaseClient.saveMarketSummary(marketSummary);
         }

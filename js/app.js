@@ -520,9 +520,18 @@ function renderDashboard() {
 
 function renderMarketOverview() {
     const container = elements.marketCards;
-    if (!container || !state.marketData?.marketIntelligence) return;
+    if (!container) return;
 
-    container.innerHTML = state.marketData.marketIntelligence.map(item => `
+    // Fallback: 如果後端沒有提供 marketIntelligence，則前端即時計算
+    let intelligence = state.marketData?.marketIntelligence;
+    if (!Array.isArray(intelligence) || intelligence.length === 0) {
+        // 使用前端數據生成
+        intelligence = generateMarketIntelligenceFallback();
+    }
+
+    if (!intelligence || intelligence.length === 0) return;
+
+    container.innerHTML = intelligence.map(item => `
         <div class="market-card">
             <div class="market-card-header">
                 <div class="market-card-icon">${item.icon}</div>
@@ -532,6 +541,68 @@ function renderMarketOverview() {
             <div class="market-card-content">${item.content?.replace(/\n/g, '<br>') || ''}</div>
         </div>
     `).join('');
+}
+
+// [新增] 前端即時生成市場概覽數據 (Fallback)
+function generateMarketIntelligenceFallback() {
+    const stocks = state.allStocks || [];
+    if (stocks.length === 0) return [];
+
+    // 1. 統計多空
+    const bullish = stocks.filter(s => s.signal === 'BULLISH').length;
+    const bearish = stocks.filter(s => s.signal === 'BEARISH').length;
+
+    // 2. 計算平均漲跌
+    let totalChange = 0;
+    stocks.forEach(s => totalChange += parseFloat(s.changePercent || 0));
+    const avgChange = (totalChange / stocks.length).toFixed(2);
+
+    // 3. 尋找強勢產業
+    const sectorStats = {};
+    stocks.forEach(s => {
+        const sector = (s.sector || '其他').trim();
+        if (!sectorStats[sector]) sectorStats[sector] = { sum: 0, count: 0 };
+        sectorStats[sector].sum += parseFloat(s.changePercent || 0);
+        sectorStats[sector].count++;
+    });
+
+    let bestSector = { name: '分析中', avg: -999 };
+    for (const [name, stats] of Object.entries(sectorStats)) {
+        const avg = stats.sum / stats.count;
+        if (avg > bestSector.avg) bestSector = { name, avg };
+    }
+
+    // 4. 國際市場 (從 raw 或暫存取)
+    const indices = state.marketData?.raw?.usIndices || [];
+    const dji = indices.find(i => i.symbol === '^DJI' || i.symbol === 'DJI') || { changePercent: '--' };
+    const ndx = indices.find(i => i.symbol === '^IXIC' || i.symbol === 'NASDAQ') || { changePercent: '--' };
+
+    return [
+        {
+            icon: '📊',
+            category: '全市場掃描',
+            title: `共掃描 ${stocks.length} 檔`,
+            content: `看多 ${bullish} 檔 • 看空 ${bearish} 檔\n平均漲跌 ${avgChange}%`
+        },
+        {
+            icon: '🔥',
+            category: '熱門產業',
+            title: `${bestSector.name || '電子'} 最強`,
+            content: `該板塊平均漲幅 ${bestSector.avg > -900 ? bestSector.avg.toFixed(2) : 0}%`
+        },
+        {
+            icon: '🌍',
+            category: '國際市場',
+            title: '美股連動',
+            content: `道瓊 ${dji.changePercent}% | 那斯達克 ${ndx.changePercent}%`
+        },
+        {
+            icon: '🤖',
+            category: 'AI 觀點',
+            title: bullish > bearish ? '多頭架構' : '空方主導',
+            content: `目前 ${bullish > bearish ? '多方' : '空方'} 佔優，建議順勢操作。`
+        }
+    ];
 }
 
 function applyFiltersAndSort() {
