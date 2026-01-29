@@ -32,9 +32,9 @@ app.use(express.static(__dirname));
 // 解決前端 CORS 問題，所有 API 請求都透過後端代發
 
 // TWSE Proxy
-app.get('/api/twse/*', async (req, res) => {
+app.get('/api/twse/:path(*)', async (req, res) => {
     try {
-        const targetPath = req.params[0];
+        const targetPath = req.params.path;
         const queryString = new URLSearchParams(req.query).toString();
         const url = `https://www.twse.com.tw/${targetPath}${queryString ? '?' + queryString : ''}`;
 
@@ -52,9 +52,9 @@ app.get('/api/twse/*', async (req, res) => {
 });
 
 // TPEx Proxy
-app.get('/api/tpex/*', async (req, res) => {
+app.get('/api/tpex/:path(*)', async (req, res) => {
     try {
-        const targetPath = req.params[0];
+        const targetPath = req.params.path;
         const queryString = new URLSearchParams(req.query).toString();
         const url = `https://www.tpex.org.tw/${targetPath}${queryString ? '?' + queryString : ''}`;
 
@@ -72,9 +72,9 @@ app.get('/api/tpex/*', async (req, res) => {
 });
 
 // Yahoo Finance Proxy
-app.get('/api/yahoo/*', async (req, res) => {
+app.get('/api/yahoo/:path(*)', async (req, res) => {
     try {
-        const targetPath = req.params[0];
+        const targetPath = req.params.path;
         const queryString = new URLSearchParams(req.query).toString();
         const url = `https://query1.finance.yahoo.com/${targetPath}${queryString ? '?' + queryString : ''}`;
 
@@ -90,6 +90,7 @@ app.get('/api/yahoo/*', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+
 
 // === 健康檢查端點 ===
 app.get('/api/health', (req, res) => {
