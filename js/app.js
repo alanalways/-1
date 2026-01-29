@@ -51,7 +51,8 @@ const elements = {
 };
 
 // === Initialization ===
-document.addEventListener('DOMContentLoaded', async () => {
+// === Initialization ===
+const initApp = async () => {
     console.log('🚀 Discover Latest initializing...');
 
     // Setup event listeners
@@ -77,7 +78,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Setup auto-refresh during Taiwan trading hours (9:00-13:30)
     setupAutoRefresh();
-});
+};
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initApp);
+} else {
+    initApp();
+}
 
 // === Loading Progress Functions ===
 function updateLoadingProgress(percent, step) {
