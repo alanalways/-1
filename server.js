@@ -163,6 +163,33 @@ cron.schedule('0 14 * * 1-5', async () => {
 }, {
     timezone: 'Asia/Taipei'
 });
+// === 初始化檢查機制 ===
+async function checkAndInitializeData() {
+    console.log('🔍 Checking database status...');
+    try {
+        const summary = await getMarketSummary();
+        const now = new Date();
+        const oneDayCheck = 24 * 60 * 60 * 1000; // 24 hours
+
+        // 條件：(1) 完全沒資料 或 (2) 資料過期超過 24 小時
+        const needsUpdate = !summary || !summary.updated_at || (now - new Date(summary.updated_at) > oneDayCheck);
+
+        if (needsUpdate) {
+            console.warn('⚠️ Database empty or stale. Triggering immediate update...');
+            console.log('🚀 Running Cold Start Update...');
+
+            // 動態載入並執行更新
+            const { runDailyUpdate } = await import('./scripts/daily-update.js');
+            await runDailyUpdate();
+            console.log('✅ Cold Start Update Completed!');
+        } else {
+            console.log('✅ Database is up to date. Last updated:', summary.updated_at);
+        }
+    } catch (error) {
+        console.error('❌ Database Initialization Check Failed:', error);
+        console.warn('⚠️ HINT: Did you create the tables in Supabase? Check Supabase SQL Editor.');
+    }
+}
 
 // === 啟動伺服器 ===
 app.listen(PORT, '0.0.0.0', () => {
@@ -174,4 +201,7 @@ app.listen(PORT, '0.0.0.0', () => {
     ⏰ Cron: 每個交易日 14:00 更新
     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     `);
+
+    // 啟動後立即檢查資料狀態 (Cold Start Fix)
+    checkAndInitializeData();
 });

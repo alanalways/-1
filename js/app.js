@@ -323,9 +323,9 @@ async function fetchWithCORS(url) {
 async function loadMarketData() {
     try {
         state.isLoading = true;
-        
+
         console.log('📡 正在從伺服器 API 請求數據...');
-        
+
         // 1. 平行請求股票列表與市場摘要
         const [stocksRes, marketRes] = await Promise.all([
             fetch('/api/data/stocks'),
@@ -357,6 +357,14 @@ async function loadMarketData() {
                 patterns: s.patterns
             }));
             console.log(`✅ 成功載入 ${stocks.length} 檔股票`);
+        } else if (stocksRes.status === 404) {
+            // [新增] 處理空資料庫狀態 (Cold Start)
+            console.warn('⚠️ 資料庫為空，系統可能正在初始化...');
+            updateLoadingProgress(50, '系統初次啟動，正在抓取最新數據... (每 10 秒重試)');
+
+            // 等待 10 秒後重試 Polling
+            await new Promise(resolve => setTimeout(resolve, 10000));
+            return loadMarketData(); // 遞迴呼叫
         } else {
             console.warn('無法載入股票數據');
         }
