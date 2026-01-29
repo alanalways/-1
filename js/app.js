@@ -343,23 +343,25 @@ async function loadMarketData() {
             console.log('📡 Fetching from Supabase...');
 
             try {
-                // Fetch stocks (Top 100 by score for faster load, or all?)
-                // Default fetch all 1000+ is fine for Supabase, it returns in ~500ms
-                const { data: stocksData, error: stocksError } = await supabase
-                    .from('stocks')
-                    .select('*')
-                    .order('score', { ascending: false });
+                // 優化：並行請求 + 3秒超時機制 (Fast Failover)
+                const timeoutPromise = new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error('Supabase request timed out (3000ms)')), 3000)
+                );
 
+                const fetchPromise = Promise.all([
+                    supabase.from('stocks').select('*').order('score', { ascending: false }),
+                    supabase.from('market_summary').select('*').order('date', { ascending: false }).limit(1).single()
+                ]);
+
+                // Race for speed: 誰快用誰 (或是超時就報錯 -> Fallback)
+                const [stocksRes, summaryRes] = await Promise.race([fetchPromise, timeoutPromise]);
+
+                // Process Stocks
+                const { data: stocksData, error: stocksError } = stocksRes;
                 if (stocksError) throw stocksError;
 
-                // Fetch market summary
-                const { data: summaryData, error: summaryError } = await supabase
-                    .from('market_summary')
-                    .select('*')
-                    .order('date', { ascending: false })
-                    .limit(1)
-                    .single();
-
+                // Process Summary
+                const { data: summaryData, error: summaryError } = summaryRes;
                 if (!summaryError && summaryData) {
                     marketSummary = summaryData;
                     if (typeof summaryData.data_json === 'string') {
