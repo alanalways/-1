@@ -618,19 +618,28 @@ function applyFiltersAndSort() {
 
     // Apply category filter
     if (state.currentFilter !== 'all') {
+        const beforeCount = stocks.length;
         switch (state.currentFilter) {
             case 'bullish':
-                stocks = stocks.filter(s => s.signal === 'BULLISH');
+                stocks = stocks.filter(s =>
+                    s.signal?.toUpperCase() === 'BULLISH' ||
+                    parseFloat(s.changePercent) > 3 // 漲幅 > 3% 也算看多
+                );
                 break;
             case 'bearish':
-                stocks = stocks.filter(s => s.signal === 'BEARISH');
+                stocks = stocks.filter(s =>
+                    s.signal?.toUpperCase() === 'BEARISH' ||
+                    parseFloat(s.changePercent) < -3 // 跌幅 > 3% 也算看空
+                );
                 break;
             case 'smc':
                 stocks = stocks.filter(s =>
-                    s.patterns?.ob || s.patterns?.fvg || s.patterns?.sweep
+                    s.patterns?.ob || s.patterns?.fvg || s.patterns?.sweep ||
+                    (s.score && s.score >= 70) // SMC 評分 >= 70 也納入
                 );
                 break;
         }
+        console.log(`🎯 篩選 [${state.currentFilter}]: ${beforeCount} → ${stocks.length} 檔`);
     }
 
     // Apply sort
@@ -1325,6 +1334,16 @@ function showAnalysis(code) {
 
             // Setup AI 介紹股簡報按鈕 (Gemini API)
             setupAIAnalysisButton(stock);
+
+            // [新增] K 線時間範圍下拉選單連動
+            const chartTimeframe = document.getElementById('chartTimeframe');
+            if (chartTimeframe) {
+                chartTimeframe.addEventListener('change', () => {
+                    const timeframe = chartTimeframe.value;
+                    console.log(`📊 切換 K 線時間範圍: ${timeframe}`);
+                    loadTradingViewWidget(pureCode, timeframe);
+                });
+            }
         }, 100);
     }
 
@@ -1803,13 +1822,23 @@ function calculateResult() {
     showStep('quizResult');
 }
 
-async function loadTradingViewWidget(symbol) {
+async function loadTradingViewWidget(symbol, timeframe = '1Y') {
     const container = document.getElementById('tradingview_chart');
     const loading = document.getElementById('tvLoading');
 
     if (!container) return;
 
     const cleanCode = symbol.replace('.TW', '').replace('.TWO', '');
+
+    // [新增] 時間範圍對照表
+    const timeframeToRange = {
+        '1M': { yahoo: '1mo', days: 30 },
+        '3M': { yahoo: '3mo', days: 90 },
+        '1Y': { yahoo: '1y', days: 365 },
+        '5Y': { yahoo: '5y', days: 1825 },
+        'ALL': { yahoo: 'max', days: 9999 }
+    };
+    const range = timeframeToRange[timeframe] || timeframeToRange['1Y'];
 
     // === Strategy 1: Try static JSON first ===
     try {
@@ -1818,7 +1847,12 @@ async function loadTradingViewWidget(symbol) {
 
         if (response.ok) {
             const data = await response.json();
-            const historyData = data.daily || [];
+            let historyData = data.daily || [];
+
+            // [新增] 根據時間篩選資料
+            if (historyData.length > range.days) {
+                historyData = historyData.slice(-range.days);
+            }
 
             if (historyData.length > 0) {
                 const chartData = historyData.map(d => ({
@@ -1830,7 +1864,7 @@ async function loadTradingViewWidget(symbol) {
 
                 renderSelfBuiltChart(container, chartData, symbol);
                 if (loading) loading.style.display = 'none';
-                console.log(`📊 Chart loaded from static JSON for ${cleanCode}`);
+                console.log(`📊 Chart loaded from static JSON for ${cleanCode} (${timeframe})`);
                 return;
             }
         }
@@ -1841,7 +1875,8 @@ async function loadTradingViewWidget(symbol) {
     // === Strategy 2: Handle USDT (Crypto) via Binance API ===
     if (symbol.endsWith('USDT')) {
         try {
-            const binanceUrl = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=1d&limit=365`;
+            const limit = Math.min(range.days, 1000); // Binance 限制
+            const binanceUrl = `https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=1d&limit=${limit}`;
             const response = await fetch(binanceUrl);
             const data = await response.json();
 
@@ -1861,42 +1896,44 @@ async function loadTradingViewWidget(symbol) {
         }
     }
 
-    // === Strategy 3: Try TWSE API directly (真實台股數據) ===
-    try {
-        const twseUrl = `https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=json&stockNo=${cleanCode}`;
-        if (loading) loading.innerHTML = '<span style="color: var(--accent-yellow);">📊 從證交所抓取資料中...</span>';
+    // === Strategy 3: Try TWSE API directly (僅當月資料) ===
+    if (timeframe === '1M') {
+        try {
+            const twseUrl = `https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=json&stockNo=${cleanCode}`;
+            if (loading) loading.innerHTML = '<span style="color: var(--accent-yellow);">📊 從證交所抓取資料中...</span>';
 
-        const response = await fetchWithCORS(twseUrl);
-        const data = await response.json();
+            const response = await fetchWithCORS(twseUrl);
+            const data = await response.json();
 
-        if (data.stat === 'OK' && data.data && data.data.length > 0) {
-            // TWSE 格式: [日期, 成交股數, 成交金額, 開盤價, 最高價, 最低價, 收盤價, 漲跌價差, 成交筆數]
-            const chartData = data.data.map(row => {
-                const parsePrice = (str) => parseFloat(String(str).replace(/,/g, '')) || 0;
-                return {
-                    date: row[0], // TWSE 日期格式
-                    open: parsePrice(row[3]),
-                    high: parsePrice(row[4]),
-                    low: parsePrice(row[5]),
-                    close: parsePrice(row[6])
-                };
-            }).filter(d => d.close > 0);
+            if (data.stat === 'OK' && data.data && data.data.length > 0) {
+                const chartData = data.data.map(row => {
+                    const parsePrice = (str) => parseFloat(String(str).replace(/,/g, '')) || 0;
+                    return {
+                        date: row[0],
+                        open: parsePrice(row[3]),
+                        high: parsePrice(row[4]),
+                        low: parsePrice(row[5]),
+                        close: parsePrice(row[6])
+                    };
+                }).filter(d => d.close > 0);
 
-            if (chartData.length > 0) {
-                renderSelfBuiltChart(container, chartData, symbol);
-                if (loading) loading.style.display = 'none';
-                console.log(`📊 Chart loaded from TWSE API for ${cleanCode}`);
-                return;
+                if (chartData.length > 0) {
+                    renderSelfBuiltChart(container, chartData, symbol);
+                    if (loading) loading.style.display = 'none';
+                    console.log(`📊 Chart loaded from TWSE API for ${cleanCode}`);
+                    return;
+                }
             }
+        } catch (e) {
+            console.warn('TWSE API failed:', e);
         }
-    } catch (e) {
-        console.warn('TWSE API failed:', e);
     }
 
     // === Strategy 4: Try Yahoo Finance via CORS proxy (備用) ===
     try {
         const twSymbol = `${cleanCode}.TW`;
-        const url = `https://query1.finance.yahoo.com/v8/finance/chart/${twSymbol}?interval=1d&range=6mo`;
+        // [修改] 使用動態 range 參數
+        const url = `https://query1.finance.yahoo.com/v8/finance/chart/${twSymbol}?interval=1d&range=${range.yahoo}`;
 
         if (loading) loading.innerHTML = '<span style="color: var(--accent-yellow);">📊 從 Yahoo 抓取資料中...</span>';
 
