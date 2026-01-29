@@ -100,60 +100,117 @@ app.use('/api/yahoo', async (req, res) => {
 // ========================================
 // Gemini AI 分析端點
 // ========================================
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyAGlx-c3fMJvX-q12kolNfXHfV18dew_yc';
-const GEMINI_MODELS = [
-    'gemini-3-flash-preview',           // 優先使用 (Free tier: 5-10 RPM, 250K TPM)
-    'gemini-2.5-flash-preview-09-2025'  // 備用 (Free tier: 10 RPM, 250K TPM, 250 RPD)
+// ========================================
+// Gemini AI 分析端點 (Multi-Key Rotation)
+// ========================================
+const GEMINI_API_KEYS = [
+    'AIzaSyBYeW6P87Hc5GiKy56ESI-2gotdfiNYWug',
+    'AIzaSyB2HQuUFBAkTD01HPQBlOuymIKKtfruHKs',
+    'AIzaSyBegBOQKsZ8VIQNxWxAFjIGFnR-N9HqD-A',
+    'AIzaSyBH4DospzODeYRHZ-KbnHgdfhkXjN28Yq4',
+    // 'AIzaSyBegBOQKsZ8VIQNxWxAFjIGFnR-N9HqD-A' // Duplicate removed
 ];
 
-// 記錄上次請求時間 (簡易 rate limiting)
-let lastGeminiRequest = 0;
-const MIN_REQUEST_INTERVAL = 6500; // 6.5 秒間隔 (約 10 RPM)
+const GEMINI_MODELS = [
+    'gemini-3-flash-preview',           // Tier 1: 優先 (Better quality)
+    'gemini-2.5-flash-preview-09-2025'  // Tier 2: 備用 (Fallback)
+];
 
-async function callGeminiAPI(prompt, modelIndex = 0) {
-    const model = GEMINI_MODELS[modelIndex];
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
+// Key 狀態管理 (各 Key 獨立 Rate Limit)
+const keyStates = GEMINI_API_KEYS.map(key => ({
+    key,
+    lastused: 0,
+    disabledUntil: 0 // 若遇到非相關錯誤可暫時停用
+}));
 
-    try {
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: prompt }] }],
-                generationConfig: {
-                    temperature: 0.7,
-                    maxOutputTokens: 1024,
-                    topP: 0.9
-                }
-            })
-        });
+function getNextAvailableKey() {
+    const now = Date.now();
+    // 簡單輪詢: 找一個最近最少使用且未被停用的 Key
+    // 這裡為了均勻分佈，可以排序 lastused
+    const availableKeys = keyStates
+        .filter(k => now > k.disabledUntil)
+        .sort((a, b) => a.lastused - b.lastused);
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            // 429 = Rate Limit, 嘗試下一個模型
-            if (response.status === 429 && modelIndex < GEMINI_MODELS.length - 1) {
-                console.warn(`⚠️ ${model} rate limited, trying fallback...`);
-                return callGeminiAPI(prompt, modelIndex + 1);
-            }
-            throw new Error(errorData.error?.message || `HTTP ${response.status}`);
-        }
-
-        const data = await response.json();
-        return {
-            success: true,
-            model,
-            content: data.candidates?.[0]?.content?.parts?.[0]?.text || '分析生成失敗'
-        };
-    } catch (error) {
-        console.error(`Gemini API Error (${model}):`, error.message);
-
-        // Fallback to next model
-        if (modelIndex < GEMINI_MODELS.length - 1) {
-            return callGeminiAPI(prompt, modelIndex + 1);
-        }
-
-        return { success: false, error: error.message };
+    if (availableKeys.length === 0) {
+        // 若全部都在冷卻，選最早的一個 (強制等待)
+        return keyStates.sort((a, b) => a.disabledUntil - b.disabledUntil)[0];
     }
+    return availableKeys[0];
+}
+
+const MIN_REQUEST_INTERVAL = 2000; // 每個 Key 至少間隔 2 秒 (分散負載)
+
+async function callGeminiAPI(prompt) {
+    // 雙層迴圈: Model -> Keys
+    for (const model of GEMINI_MODELS) {
+        // 嘗試所有可用的 Keys (最多嘗試次數 = Keys 數量)
+        // 為了避免單次請求過久，這裡限制每種模型最多試 3 次不同的 Key
+        let attempts = 0;
+        const maxAttempts = GEMINI_API_KEYS.length;
+
+        while (attempts < maxAttempts) {
+            attempts++;
+            const keyState = getNextAvailableKey();
+            const now = Date.now();
+
+            // 檢查是否需要等待 (Rate Limit)
+            const waitTime = Math.max(0, MIN_REQUEST_INTERVAL - (now - keyState.lastused));
+            if (waitTime > 0) await new Promise(r => setTimeout(r, waitTime));
+
+            keyState.lastused = Date.now();
+
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${keyState.key}`;
+
+            try {
+                console.log(`🤖 Gemini Attempt: ${model} with Key ending ...${keyState.key.slice(-4)}`);
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: prompt }] }],
+                        generationConfig: {
+                            temperature: 0.7,
+                            maxOutputTokens: 1024,
+                            topP: 0.9
+                        }
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+
+                    // 429 Rate Limit -> 標記該 Key 暫時停用，換下一個 Key
+                    if (response.status === 429) {
+                        console.warn(`⚠️ Key ...${keyState.key.slice(-4)} hit Rate Limit on ${model}`);
+                        keyState.disabledUntil = Date.now() + 60000; // 停用 1 分鐘
+                        continue; // Try next key
+                    }
+
+                    // 503 Service Unavailable -> 也換 Key 試試
+                    if (response.status === 503) {
+                        continue;
+                    }
+
+                    throw new Error(errorData.error?.message || `HTTP ${response.status}`);
+                }
+
+                const data = await response.json();
+                return {
+                    success: true,
+                    model, // 回傳成功使用的模型
+                    content: data.candidates?.[0]?.content?.parts?.[0]?.text || '分析生成失敗'
+                };
+
+            } catch (error) {
+                console.error(`❌ Error (${model}):`, error.message);
+                // 若是網路或嚴重錯誤，可能不是 Key 的問題，但換個 Key 試試也無妨
+                // 繼續迴圈嘗試下一個 Key
+            }
+        }
+        console.warn(`⚠️ All keys failed for model ${model}, switching to next model...`);
+    }
+
+    return { success: false, error: '所有 Gemini Keys 與模型皆無法使用，請稍後再試。' };
 }
 
 app.get('/api/ai-analysis', async (req, res) => {
