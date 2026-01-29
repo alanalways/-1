@@ -220,15 +220,7 @@ app.get('/api/ai-analysis', async (req, res) => {
         return res.status(400).json({ error: '缺少股票代碼' });
     }
 
-    // Simple rate limiting
-    const now = Date.now();
-    if (now - lastGeminiRequest < MIN_REQUEST_INTERVAL) {
-        return res.status(429).json({
-            error: '請求過快，請稍後再試',
-            retryAfter: Math.ceil((MIN_REQUEST_INTERVAL - (now - lastGeminiRequest)) / 1000)
-        });
-    }
-    lastGeminiRequest = now;
+    // Rate Limit 由 callGeminiAPI 內部每組 Key 獨立控制
 
     const prompt = `你是一位專業的台灣股市分析師，請用繁體中文提供以下股票的簡報分析：
 
