@@ -642,7 +642,7 @@ function generateMarketIntelligenceFallback() {
     stocks.forEach(s => totalChange += parseFloat(s.changePercent || 0));
     const avgChange = (totalChange / stocks.length).toFixed(2);
 
-    // 3. 尋找強勢產業
+    // 3. 尋找強勢產業 (排除 Generic)
     const sectorStats = {};
     stocks.forEach(s => {
         const sector = (s.sector || '其他').trim();
@@ -652,9 +652,31 @@ function generateMarketIntelligenceFallback() {
     });
 
     let bestSector = { name: '分析中', avg: -999 };
+    const ignoredSectors = ['其他', 'ETF', '受益證券', '存託憑證'];
+
+    // First pass: Try to find best non-ignored sector
     for (const [name, stats] of Object.entries(sectorStats)) {
+        if (ignoredSectors.includes(name) && Object.keys(sectorStats).length > 1) continue;
         const avg = stats.sum / stats.count;
         if (avg > bestSector.avg) bestSector = { name, avg };
+    }
+
+    // If still defaults (e.g. all ignored), try again without filter
+    if (bestSector.avg === -999) {
+        for (const [name, stats] of Object.entries(sectorStats)) {
+            const avg = stats.sum / stats.count;
+            if (avg > bestSector.avg) bestSector = { name, avg };
+        }
+    }
+
+    // Formatting Logic
+    let sectorTitle = `${bestSector.name || '電子'} 最強`;
+    let sectorContent = `該板塊平均漲幅 ${bestSector.avg > -900 ? bestSector.avg.toFixed(2) : 0}%`;
+
+    // Handle Flat Market (Zero change)
+    if (Math.abs(bestSector.avg) < 0.01 || bestSector.avg === -999) {
+        sectorTitle = '市場觀望中';
+        sectorContent = '各產業平均漲跌幅持平 (0.00%)';
     }
 
     // 4. 國際市場 (從 raw 或暫存取)
@@ -672,8 +694,8 @@ function generateMarketIntelligenceFallback() {
         {
             icon: '🔥',
             category: '熱門產業',
-            title: `${bestSector.name || '電子'} 最強`,
-            content: `該板塊平均漲幅 ${bestSector.avg > -900 ? bestSector.avg.toFixed(2) : 0}%`
+            title: sectorTitle,
+            content: sectorContent
         },
         {
             icon: '🌍',
