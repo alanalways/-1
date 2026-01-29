@@ -304,55 +304,129 @@ async function fetchWithCORS(url) {
     }
 }
 
-// === Data Loading (使用瘦身版 JSON 加速載入) ===
+// === Initialization Supabase ===
+let supabase = null;
+if (typeof window.supabase !== 'undefined' && typeof CONFIG !== 'undefined') {
+    supabase = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
+    console.log('✅ Supabase initialized');
+} else {
+    console.warn('⚠️ Supabase client not found or CONFIG missing');
+}
+
+// === Data Loading ===
 async function loadMarketData() {
     try {
-        // 優先使用瘦身版 stocks-lite.json (快速載入)
-        const response = await fetch('data/stocks-lite.json');
-        if (!response.ok) throw new Error('Failed to load lite data');
+        state.isLoading = true;
+        let stocks = [];
+        let marketSummary = null;
+        let loadedFrom = '';
 
-        const liteData = await response.json();
+        // 1. Try to load from Supabase
+        if (supabase) {
+            console.time('SupabaseFetch');
+            console.log('📡 Fetching from Supabase...');
 
-        // 設定 state
-        state.marketData = liteData;
-        state.allStocks = liteData.stocks || [];
-        state.filteredStocks = [...state.allStocks];
-        state.analysisDate = liteData.analysisDate;
+            try {
+                // Fetch stocks (Top 100 by score for faster load, or all?)
+                // Default fetch all 1000+ is fine for Supabase, it returns in ~500ms
+                const { data: stocksData, error: stocksError } = await supabase
+                    .from('stocks')
+                    .select('*')
+                    .order('score', { ascending: false });
 
-        // === 動態更新 Market Intelligence (已改為後端生成，前端直接信任) ===
-        // updateMarketIntelligence(); // Removed
+                if (stocksError) throw stocksError;
 
-        // Update last updated time with analysis date warning
-        if (elements.lastUpdated && liteData.lastUpdated) {
-            elements.lastUpdated.textContent = `${liteData.lastUpdated} (訊號分析：${liteData.analysisDate})`;
+                // Fetch market summary
+                const { data: summaryData, error: summaryError } = await supabase
+                    .from('market_summary')
+                    .select('*')
+                    .order('date', { ascending: false })
+                    .limit(1)
+                    .single();
+
+                if (!summaryError && summaryData) {
+                    marketSummary = summaryData;
+                    if (typeof summaryData.data_json === 'string') {
+                        summaryData.data_json = JSON.parse(summaryData.data_json);
+                    }
+                }
+
+                if (stocksData && stocksData.length > 0) {
+                    loadedFrom = 'Supabase';
+                    stocks = stocksData.map(s => ({
+                        code: s.code,
+                        name: s.name,
+                        closePrice: parseFloat(s.close_price) || 0,
+                        openPrice: parseFloat(s.open_price) || 0,
+                        highPrice: parseFloat(s.high_price) || 0,
+                        lowPrice: parseFloat(s.low_price) || 0,
+                        volume: parseInt(s.volume) || 0,
+                        changePercent: parseFloat(s.change_percent) || 0,
+                        signal: s.signal || 'NEUTRAL',
+                        score: s.score || 0,
+                        market: s.market || '上市',
+                        sector: s.sector || '其他',
+                        peRatio: s.pe_ratio,
+                        analysis: s.analysis,
+                        patterns: s.patterns
+                    }));
+                }
+            } catch (dbError) {
+                console.warn('Supabase fetch failed, falling back...', dbError);
+            }
+            console.timeEnd('SupabaseFetch');
         }
 
-        console.log(`✅ Loaded ${state.allStocks.length} stocks (瘦身版，快速載入)`);
+        // 2. Fallback to local JSON
+        if (stocks.length === 0) {
+            console.log('⚠️ Supabase empty, falling back to local JSON...');
+            loadedFrom = 'Local JSON';
+            const response = await fetch('data/stocks-lite.json?t=' + new Date().getTime());
+            if (!response.ok) throw new Error('Failed to load local data');
+            const data = await response.json();
+
+            stocks = data.stocks;
+            marketSummary = {
+                data_json: {
+                    taiex: data.marketIntelligence?.taiex,
+                    usIndices: data.marketIntelligence?.usIndices,
+                    commodities: data.marketIntelligence?.commodities
+                },
+                updated_at: data.lastUpdated
+            };
+        }
+
+        // Update State
+        state.marketData = marketSummary?.data_json || {};
+        state.allStocks = stocks;
+        state.filteredStocks = [...state.allStocks];
+
+        // Update Last Updated Time
+        if (elements.lastUpdated) {
+            const timeStr = marketSummary?.updated_at
+                ? new Date(marketSummary.updated_at).toLocaleString('zh-TW')
+                : new Date().toLocaleString('zh-TW');
+            elements.lastUpdated.textContent = `${timeStr} (來源: ${loadedFrom})`;
+        }
+
+        console.log(`✅ Loaded ${stocks.length} stocks from ${loadedFrom}`);
 
         // 盤中時段啟動即時報價更新
         if (isTaiwanTradingHours()) {
             setTimeout(() => updateVisiblePrices(), 2000);
         }
-    } catch (error) {
-        console.error('Failed to load lite data, fallback to full:', error);
 
-        // Fallback: 載入完整版
-        try {
-            const fullResponse = await fetch('data/market-data.json');
-            if (fullResponse.ok) {
-                const fullData = await fullResponse.json();
-                state.marketData = fullData;
-                state.allStocks = fullData.allStocks || [];
-                state.filteredStocks = [...state.allStocks];
-                updateMarketIntelligence();
-                console.log(`✅ Fallback: Loaded ${state.allStocks.length} stocks (完整版)`);
-            }
-        } catch (fallbackError) {
-            console.error('Fallback also failed:', fallbackError);
-            showToast('載入數據失敗，請稍後再試', 'error');
-        }
+        state.isLoading = false;
+        return true;
+
+    } catch (error) {
+        console.error('Data Load Error:', error);
+        showToast('無法載入數據: ' + error.message, 'error');
+        state.isLoading = false;
+        return false;
     }
 }
+
 
 // === 即時報價更新 (僅更新畫面上可見的股票) ===
 async function updateVisiblePrices() {
