@@ -13,6 +13,7 @@ import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import cron from 'node-cron';
+import { getStocks, getMarketSummary } from './lib/supabase.js';
 
 // ES Module 路徑處理
 const __filename = fileURLToPath(import.meta.url);
@@ -97,6 +98,32 @@ app.use('/api/yahoo', async (req, res) => {
 
 
 
+
+// === API Proxy 端點 ===
+// [新增] 內部數據 API (讓前端讀取 Supabase)
+app.get('/api/data/stocks', async (req, res) => {
+    try {
+        const stocks = await getStocks();
+        if (!stocks || stocks.length === 0) {
+            // 如果資料庫是空的，嘗試讀取本地備份 (或是回傳空陣列)
+            return res.status(404).json({ error: '目前沒有資料' });
+        }
+        res.json(stocks);
+    } catch (error) {
+        console.error('API Error:', error);
+        res.status(500).json({ error: '伺服器讀取錯誤' });
+    }
+});
+
+app.get('/api/data/market', async (req, res) => {
+    try {
+        const summary = await getMarketSummary();
+        res.json(summary || {});
+    } catch (error) {
+        console.error('Market API Error:', error);
+        res.status(500).json({ error: '市場摘要讀取錯誤' });
+    }
+});
 
 // === 健康檢查端點 ===
 app.get('/api/health', (req, res) => {
