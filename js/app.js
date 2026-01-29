@@ -765,7 +765,7 @@ function createStockCard(stock, index) {
     }).join('');
 
     return `
-        <div class="stock-card" style="animation-delay: ${index * 0.05}s">
+        <div class="stock-card" data-stock-code="${stock.code}" style="animation-delay: ${index * 0.05}s">
             <div class="stock-card-header">
                 <div class="stock-card-info">
                     <span class="stock-code">${stock.code || 'N/A'}</span>
