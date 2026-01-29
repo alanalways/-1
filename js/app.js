@@ -824,6 +824,36 @@ function renderWatchlist() {
 
     if (emptyState) emptyState.style.display = 'none';
     container.innerHTML = watchlistStocks.map((stock, index) => createStockCard(stock, index)).join('');
+
+    // [修復] 綁定按鈕事件 - 這是之前缺失的部分
+    container.querySelectorAll('.action-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const action = btn.dataset.action;
+            const code = btn.dataset.code;
+
+            switch (action) {
+                case 'favorite':
+                    toggleFavorite(code, btn);
+                    break;
+                case 'analyze':
+                    showAnalysis(code);
+                    break;
+                case 'chart':
+                    openChart(code);
+                    break;
+            }
+        });
+    });
+
+    // 卡片點擊事件
+    container.querySelectorAll('.stock-card').forEach(card => {
+        card.addEventListener('click', (e) => {
+            if (e.target.closest('.action-btn')) return;
+            const code = card.dataset.stockCode;
+            showAnalysis(code);
+        });
+    });
 }
 
 function renderGlobalMarkets() {
@@ -1018,8 +1048,8 @@ function showAnalysis(code) {
                     <div class="info-cards-grid">
                         <div class="info-card">
                             <div class="info-label">成交量</div>
-                            <div class="info-value">${formatNumber(stock.volume)}</div>
-                            <div class="info-unit">TWD</div>
+                            <div class="info-value">${Math.floor(stock.volume / 1000).toLocaleString()}</div>
+                            <div class="info-unit">張</div>
                         </div>
                         <div class="info-card ${parseFloat(stock.changePercent) >= 0 ? 'positive' : 'negative'}">
                             <div class="info-label">漲幅</div>
@@ -1287,9 +1317,73 @@ function showAnalysis(code) {
 
         // Setup toggle button event delegation for 存股派/大膽派
         setupAllocationToggle(stock);
+
+        // [修復] Setup AI prediction dropdown event handlers
+        setupPredictionControls(stock);
     }
 
     openModal();
+}
+
+// ============================================
+// AI Prediction Controls (AI 進場價位預測)
+// ============================================
+function setupPredictionControls(stock) {
+    const techniqueSelect = document.getElementById('predictionTechnique');
+    const aiTypeSelect = document.getElementById('predictionAI');
+
+    if (!techniqueSelect || !aiTypeSelect) return;
+
+    const updatePrediction = () => {
+        const technique = techniqueSelect.value;
+        const aiType = aiTypeSelect.value;
+        const basePrice = parseFloat(stock.price || stock.closePrice || 100);
+
+        // 根據技術類型計算不同的進場價位
+        let entryMultiplier = 0.95;
+        let stopLossMultiplier = 0.90;
+        let targetMultiplier = 1.15;
+
+        switch (technique) {
+            case 'sma':
+                entryMultiplier = 0.97;
+                stopLossMultiplier = 0.92;
+                targetMultiplier = 1.12;
+                break;
+            case 'bollinger':
+                entryMultiplier = 0.93;
+                stopLossMultiplier = 0.88;
+                targetMultiplier = 1.18;
+                break;
+            case 'fibonacci':
+                entryMultiplier = 0.382 + 0.58; // 61.8% retracement
+                stopLossMultiplier = 0.85;
+                targetMultiplier = 1.20;
+                break;
+        }
+
+        // 根據 AI 類型調整
+        if (aiType === 'aggressive') {
+            entryMultiplier += 0.02;
+            stopLossMultiplier += 0.03;
+            targetMultiplier += 0.05;
+        } else if (aiType === 'conservative') {
+            entryMultiplier -= 0.02;
+            stopLossMultiplier -= 0.02;
+            targetMultiplier -= 0.03;
+        }
+
+        // 更新 DOM
+        const priceBoxes = document.querySelectorAll('.prediction-price');
+        if (priceBoxes[0]) priceBoxes[0].textContent = (basePrice * entryMultiplier).toFixed(2);
+        if (priceBoxes[1]) priceBoxes[1].textContent = (basePrice * stopLossMultiplier).toFixed(2);
+        if (priceBoxes[2]) priceBoxes[2].textContent = (basePrice * targetMultiplier).toFixed(2);
+
+        console.log(`🎯 AI 預測更新: ${technique} + ${aiType} → Entry: ${(basePrice * entryMultiplier).toFixed(2)}`);
+    };
+
+    techniqueSelect.addEventListener('change', updatePrediction);
+    aiTypeSelect.addEventListener('change', updatePrediction);
 }
 
 // ============================================

@@ -102,6 +102,39 @@ export async function fetchDailyPrices(date) {
 }
 
 // ========================================
+// TWSE 產業分類 API
+// ========================================
+
+/**
+ * 從 TWSE 取得上市公司產業分類對照表
+ * API: https://openapi.twse.com.tw/v1/opendata/t187ap03_L
+ * @returns {Map<string, string>} 股票代碼 -> 產業類別
+ */
+export async function fetchTWSESectorList() {
+    console.log('📡 正在從 TWSE 取得產業分類對照表...');
+    try {
+        const response = await http.get('https://openapi.twse.com.tw/v1/opendata/t187ap03_L', {
+            timeout: 30000
+        });
+
+        const sectorMap = new Map();
+        if (response.data && Array.isArray(response.data)) {
+            response.data.forEach(item => {
+                // 欄位名稱：公司代號, 公司名稱, 產業類別
+                const code = item['公司代號'] || item.code;
+                const sector = item['產業類別'] || item.industry || '其他';
+                if (code) sectorMap.set(code.trim(), sector.trim());
+            });
+            console.log(`✅ TWSE 產業分類對照表: ${sectorMap.size} 檔`);
+        }
+        return sectorMap;
+    } catch (error) {
+        console.error('TWSE 產業分類 API 失敗:', error.message);
+        return new Map();
+    }
+}
+
+// ========================================
 // Yahoo Finance - 批次取得報價
 // ========================================
 
@@ -249,11 +282,31 @@ export async function fetchTWSEAllStocks() {
 
         console.log(`✅ TWSE 共 ${stocks.length} 檔上市股票 (含 ETF)`);
 
+        // 3. [新增] 補充產業分類資料
+        try {
+            const sectorMap = await fetchTWSESectorList();
+            let sectorCount = 0;
+            for (const stock of stocks) {
+                const sector = sectorMap.get(stock.code);
+                if (sector) {
+                    stock.sector = sector;
+                    sectorCount++;
+                } else {
+                    stock.sector = '其他'; // ETF 或未分類
+                }
+            }
+            console.log(`   🏭 補充產業分類: ${sectorCount} 檔`);
+        } catch (sectorError) {
+            console.warn('產業分類資料獲取失敗（不影響主要數據）:', sectorError.message);
+            // 預設為「其他」
+            stocks.forEach(s => s.sector = s.sector || '其他');
+        }
+
         // 驗證 0050 和 2330
         const etf0050 = stocks.find(s => s.code === '0050');
         const tsmc = stocks.find(s => s.code === '2330');
-        if (etf0050) console.log(`   📊 驗證 ETF: 0050 元大台灣50 收盤價 = ${etf0050.closePrice}`);
-        if (tsmc) console.log(`   📊 驗證: 2330 台積電 收盤價 = ${tsmc.closePrice}, PE = ${tsmc.peRatio}`);
+        if (etf0050) console.log(`   📊 驗證 ETF: 0050 元大台灣50 收盤價 = ${etf0050.closePrice}, 產業 = ${etf0050.sector}`);
+        if (tsmc) console.log(`   📊 驗證: 2330 台積電 收盤價 = ${tsmc.closePrice}, PE = ${tsmc.peRatio}, 產業 = ${tsmc.sector}`);
 
         return stocks;
     } catch (error) {

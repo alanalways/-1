@@ -100,9 +100,21 @@ export async function runDailyUpdate() {
                 },
                 {
                     icon: '🤖',
-                    category: 'AI 觀點',
-                    title: '趨勢分析',
-                    content: 'SMC 機構單與市場情緒綜合分析。'
+                    category: 'SMC 訊號',
+                    title: (() => {
+                        // [修正] 計算實際 SMC 訊號數量
+                        const obCount = analyzedStocks.filter(s => s.patterns?.ob).length;
+                        const fvgCount = analyzedStocks.filter(s => s.patterns?.fvg).length;
+                        const sweepCount = analyzedStocks.filter(s => s.patterns?.sweep).length;
+                        const total = obCount + fvgCount + sweepCount;
+                        return `${total} 檔觸發`;
+                    })(),
+                    content: (() => {
+                        const obCount = analyzedStocks.filter(s => s.patterns?.ob).length;
+                        const fvgCount = analyzedStocks.filter(s => s.patterns?.fvg).length;
+                        const sweepCount = analyzedStocks.filter(s => s.patterns?.sweep).length;
+                        return `OB: ${obCount} 檔 | FVG: ${fvgCount} 檔 | Sweep: ${sweepCount} 檔`;
+                    })()
                 }
             ];
 
