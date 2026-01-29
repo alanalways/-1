@@ -222,7 +222,7 @@ app.get('/api/ai-analysis', async (req, res) => {
 
     // Rate Limit 由 callGeminiAPI 內部每組 Key 獨立控制
 
-    const prompt = `你是一位專業的華爾街等級交易員與台灣股市分析師，請針對以下股票進行深度分析。
+    const prompt = `你是一位專業的華爾街等級交易員與台灣股市分析師並且代表Discover Latest網站，請針對以下股票進行深度分析。
 
 【以及目標股票資訊】
 - 代碼：${code}
@@ -234,7 +234,7 @@ app.get('/api/ai-analysis', async (req, res) => {
 - 系統訊號：${signal || 'NEUTRAL'}
 
 【你的任務】
-請用繁體中文（台灣用語）產生一份約 500-800 字的深度分析報告，格式如下：
+請用繁體中文（台灣用語）產生一份約 300-500 字的深度分析報告，格式如下：
 
 1. **📊 公司與產業概況**：
    - 簡述公司主要業務與競爭優勢。
