@@ -164,25 +164,26 @@ export async function fetchYahooQuotes(symbols) {
 
 /**
  * 從證交所取得當日所有上市股票交易資料
- * 使用 STOCK_DAY_ALL API (股價) + BWIBBU_d API (基本面)
+ * 使用 STOCK_DAY_ALL API (股價) 為主，BWIBBU_d API (基本面) 為輔
+ * 這樣可以包含 ETF (如 0050) 等沒有本益比的商品
  */
 export async function fetchTWSEAllStocks() {
     console.log('📡 正在從 TWSE 取得全部上市股票資料...');
 
     try {
-        // 1. 先抓股價資料 (STOCK_DAY_ALL)
+        // 1. 主要資料來源：STOCK_DAY_ALL (所有上市股票含 ETF)
         const priceResponse = await http.get('https://www.twse.com.tw/exchangeReport/STOCK_DAY_ALL', {
             params: { response: 'open_data' },
             timeout: 60000
         });
 
-        // 2. 再抓基本面資料 (OpenAPI - 本益比、殖利率)
-        const fundResponse = await http.get('https://openapi.twse.com.tw/v1/exchangeReport/BWIBBU_d', {
-            timeout: 30000
-        });
+        // 解析股價資料（作為主要列表）
+        const stocks = [];
+        const parseNum = (str) => {
+            if (!str || str === '--' || str === '') return 0;
+            return parseFloat(str.replace(/,/g, '')) || 0;
+        };
 
-        // 解析股價資料
-        const priceMap = new Map();
         if (priceResponse.data) {
             const lines = priceResponse.data.split('\n');
             for (let i = 1; i < lines.length; i++) {
@@ -191,62 +192,68 @@ export async function fetchTWSEAllStocks() {
 
                 const cols = line.split(',').map(c => c.replace(/"/g, '').trim());
                 const code = cols[1];
-                if (!/^\d{4,6}$/.test(code)) continue;
+                const name = cols[2];
 
-                const parseNum = (str) => {
-                    if (!str || str === '--' || str === '') return 0;
-                    return parseFloat(str.replace(/,/g, '')) || 0;
-                };
+                // 只過濾 4 位數純數字代碼（包含 ETF 如 0050, 0056 等）
+                if (!/^\d{4}$/.test(code)) continue;
 
-                priceMap.set(code, {
-                    date: cols[0],
-                    volume: parseNum(cols[3]),
-                    tradeValue: parseNum(cols[4]),
+                stocks.push({
+                    code: code,
+                    name: name || '',
                     openPrice: parseNum(cols[5]),
                     highPrice: parseNum(cols[6]),
                     lowPrice: parseNum(cols[7]),
                     closePrice: parseNum(cols[8]),
+                    volume: parseNum(cols[3]),
+                    tradeValue: parseNum(cols[4]),
                     change: parseNum(cols[9]),
-                    transactions: parseNum(cols[10])
+                    transactions: parseNum(cols[10]),
+                    peRatio: null,
+                    pbRatio: null,
+                    dividendYield: null
                 });
             }
         }
-        console.log(`   📈 股價資料: ${priceMap.size} 檔`);
+        console.log(`   📈 STOCK_DAY_ALL 股價資料: ${stocks.length} 檔`);
 
-        // 解析基本面資料並合併
-        const stocks = [];
-        if (fundResponse.data && Array.isArray(fundResponse.data)) {
-            for (const item of fundResponse.data) {
-                const code = item.Code;
-                if (!/^\d{4,6}$/.test(code)) continue;
+        // 2. 補充基本面資料 (BWIBBU_d - 只有普通股票有本益比，ETF 沒有)
+        try {
+            const fundResponse = await http.get('https://openapi.twse.com.tw/v1/exchangeReport/BWIBBU_d', {
+                timeout: 30000
+            });
 
-                const priceData = priceMap.get(code) || {};
+            if (fundResponse.data && Array.isArray(fundResponse.data)) {
+                const fundMap = new Map();
+                for (const item of fundResponse.data) {
+                    fundMap.set(item.Code, {
+                        peRatio: parseFloat(item.PEratio) || null,
+                        pbRatio: parseFloat(item.PBratio) || null,
+                        dividendYield: parseFloat(item.DividendYield) || null
+                    });
+                }
 
-                stocks.push({
-                    code: code,
-                    name: item.Name,
-                    closePrice: priceData.closePrice || 0,
-                    openPrice: priceData.openPrice || 0,
-                    highPrice: priceData.highPrice || 0,
-                    lowPrice: priceData.lowPrice || 0,
-                    volume: priceData.volume || 0,
-                    tradeValue: priceData.tradeValue || 0,
-                    change: priceData.change || 0,
-                    transactions: priceData.transactions || 0,
-                    peRatio: parseFloat(item.PEratio) || null,
-                    pbRatio: parseFloat(item.PBratio) || null,
-                    dividendYield: parseFloat(item.DividendYield) || null
-                });
+                // 補充基本面到已有股票
+                for (const stock of stocks) {
+                    const fund = fundMap.get(stock.code);
+                    if (fund) {
+                        stock.peRatio = fund.peRatio;
+                        stock.pbRatio = fund.pbRatio;
+                        stock.dividendYield = fund.dividendYield;
+                    }
+                }
+                console.log(`   💹 補充基本面資料: ${fundMap.size} 檔`);
             }
+        } catch (fundError) {
+            console.warn('基本面資料獲取失敗（不影響主要數據）:', fundError.message);
         }
 
-        console.log(`✅ TWSE 合併後共 ${stocks.length} 檔上市股票`);
+        console.log(`✅ TWSE 共 ${stocks.length} 檔上市股票 (含 ETF)`);
 
-        // 驗證 2330 台積電
+        // 驗證 0050 和 2330
+        const etf0050 = stocks.find(s => s.code === '0050');
         const tsmc = stocks.find(s => s.code === '2330');
-        if (tsmc) {
-            console.log(`   📊 驗證: 2330 台積電 收盤價 = ${tsmc.closePrice} 元, PE = ${tsmc.peRatio}`);
-        }
+        if (etf0050) console.log(`   📊 驗證 ETF: 0050 元大台灣50 收盤價 = ${etf0050.closePrice}`);
+        if (tsmc) console.log(`   📊 驗證: 2330 台積電 收盤價 = ${tsmc.closePrice}, PE = ${tsmc.peRatio}`);
 
         return stocks;
     } catch (error) {
@@ -258,37 +265,87 @@ export async function fetchTWSEAllStocks() {
 
 /**
  * 從櫃買中心取得當日所有上櫃股票交易資料
- * 使用 TPEx OpenAPI
+ * 使用 tpex_mainboard_quotes (收盤行情) 為主，peratio_analysis 為輔
+ * 這樣可以包含所有上櫃股票
  */
 export async function fetchTPExAllStocks() {
     console.log('📡 正在從 TPEx 取得全部上櫃股票資料...');
 
     try {
-        // 使用用戶提供的 OpenAPI 端點
-        const response = await http.get('https://www.tpex.org.tw/openapi/v1/tpex_mainboard_peratio_analysis', {
+        // 1. 主要資料來源：收盤行情 (所有上櫃股票)
+        const quotesResponse = await http.get('https://www.tpex.org.tw/openapi/v1/tpex_mainboard_quotes', {
             timeout: 30000
         });
 
-        if (response.data && Array.isArray(response.data)) {
-            const stocks = response.data
-                .filter(item => /^\d{4,6}$/.test(item.SecuritiesCompanyCode))
-                .map(item => ({
-                    code: item.SecuritiesCompanyCode,
-                    name: item.CompanyName,
-                    closePrice: parseFloat(item.ClosingPrice) || 0,
-                    peRatio: parseFloat(item.PriceEarningRatio) || null,
-                    pbRatio: parseFloat(item.PriceBookRatio) || null,
-                    dividendYield: parseFloat(item.YieldRatio) || null,
-                    openPrice: 0,
-                    highPrice: 0,
-                    lowPrice: 0,
-                    volume: 0,
-                    change: 0
-                }));
+        const stocks = [];
+        const parseNum = (str) => {
+            if (!str || str === '--' || str === '') return 0;
+            return parseFloat(String(str).replace(/,/g, '')) || 0;
+        };
 
-            console.log(`✅ TPEx OpenAPI 回傳 ${stocks.length} 檔上櫃股票`);
-            return stocks;
+        if (quotesResponse.data && Array.isArray(quotesResponse.data)) {
+            for (const item of quotesResponse.data) {
+                const code = item.SecuritiesCompanyCode;
+                // 只過濾 4 位數純數字代碼
+                if (!/^\d{4}$/.test(code)) continue;
+
+                stocks.push({
+                    code: code,
+                    name: item.CompanyName || '',
+                    closePrice: parseNum(item.Close),
+                    openPrice: parseNum(item.Open),
+                    highPrice: parseNum(item.High),
+                    lowPrice: parseNum(item.Low),
+                    volume: parseNum(item.TradingShares),
+                    tradeValue: parseNum(item.TransactionAmount),
+                    change: parseNum(item.Change),
+                    transactions: parseNum(item.Transaction),
+                    peRatio: null,
+                    pbRatio: null,
+                    dividendYield: null
+                });
+            }
         }
+        console.log(`   📈 tpex_mainboard_quotes: ${stocks.length} 檔`);
+
+        // 2. 補充基本面資料 (peratio_analysis)
+        try {
+            const peResponse = await http.get('https://www.tpex.org.tw/openapi/v1/tpex_mainboard_peratio_analysis', {
+                timeout: 30000
+            });
+
+            if (peResponse.data && Array.isArray(peResponse.data)) {
+                const peMap = new Map();
+                for (const item of peResponse.data) {
+                    peMap.set(item.SecuritiesCompanyCode, {
+                        peRatio: parseFloat(item.PriceEarningRatio) || null,
+                        pbRatio: parseFloat(item.PriceBookRatio) || null,
+                        dividendYield: parseFloat(item.YieldRatio) || null
+                    });
+                }
+
+                // 補充基本面到已有股票
+                for (const stock of stocks) {
+                    const pe = peMap.get(stock.code);
+                    if (pe) {
+                        stock.peRatio = pe.peRatio;
+                        stock.pbRatio = pe.pbRatio;
+                        stock.dividendYield = pe.dividendYield;
+                    }
+                }
+                console.log(`   💹 補充本益比資料: ${peMap.size} 檔`);
+            }
+        } catch (peError) {
+            console.warn('TPEx 本益比資料獲取失敗（不影響主要數據）:', peError.message);
+        }
+
+        console.log(`✅ TPEx 共 ${stocks.length} 檔上櫃股票`);
+
+        // 驗證 8048
+        const desheng = stocks.find(s => s.code === '8048');
+        if (desheng) console.log(`   📊 驗證: 8048 德勝 收盤價 = ${desheng.closePrice}`);
+
+        return stocks;
     } catch (error) {
         console.error('TPEx API 失敗:', error.message);
     }
