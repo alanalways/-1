@@ -96,35 +96,36 @@ async function fetchStockHistory(symbol) {
 
 async function main() {
     const stocks = loadStocks();
-    let stocksToProcess = stocks;
 
-    // Filter relevant stocks (e.g., top 100 by volume or manual list to start)
-    // For now, let's process ALL but with a limit for testing/MVP
-    // Or prioritize stocks with high volume/score from previous step
-    // Debug Mode: Single Stock Test
-    if (stocks.length > 0) {
-        // Just pick one stock for verify, e.g. 6770 which failed earlier
-        // Or if lists are ordered, just first few
-        // Let's stick to first one, which seemed to be 6770 based on previous logs? 
-        // Actually log says 6770.TW previously.
-        stocksToProcess = stocks.slice(0, 3); // Try 3 stocks
-        console.log(`Debug Mode: Processing 3 stocks...`);
-    }
+    // Process all stocks (no debug limit)
+    console.log(`🎯 Target: ${stocks.length} stocks`);
 
-    console.log(`🎯 Target: ${stocksToProcess.length} stocks`);
+    let success = 0;
+    let failed = 0;
 
-    for (const stock of stocksToProcess) {
+    for (let i = 0; i < stocks.length; i++) {
+        const stock = stocks[i];
         const code = stock.code || stock.symbol;
         if (!code) continue;
 
-        const cleanCode = code.replace('.TW', '').replace('.TWO', ''); // Remove existing suffix if any
-        console.log(`🚀 Processing ${cleanCode}...`);
+        const cleanCode = code.replace('.TW', '').replace('.TWO', '');
+        console.log(`[${i + 1}/${stocks.length}] 🚀 Processing ${cleanCode}...`);
+
         const result = await fetchStockHistory(cleanCode);
-        console.log(`Result for ${cleanCode}: ${result ? 'SUCCESS' : 'FAILED'}`);
-        await sleep(1000);
+        if (result) {
+            success++;
+            console.log(`✅ ${cleanCode} saved successfully`);
+        } else {
+            failed++;
+        }
+
+        // Rate limiting - 800ms between requests
+        await sleep(800);
     }
 
+    console.log(`\n📊 Summary: ${success} success, ${failed} failed out of ${stocks.length} total`);
     console.log('✅ Historical data update complete.');
 }
+
 
 main();
