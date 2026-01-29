@@ -1,17 +1,23 @@
 {
     "name": "taiwan-stock-report",
-    "version": "1.0.0",
-    "description": "台股每日市場分析報告系統",
+    "version": "2.0.0",
+    "description": "台股每日市場分析報告系統 - Hugging Face + Supabase 版本",
     "type": "module",
     "scripts": {
+        "start": "node server.js",
         "update-data": "node scripts/generate-report.js",
+        "daily-update": "node scripts/daily-update.js",
         "dev": "npx serve .",
         "test:fetch": "node scripts/test-fetch.js"
     },
     "dependencies": {
+        "@supabase/supabase-js": "^2.39.0",
         "axios": "^1.6.0",
         "better-sqlite3": "^12.6.2",
         "cheerio": "^1.0.0-rc.12",
+        "cors": "^2.8.5",
+        "express": "^5.2.1",
+        "node-cron": "^4.2.1",
         "yahoo-finance2": "^3.13.0"
     },
     "devDependencies": {
