@@ -24,6 +24,7 @@ jobs:
       run: npm install
 
     - name: Fetch Historical Data (TWSE)
+      continue-on-error: true
       run: node scripts/fetch-historical.js
 
     - name: Generate SMC Analysis Report

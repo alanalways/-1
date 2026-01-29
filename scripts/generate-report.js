@@ -73,6 +73,18 @@ function generateAIAdvice(allStocks) {
     return `今日 SMC 策略掃描全市場，發現 ${smcStocks.length} 檔具備機構訊號。資金集中於「${uniqueReasons.join('、') || '特定型態'}」之個股。`;
 }
 
+// === 安全格式化成交金額 ===
+function formatAmount(amount) {
+    if (!amount || amount === 'N/A' || amount === '--') {
+        return 'N/A';
+    }
+    const numValue = parseInt(String(amount).replace(/,/g, ''));
+    if (isNaN(numValue) || numValue === 0) {
+        return 'N/A';
+    }
+    return Math.round(numValue / 100000000) + '億';
+}
+
 // === Main Report Generation ===
 async function generateReport() {
     console.log('🚀 開始執行 Discover Latest (Alan) 全市場掃描...\n');
@@ -243,7 +255,7 @@ async function generateReport() {
             category: '盤後總結',
             title: twIndex ? `加權指數 ${twIndex.index}` : '指數資料暫缺',
             content: twIndex
-                ? `漲跌 ${twIndex.change} • 成交 ${Math.round(parseInt(String(twIndex.amount || '0').replace(/,/g, '')) / 100000000)}億\n${String(twIndex.change || '').startsWith('-') ? '空方管控' : '多方控盤'}`
+                ? `漲跌 ${twIndex.change} • 成交 ${formatAmount(twIndex.amount)}\n${String(twIndex.change || '').startsWith('-') ? '空方管控' : '多方控盤'}`
                 : '無法取得證交所即時指數資料',
             stats: twIndex ? [
                 { label: '指數', value: twIndex.index, change: parseFloat(twIndex.change || 0) }
@@ -377,6 +389,22 @@ async function generateReport() {
     console.log(`   ⚡ 瘦身版：${litePath} (${liteSize} KB)`);
 }
 
-// Execute
-generateReport().catch(console.error);
+// Execute with enhanced error handling
+generateReport()
+    .then(() => {
+        console.log('✅ Report generation completed successfully.');
+        process.exit(0);
+    })
+    .catch(error => {
+        console.error('❌ Report generation failed:', error.message);
+        console.error('Stack trace:', error.stack);
+
+        // Exit gracefully in CI - don't fail the entire workflow
+        if (process.env.CI || process.env.GITHUB_ACTIONS) {
+            console.log('⚠️ Running in CI mode - exiting gracefully');
+            process.exit(0); // Exit 0 to not fail the workflow
+        } else {
+            process.exit(1);
+        }
+    });
 

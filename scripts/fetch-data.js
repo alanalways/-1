@@ -319,9 +319,34 @@ export async function fetchTaiwanStockIndex() {
                     }
                 }
             }
-            // Try to find volume/amount if possible (usually in another table or field), 
-            // but for now let's focus on the index value. 
-            // MI_INDEX 'tables' usually splits indices and other stats.
+
+            // Try to find volume/amount from stat field or other tables
+            if (response.data.stat) {
+                // Sometimes stat contains market summary
+                const statMatch = response.data.stat.match(/成交金額[：:]?\s*([\d,]+)/);
+                if (statMatch) {
+                    amount = statMatch[1];
+                }
+            }
+
+            // Try to extract from tables (look for "成交金額" field)
+            for (const table of response.data.tables) {
+                if (table.title && table.title.includes('成交')) {
+                    if (table.data && table.data[0]) {
+                        // Try to find the amount value
+                        for (let i = 0; i < table.data[0].length; i++) {
+                            const val = table.data[0][i];
+                            if (val && /^[\d,]+$/.test(val.replace(/,/g, '').trim())) {
+                                const numVal = parseInt(val.replace(/,/g, ''));
+                                if (numVal > 10000000000) { // > 100億，很可能是成交金額
+                                    amount = val;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
         // Case 2: Old API format (data1)
         else if (response.data && response.data.data1) {

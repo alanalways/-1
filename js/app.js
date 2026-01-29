@@ -796,9 +796,7 @@ function showAnalysis(code) {
                                 <option value="5Y">5 年</option>
                                 <option value="ALL">全部</option>
                             </select>
-                            <button class="chart-btn" onclick="window.open('https://www.tradingview.com/chart/?symbol=${tvSymbol}', '_blank')">
-                                📊 前往圖表
-                            </button>
+
                             <button class="chart-btn ai-btn" id="aiAnalysisBtn">
                                 ✨ AI 介紹股簡報
                                 <span class="beta-badge">BETA</span>
@@ -2033,9 +2031,8 @@ function updateEntryChecklist(history, container) {
 }
 
 function openChart(code) {
-    // Open TradingView chart
-    const symbol = code.replace('.TW', '');
-    window.open(`https://www.tradingview.com/chart/?symbol=TWSE:${symbol}`, '_blank');
+    // 開啟深度分析（不再導向 TradingView）
+    showAnalysis(code);
 }
 
 // === Modal ===

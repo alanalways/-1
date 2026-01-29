@@ -97,14 +97,23 @@ async function fetchStockHistory(symbol) {
 async function main() {
     const stocks = loadStocks();
 
+    // In CI environment, limit to 100 stocks to avoid timeout and rate limiting
+    const isCI = process.env.CI || process.env.GITHUB_ACTIONS;
+    const maxStocks = isCI ? 100 : stocks.length;
+    const targetStocks = stocks.slice(0, maxStocks);
+
+    if (isCI) {
+        console.log(`⚙️ Running in CI mode - limiting to ${maxStocks} stocks`);
+    }
+
     // Process all stocks (no debug limit)
-    console.log(`🎯 Target: ${stocks.length} stocks`);
+    console.log(`🎯 Target: ${targetStocks.length} stocks`);
 
     let success = 0;
     let failed = 0;
 
-    for (let i = 0; i < stocks.length; i++) {
-        const stock = stocks[i];
+    for (let i = 0; i < targetStocks.length; i++) {
+        const stock = targetStocks[i];
         const code = stock.code || stock.symbol;
         if (!code) continue;
 
@@ -123,7 +132,7 @@ async function main() {
         await sleep(800);
     }
 
-    console.log(`\n📊 Summary: ${success} success, ${failed} failed out of ${stocks.length} total`);
+    console.log(`\n📊 Summary: ${success} success, ${failed} failed out of ${targetStocks.length} total`);
     console.log('✅ Historical data update complete.');
 }
 
