@@ -285,11 +285,12 @@ function setupEventListeners() {
     });
 }
 
-// === Cloudflare CORS Proxy Helper ===
+// === CORS Proxy Helper (使用 codetabs 公開 proxy) ===
 async function fetchWithCORS(url) {
     try {
-        // 組合完整的 Proxy 請求網址
-        const targetUrl = `${PROXY_BASE_URL}?url=${encodeURIComponent(url)}`;
+        // 使用穩定的公開 CORS proxy
+        const proxyUrl = 'https://api.codetabs.com/v1/proxy?quest=';
+        const targetUrl = `${proxyUrl}${encodeURIComponent(url)}`;
         const response = await fetch(targetUrl);
 
         if (!response.ok) {
@@ -1502,12 +1503,44 @@ async function loadTradingViewWidget(symbol) {
         }
     }
 
-    // === Strategy 3: Try Yahoo Finance via CORS proxy ===
+    // === Strategy 3: Try TWSE API directly (真實台股數據) ===
+    try {
+        const twseUrl = `https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=json&stockNo=${cleanCode}`;
+        if (loading) loading.innerHTML = '<span style="color: var(--accent-yellow);">📊 從證交所抓取資料中...</span>';
+
+        const response = await fetchWithCORS(twseUrl);
+        const data = await response.json();
+
+        if (data.stat === 'OK' && data.data && data.data.length > 0) {
+            // TWSE 格式: [日期, 成交股數, 成交金額, 開盤價, 最高價, 最低價, 收盤價, 漲跌價差, 成交筆數]
+            const chartData = data.data.map(row => {
+                const parsePrice = (str) => parseFloat(String(str).replace(/,/g, '')) || 0;
+                return {
+                    date: row[0], // TWSE 日期格式
+                    open: parsePrice(row[3]),
+                    high: parsePrice(row[4]),
+                    low: parsePrice(row[5]),
+                    close: parsePrice(row[6])
+                };
+            }).filter(d => d.close > 0);
+
+            if (chartData.length > 0) {
+                renderSelfBuiltChart(container, chartData, symbol);
+                if (loading) loading.style.display = 'none';
+                console.log(`📊 Chart loaded from TWSE API for ${cleanCode}`);
+                return;
+            }
+        }
+    } catch (e) {
+        console.warn('TWSE API failed:', e);
+    }
+
+    // === Strategy 4: Try Yahoo Finance via CORS proxy (備用) ===
     try {
         const twSymbol = `${cleanCode}.TW`;
-        const url = `${PROXY_BASE_URL}https://query1.finance.yahoo.com/v8/finance/chart/${twSymbol}?interval=1d&range=6mo`;
+        const url = `https://query1.finance.yahoo.com/v8/finance/chart/${twSymbol}?interval=1d&range=6mo`;
 
-        if (loading) loading.innerHTML = '<span style="color: var(--accent-yellow);">📊 即時抓取資料中...</span>';
+        if (loading) loading.innerHTML = '<span style="color: var(--accent-yellow);">📊 從 Yahoo 抓取資料中...</span>';
 
         const response = await fetchWithCORS(url);
         const data = await response.json();
@@ -1519,6 +1552,7 @@ async function loadTradingViewWidget(symbol) {
 
             const chartData = timestamps.map((t, i) => ({
                 date: new Date(t * 1000).toLocaleDateString('zh-TW', { month: 'short', day: 'numeric' }),
+                open: quotes.open?.[i] || quotes.close?.[i] || 0,
                 close: quotes.close?.[i] || 0,
                 high: quotes.high?.[i] || 0,
                 low: quotes.low?.[i] || 0
@@ -1535,10 +1569,33 @@ async function loadTradingViewWidget(symbol) {
         console.warn('Yahoo Finance API failed:', e);
     }
 
-    // === No fallback - show error (禁止模擬數據) ===
+    // === Strategy 5: 使用當前股票的今日數據建立簡易圖表 ===
+    try {
+        // 從已載入的股票數據中尋找該股票
+        const stock = state.allStocks.find(s => s.code.replace('.TW', '') === cleanCode);
+        if (stock && stock.closePrice) {
+            const open = parseFloat(stock.openPrice) || parseFloat(stock.closePrice);
+            const high = parseFloat(stock.highPrice) || parseFloat(stock.closePrice);
+            const low = parseFloat(stock.lowPrice) || parseFloat(stock.closePrice);
+            const close = parseFloat(stock.closePrice);
+
+            // 建立今日單筆數據
+            const today = new Date().toLocaleDateString('zh-TW', { month: 'short', day: 'numeric' });
+            const chartData = [{ date: today, open, high, low, close }];
+
+            // 顯示今日數據
+            renderSelfBuiltChart(container, chartData, symbol);
+            if (loading) loading.innerHTML = '<span style="color: var(--accent-blue);">📊 顯示今日數據</span>';
+            console.log(`📊 Chart showing today's data for ${cleanCode}`);
+            return;
+        }
+    } catch (e) {
+        console.warn('Today data fallback failed:', e);
+    }
+
+    // === 所有來源都失敗 ===
     console.log(`⚠️ No data available for ${cleanCode}`);
-    if (loading) loading.innerHTML = '<span style="color: var(--accent-red);">⚠️ 無法載入歷史數據</span>';
-    container.innerHTML = '<div class="no-data-message" style="text-align:center;padding:40px;color:#888;">📊 暫無歷史走勢資料<br><small>無法從 API 取得數據</small></div>';
+    if (loading) loading.innerHTML = '<span style="color: var(--accent-red);">⚠️ 請稍後重試</span>';
 }
 
 
