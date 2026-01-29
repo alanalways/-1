@@ -32,14 +32,16 @@ app.use(express.static(__dirname));
 // 解決前端 CORS 問題，所有 API 請求都透過後端代發
 
 // TWSE Proxy
-app.get('/api/twse/:path(.*)', async (req, res) => {
+app.use('/api/twse', async (req, res) => {
     try {
-        const targetPath = req.params.path;
+        const targetPath = req.path; // 例如: /quote/stock.json
         const queryString = new URLSearchParams(req.query).toString();
-        const url = `https://www.twse.com.tw/${targetPath}${queryString ? '?' + queryString : ''}`;
+        // 注意：req.path 包含開頭斜線，所以直接接在網域後即可
+        const url = `https://www.twse.com.tw${targetPath}${queryString ? '?' + queryString : ''}`;
 
         const response = await fetch(url, {
-            headers: { 'User-Agent': 'Mozilla/5.0' }
+            headers: { 'User-Agent': 'Mozilla/5.0' },
+            method: req.method // 轉發對應的 HTTP method
         });
         const data = await response.text();
 
@@ -52,14 +54,15 @@ app.get('/api/twse/:path(.*)', async (req, res) => {
 });
 
 // TPEx Proxy
-app.get('/api/tpex/:path(.*)', async (req, res) => {
+app.use('/api/tpex', async (req, res) => {
     try {
-        const targetPath = req.params.path;
+        const targetPath = req.path;
         const queryString = new URLSearchParams(req.query).toString();
-        const url = `https://www.tpex.org.tw/${targetPath}${queryString ? '?' + queryString : ''}`;
+        const url = `https://www.tpex.org.tw${targetPath}${queryString ? '?' + queryString : ''}`;
 
         const response = await fetch(url, {
-            headers: { 'User-Agent': 'Mozilla/5.0' }
+            headers: { 'User-Agent': 'Mozilla/5.0' },
+            method: req.method
         });
         const data = await response.text();
 
@@ -72,14 +75,15 @@ app.get('/api/tpex/:path(.*)', async (req, res) => {
 });
 
 // Yahoo Finance Proxy
-app.get('/api/yahoo/:path(.*)', async (req, res) => {
+app.use('/api/yahoo', async (req, res) => {
     try {
-        const targetPath = req.params.path;
+        const targetPath = req.path;
         const queryString = new URLSearchParams(req.query).toString();
-        const url = `https://query1.finance.yahoo.com/${targetPath}${queryString ? '?' + queryString : ''}`;
+        const url = `https://query1.finance.yahoo.com${targetPath}${queryString ? '?' + queryString : ''}`;
 
         const response = await fetch(url, {
-            headers: { 'User-Agent': 'Mozilla/5.0' }
+            headers: { 'User-Agent': 'Mozilla/5.0' },
+            method: req.method
         });
         const data = await response.text();
 
@@ -90,6 +94,7 @@ app.get('/api/yahoo/:path(.*)', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+
 
 
 
