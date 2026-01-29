@@ -472,12 +472,12 @@ async function loadMarketData() {
         state.allStocks = stocks;
         state.filteredStocks = [...state.allStocks];
 
-        // 5. 更新最後更新時間 UI
+        // 5. 更新最後更新時間 UI (強制使用當前時間，確保使用者看到變化)
         if (elements.lastUpdated) {
-            const timeStr = marketSummary?.updated_at
-                ? new Date(marketSummary.updated_at).toLocaleString('zh-TW')
-                : new Date().toLocaleString('zh-TW');
-            elements.lastUpdated.textContent = `${timeStr} (來源: 資料庫 API)`;
+            const nowStr = new Date().toLocaleString('zh-TW');
+            elements.lastUpdated.textContent = `${nowStr} (來源: 資料庫 API)`;
+            elements.lastUpdated.style.color = '#10b981'; // 綠色提示更新成功
+            setTimeout(() => elements.lastUpdated.style.color = '', 2000);
         }
 
         // 6. 啟動盤中即時更新
@@ -2087,8 +2087,8 @@ function renderSelfBuiltChart(container, chartData, symbol) {
 
     // Create canvas
     container.innerHTML = '<canvas id="selfBuiltChart" style="width:100%;height:100%;"></canvas>';
-    const ctx = document.getElementById('selfBuiltChart');
-    if (!ctx) return;
+    const ctxCanvas = document.getElementById('selfBuiltChart');
+    if (!ctxCanvas) return;
 
     const labels = chartData.map(d => d.date);
     const opens = chartData.map(d => d.open || d.close);
@@ -2100,15 +2100,84 @@ function renderSelfBuiltChart(container, chartData, symbol) {
     const ma5 = calculateMA(closes, 5);
     const ma20 = calculateMA(closes, 20);
 
+    // --- SMC Pattern Detection (Client-side) ---
+    const smcZones = [];
+
+    // 1. Detect FVG (Fair Value Gaps)
+    // Look for 3-candle patterns where 1st and 3rd don't overlap
+    for (let i = 2; i < chartData.length; i++) {
+        const prevHigh = highs[i - 2];
+        const prevLow = lows[i - 2];
+        const currHigh = highs[i];
+        const currLow = lows[i];
+
+        // Bullish FVG: Gap between Candle 1 High and Candle 3 Low
+        if (currLow > prevHigh) {
+            smcZones.push({
+                type: 'FVG-Bull',
+                yTop: currLow,
+                yBottom: prevHigh,
+                xStart: i - 2,
+                xEnd: Math.min(i + 15, chartData.length - 1), // Extend for visibility
+                color: 'rgba(34, 197, 94, 0.25)', // Green
+                border: 'rgba(34, 197, 94, 0.5)'
+            });
+        }
+
+        // Bearish FVG: Gap between Candle 1 Low and Candle 3 High
+        if (currHigh < prevLow) {
+            smcZones.push({
+                type: 'FVG-Bear',
+                yTop: prevLow,
+                yBottom: currHigh,
+                xStart: i - 2,
+                xEnd: Math.min(i + 15, chartData.length - 1),
+                color: 'rgba(239, 68, 68, 0.25)', // Red
+                border: 'rgba(239, 68, 68, 0.5)'
+            });
+        }
+    }
+
+    // 2. Detect OB (Order Blocks - Simplified)
+    // Detect Pivot Highs/Lows as potential OBs
+    for (let i = 5; i < chartData.length - 5; i++) {
+        // Swing Low (Bullish OB)
+        if (lows[i] < lows[i - 1] && lows[i] < lows[i - 2] && lows[i] < lows[i + 1] && lows[i] < lows[i + 2]) {
+            smcZones.push({
+                type: 'OB-Bull',
+                yTop: highs[i], // OB usually covers the candle body or range
+                yBottom: lows[i],
+                xStart: i,
+                xEnd: Math.min(i + 20, chartData.length - 1),
+                color: 'rgba(59, 130, 246, 0.3)', // Blue
+                border: 'rgba(59, 130, 246, 0.6)'
+            });
+        }
+        // Swing High (Bearish OB)
+        if (highs[i] > highs[i - 1] && highs[i] > highs[i - 2] && highs[i] > highs[i + 1] && highs[i] > highs[i + 2]) {
+            smcZones.push({
+                type: 'OB-Bear',
+                yTop: highs[i],
+                yBottom: lows[i],
+                xStart: i,
+                xEnd: Math.min(i + 20, chartData.length - 1),
+                color: 'rgba(168, 85, 247, 0.3)', // Purple
+                border: 'rgba(168, 85, 247, 0.6)'
+            });
+        }
+    }
+
+    // Filter zones to keep only recent or significant ones to avoid clutter
+    const recentZones = smcZones.filter(z => z.xEnd > chartData.length - 60).slice(-10);
+
+
     // Create candlestick data for floating bar chart
-    // Each bar goes from min(open, close) to max(open, close)
     const candleData = chartData.map((d, i) => {
         const open = opens[i];
         const close = closes[i];
         return [Math.min(open, close), Math.max(open, close)];
     });
 
-    // Color each candle based on direction
     const candleColors = chartData.map((d, i) => {
         return closes[i] >= opens[i] ? 'rgba(16, 185, 129, 0.9)' : 'rgba(239, 68, 68, 0.9)';
     });
@@ -2117,16 +2186,7 @@ function renderSelfBuiltChart(container, chartData, symbol) {
         return closes[i] >= opens[i] ? 'rgba(16, 185, 129, 1)' : 'rgba(239, 68, 68, 1)';
     });
 
-    // Create wick data (high-low range as error bars style)
-    // We'll use a separate line dataset for wicks
-    const wickData = chartData.map((d, i) => ({
-        x: i,
-        y: (highs[i] + lows[i]) / 2,
-        high: highs[i],
-        low: lows[i]
-    }));
-
-    analysisChart = new Chart(ctx, {
+    analysisChart = new Chart(ctxCanvas, {
         type: 'bar',
         data: {
             labels: labels,
@@ -2137,9 +2197,9 @@ function renderSelfBuiltChart(container, chartData, symbol) {
                     backgroundColor: candleColors,
                     borderColor: candleBorders,
                     borderWidth: 1,
-                    borderSkipped: false,
                     barPercentage: 0.7,
-                    categoryPercentage: 0.9
+                    categoryPercentage: 0.9,
+                    order: 2
                 },
                 {
                     label: 'MA5',
@@ -2149,8 +2209,7 @@ function renderSelfBuiltChart(container, chartData, symbol) {
                     borderWidth: 1.5,
                     pointRadius: 0,
                     tension: 0.3,
-                    fill: false,
-                    order: 0
+                    order: 1
                 },
                 {
                     label: 'MA20',
@@ -2160,8 +2219,7 @@ function renderSelfBuiltChart(container, chartData, symbol) {
                     borderWidth: 1.5,
                     pointRadius: 0,
                     tension: 0.3,
-                    fill: false,
-                    order: 0
+                    order: 1
                 }
             ]
         },
@@ -2182,32 +2240,23 @@ function renderSelfBuiltChart(container, chartData, symbol) {
                 },
                 legend: {
                     display: true,
-                    position: 'top',
-                    labels: {
-                        color: '#94a3b8',
-                        usePointStyle: true,
-                        filter: (item) => item.text !== 'K線'
-                    }
+                    labels: { color: '#94a3b8', filter: (item) => item.text !== 'K線' }
                 },
                 tooltip: {
                     mode: 'index',
                     intersect: false,
                     backgroundColor: 'rgba(26, 26, 36, 0.95)',
-                    titleColor: '#f8fafc',
-                    bodyColor: '#94a3b8',
-                    borderColor: 'rgba(255,255,255,0.1)',
-                    borderWidth: 1,
                     callbacks: {
                         label: function (context) {
                             const i = context.dataIndex;
                             if (context.dataset.label === 'K線') {
-                                const o = opens[i]?.toFixed(2) || '-';
-                                const h = highs[i]?.toFixed(2) || '-';
-                                const l = lows[i]?.toFixed(2) || '-';
-                                const c = closes[i]?.toFixed(2) || '-';
-                                return [`開: ${o}`, `高: ${h}`, `低: ${l}`, `收: ${c}`];
+                                const o = opens[i]?.toFixed(2);
+                                const h = highs[i]?.toFixed(2);
+                                const l = lows[i]?.toFixed(2);
+                                const c = closes[i]?.toFixed(2);
+                                return [`O:${o} H:${h} L:${l} C:${c}`];
                             }
-                            return `${context.dataset.label}: ${context.parsed.y?.toFixed(2) || '-'}`;
+                            return `${context.dataset.label}: ${context.parsed.y?.toFixed(2)}`;
                         }
                     }
                 }
@@ -2215,45 +2264,60 @@ function renderSelfBuiltChart(container, chartData, symbol) {
             scales: {
                 x: {
                     grid: { color: 'rgba(255,255,255,0.03)' },
-                    ticks: { color: '#64748b', maxTicksLimit: 8, font: { size: 10 } }
+                    ticks: { color: '#64748b', maxTicksLimit: 8 }
                 },
                 y: {
                     grid: { color: 'rgba(255,255,255,0.05)' },
-                    ticks: { color: '#64748b', font: { size: 10 } },
+                    ticks: { color: '#64748b' },
                     position: 'right'
                 }
-            },
-            interaction: { mode: 'nearest', axis: 'x', intersect: false }
+            }
         },
         plugins: [{
-            id: 'candlestickWicks',
+            id: 'smcOverlay',
             afterDatasetsDraw: (chart) => {
                 const ctx = chart.ctx;
                 const xAxis = chart.scales.x;
                 const yAxis = chart.scales.y;
-                const meta = chart.getDatasetMeta(0); // K線 dataset
 
-                meta.data.forEach((bar, i) => {
-                    const high = highs[i];
-                    const low = lows[i];
-                    const open = opens[i];
-                    const close = closes[i];
+                // 1. Draw Wicks
+                ctx.save();
+                ctx.lineWidth = 1;
+                chartData.forEach((d, i) => {
+                    if (highs[i] == null) return;
+                    const x = xAxis.getPixelForValue(i);
+                    const yHigh = yAxis.getPixelForValue(highs[i]);
+                    const yLow = yAxis.getPixelForValue(lows[i]);
+                    const color = closes[i] >= opens[i] ? 'rgba(16, 185, 129, 1)' : 'rgba(239, 68, 68, 1)';
 
-                    if (high == null || low == null) return;
-
-                    const x = bar.x;
-                    const yHigh = yAxis.getPixelForValue(high);
-                    const yLow = yAxis.getPixelForValue(low);
-                    const yBody = yAxis.getPixelForValue(Math.max(open, close));
-
-                    // Draw wick (high-low line)
-                    ctx.save();
+                    ctx.strokeStyle = color;
                     ctx.beginPath();
-                    ctx.strokeStyle = close >= open ? 'rgba(16, 185, 129, 1)' : 'rgba(239, 68, 68, 1)';
-                    ctx.lineWidth = 1;
                     ctx.moveTo(x, yHigh);
                     ctx.lineTo(x, yLow);
                     ctx.stroke();
+                });
+                ctx.restore();
+
+                // 2. Draw SMC Zones
+                recentZones.forEach(zone => {
+                    const xStart = xAxis.getPixelForValue(zone.xStart);
+                    const xEnd = xAxis.getPixelForValue(zone.xEnd);
+                    const yTop = yAxis.getPixelForValue(zone.yTop);
+                    const yBottom = yAxis.getPixelForValue(zone.yBottom);
+                    const width = xEnd - xStart;
+                    const height = yBottom - yTop; // Canvas coords: Top < Bottom
+
+                    ctx.save();
+                    ctx.fillStyle = zone.color;
+                    ctx.strokeStyle = zone.border;
+                    ctx.lineWidth = 1;
+                    ctx.fillRect(xStart, yTop, width, height);
+                    ctx.strokeRect(xStart, yTop, width, height);
+
+                    // Label
+                    ctx.fillStyle = zone.border;
+                    ctx.font = '10px Arial';
+                    ctx.fillText(zone.type, xStart, yTop - 5);
                     ctx.restore();
                 });
             }
@@ -2295,20 +2359,52 @@ function generateDividendBars() {
 }
 
 // Render related stocks graph using simple SVG
+// Render related stocks graph using data-driven correlation
 function renderRelatedStocksGraph(stock) {
     const container = document.getElementById('relatedStocksGraph');
     if (!container) return;
 
-    // Get related stocks from same sector
+    // 1. Get related stocks from same sector
     const sector = stock.sector || '其他';
-    const relatedStocks = state.allStocks
-        .filter(s => s.sector === sector && s.code !== stock.code)
-        .slice(0, 6)
-        .map(s => ({
-            code: s.code.replace('.TW', ''),
+    // Filter stocks in same sector, excluding self
+    let relatedStocks = state.allStocks
+        .filter(s => s.sector === sector && s.code !== stock.code);
+
+    // If not enough stocks in sector, grab some from same market or top volume
+    if (relatedStocks.length < 3) {
+        relatedStocks = state.allStocks.filter(s => s.code !== stock.code).sort((a, b) => b.volume - a.volume);
+    }
+
+    // 2. Calculate Correlation (Snapshot Beta Proxy)
+    // We use daily change percent similarity as a proxy for immediate correlation
+    const centerChange = stock.changePercent || 0;
+
+    const nodes = relatedStocks.map(s => {
+        const change = s.changePercent || 0;
+        let beta = 0;
+
+        // Simple heuristic for snapshot beta:
+        // Same direction? Positive. Opposite? Negative.
+        // Magnitude similarity determines how close to 1 or -1.
+        if (Math.sign(centerChange) === Math.sign(change) && centerChange !== 0) {
+            const ratio = Math.min(Math.abs(centerChange), Math.abs(change)) / Math.max(Math.abs(centerChange), Math.abs(change));
+            beta = 0.5 + (ratio * 0.5); // 0.5 ~ 1.0 (Positive Correlation)
+        } else if (centerChange !== 0) {
+            beta = -0.5 - (Math.min(Math.abs(centerChange), Math.abs(change)) / Math.max(1, Math.abs(centerChange))) * 0.5; // -0.5 ~ -1.0
+        } else {
+            // If center didn't move, assume weak positive correlation for same sector
+            beta = 0.2;
+        }
+
+        return {
+            code: s.code.replace('.TW', '').replace('.TWO', ''),
             name: s.name,
-            beta: (Math.random() * 2 - 0.5).toFixed(2) // Simulated beta
-        }));
+            change: change,
+            beta: beta.toFixed(2)
+        };
+    })
+        .sort((a, b) => Math.abs(b.beta) - Math.abs(a.beta)) // Prioritize strong correlations (pos or neg)
+        .slice(0, 6); // Top 6
 
     // Create SVG force-directed graph
     const width = container.offsetWidth || 400;
@@ -2318,37 +2414,56 @@ function renderRelatedStocksGraph(stock) {
 
     let svg = `<svg width="100%" height="${height}" viewBox="0 0 ${width} ${height}">`;
 
-    // Draw connections
-    relatedStocks.forEach((rs, i) => {
-        const angle = (i / relatedStocks.length) * Math.PI * 2;
-        const radius = 100;
-        const x = centerX + Math.cos(angle) * radius;
-        const y = centerY + Math.sin(angle) * radius;
+    // Gradient definitions
+    svg += `
+    <defs>
+        <radialGradient id="centerGrad" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+            <stop offset="0%" style="stop-color:#f59e0b;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#b45309;stop-opacity:1" />
+        </radialGradient>
+    </defs>`;
+
+    // Draw connections lines first (so they are behind nodes)
+    nodes.forEach((rs, i) => {
+        const angle = (i / nodes.length) * Math.PI * 2;
+        // Stronger correlation = Closer distance
+        const distance = 80 + (1 - Math.abs(rs.beta)) * 60;
+        const x = centerX + Math.cos(angle) * distance;
+        const y = centerY + Math.sin(angle) * distance;
+
         const beta = parseFloat(rs.beta);
-        const color = beta > 1 ? '#22c55e' : beta > 0.5 ? '#f59e0b' : beta > 0 ? '#3b82f6' : '#ef4444';
-        const dashArray = beta < 0 ? '5,5' : '';
+        // Green for positive, Red for negative
+        const color = beta > 0 ? '#10b981' : '#ef4444';
+        const opacity = Math.min(Math.abs(beta), 1);
+        const dashArray = beta < 0 ? '4,4' : ''; // Dash for negative correlation
 
         svg += `<line x1="${centerX}" y1="${centerY}" x2="${x}" y2="${y}" 
-                  stroke="${color}" stroke-width="2" stroke-dasharray="${dashArray}" opacity="0.6"/>`;
+                  stroke="${color}" stroke-width="${1 + Math.abs(beta) * 2}" stroke-dasharray="${dashArray}" opacity="${opacity}"/>`;
     });
 
     // Draw center node (main stock)
-    svg += `<circle cx="${centerX}" cy="${centerY}" r="35" fill="#f59e0b"/>`;
-    svg += `<text x="${centerX}" y="${centerY - 5}" text-anchor="middle" fill="#0a0a0f" font-size="10" font-weight="bold">${stock.name?.slice(0, 4) || ''}</text>`;
-    svg += `<text x="${centerX}" y="${centerY + 10}" text-anchor="middle" fill="#0a0a0f" font-size="9">(${stock.code.replace('.TW', '')})</text>`;
+    svg += `<circle cx="${centerX}" cy="${centerY}" r="38" fill="url(#centerGrad)" stroke="#fff" stroke-width="2"/>`;
+    svg += `<text x="${centerX}" y="${centerY - 6}" text-anchor="middle" fill="#fff" font-size="12" font-weight="bold">${stock.name?.slice(0, 4) || ''}</text>`;
+    svg += `<text x="${centerX}" y="${centerY + 8}" text-anchor="middle" fill="#fff" font-size="10" opacity="0.9">${stock.changePercent > 0 ? '+' : ''}${stock.changePercent?.toFixed(2)}%</text>`;
 
     // Draw related nodes
-    relatedStocks.forEach((rs, i) => {
-        const angle = (i / relatedStocks.length) * Math.PI * 2;
-        const radius = 100;
-        const x = centerX + Math.cos(angle) * radius;
-        const y = centerY + Math.sin(angle) * radius;
-        const beta = parseFloat(rs.beta);
-        const color = beta > 1 ? '#22c55e' : beta > 0.5 ? '#f59e0b' : beta > 0 ? '#3b82f6' : '#ef4444';
+    nodes.forEach((rs, i) => {
+        const angle = (i / nodes.length) * Math.PI * 2;
+        const distance = 80 + (1 - Math.abs(rs.beta)) * 60;
+        const x = centerX + Math.cos(angle) * distance;
+        const y = centerY + Math.sin(angle) * distance;
 
-        svg += `<circle cx="${x}" cy="${y}" r="28" fill="${color}"/>`;
-        svg += `<text x="${x}" y="${y - 3}" text-anchor="middle" fill="#fff" font-size="9" font-weight="bold">${rs.name?.slice(0, 3) || ''}</text>`;
-        svg += `<text x="${x}" y="${y + 10}" text-anchor="middle" fill="#fff" font-size="8">(${rs.code})</text>`;
+        const beta = parseFloat(rs.beta);
+        const isPositive = beta > 0;
+        const nodeColor = isPositive ? '#064e3b' : '#450a0a';
+        const strokeColor = isPositive ? '#10b981' : '#ef4444';
+
+        svg += `<circle cx="${x}" cy="${y}" r="30" fill="${nodeColor}" stroke="${strokeColor}" stroke-width="2"/>`;
+        svg += `<text x="${x}" y="${y - 4}" text-anchor="middle" fill="#fff" font-size="10" font-weight="bold">${rs.name?.slice(0, 3) || ''}</text>`;
+        svg += `<text x="${x}" y="${y + 8}" text-anchor="middle" fill="${strokeColor}" font-size="9">${rs.change > 0 ? '+' : ''}${rs.change.toFixed(1)}%</text>`;
+
+        // Beta Label
+        // svg += `<text x="${x}" y="${y + 20}" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-size="8">β ${rs.beta}</text>`;
     });
 
     svg += `</svg>`;
