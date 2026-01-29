@@ -32,7 +32,7 @@ app.use(express.static(__dirname));
 // 解決前端 CORS 問題，所有 API 請求都透過後端代發
 
 // TWSE Proxy
-app.get('/api/twse/:path(*)', async (req, res) => {
+app.get('/api/twse/:path(.*)', async (req, res) => {
     try {
         const targetPath = req.params.path;
         const queryString = new URLSearchParams(req.query).toString();
@@ -52,7 +52,7 @@ app.get('/api/twse/:path(*)', async (req, res) => {
 });
 
 // TPEx Proxy
-app.get('/api/tpex/:path(*)', async (req, res) => {
+app.get('/api/tpex/:path(.*)', async (req, res) => {
     try {
         const targetPath = req.params.path;
         const queryString = new URLSearchParams(req.query).toString();
@@ -72,7 +72,7 @@ app.get('/api/tpex/:path(*)', async (req, res) => {
 });
 
 // Yahoo Finance Proxy
-app.get('/api/yahoo/:path(*)', async (req, res) => {
+app.get('/api/yahoo/:path(.*)', async (req, res) => {
     try {
         const targetPath = req.params.path;
         const queryString = new URLSearchParams(req.query).toString();
@@ -90,6 +90,7 @@ app.get('/api/yahoo/:path(*)', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+
 
 
 // === 健康檢查端點 ===
