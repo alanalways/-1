@@ -976,13 +976,13 @@ function showAnalysis(code) {
                         <div class="allocation-toggle">
                             <span class="toggle-label">風險配置（持股）</span>
                             <div class="toggle-buttons">
-                                <button class="toggle-btn active" data-mode="conservative">穩健派</button>
+                                <button class="toggle-btn active" data-mode="conservative">存股派</button>
                                 <button class="toggle-btn" data-mode="aggressive">大膽派</button>
                             </div>
                         </div>
                         <div class="allocation-caution">
                             <span class="caution-icon">⚠️</span>
-                            <span>若是以穩健配置為主「穩健派」，適合不喜歡短期波動的投資者</span>
+                            <span id="allocationCautionText">若是以穩健收息為主「存股派」，適合不喜歡短期波動的投資者</span>
                         </div>
                         <div class="allocation-chart" id="allocationChart">
                             <div class="allocation-bar-row">
@@ -1089,9 +1089,77 @@ function showAnalysis(code) {
 
         // Render related stocks graph
         renderRelatedStocksGraph(stock);
+
+        // Setup toggle button event delegation for 存股派/大膽派
+        setupAllocationToggle(stock);
     }
 
     openModal();
+}
+
+// ============================================
+// Allocation Toggle (存股派/大膽派) Logic
+// ============================================
+function setupAllocationToggle(stock) {
+    const toggleButtons = document.querySelectorAll('.toggle-btn');
+
+    toggleButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            // Update active state
+            toggleButtons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            const mode = btn.dataset.mode;
+            const cautionText = document.getElementById('allocationCautionText');
+
+            // Get allocation bar elements
+            const stockBar = document.querySelector('.allocation-bar.stock');
+            const bondBar = document.querySelector('.allocation-bar.bond');
+            const cashBar = document.querySelector('.allocation-bar.cash');
+            const otherBar = document.querySelector('.allocation-bar.other');
+
+            // Get allocation value elements
+            const valueElements = document.querySelectorAll('.allocation-value');
+
+            if (mode === 'aggressive') {
+                // 大膽派 - Aggressive allocation (90% stocks)
+                if (stockBar) stockBar.style.width = '90%';
+                if (bondBar) bondBar.style.width = '5%';
+                if (cashBar) cashBar.style.width = '3%';
+                if (otherBar) otherBar.style.width = '2%';
+
+                if (valueElements[0]) valueElements[0].textContent = '90%';
+                if (valueElements[1]) valueElements[1].textContent = '5%';
+                if (valueElements[2]) valueElements[2].textContent = '3%';
+                if (valueElements[3]) valueElements[3].textContent = '2%';
+
+                if (cautionText) {
+                    cautionText.textContent = '「大膽派」配置追求極致成長，適合風險承受度極高、能長期持有的投資者';
+                }
+            } else {
+                // 存股派 - Conservative/Stock-saving allocation (60% stocks)
+                const baseScore = stock?.score || 50;
+                const stockPct = baseScore >= 70 ? 60 : baseScore >= 40 ? 50 : 40;
+                const bondPct = baseScore >= 70 ? 25 : baseScore >= 40 ? 30 : 35;
+                const cashPct = baseScore >= 70 ? 10 : baseScore >= 40 ? 15 : 20;
+                const otherPct = 100 - stockPct - bondPct - cashPct;
+
+                if (stockBar) stockBar.style.width = `${stockPct}%`;
+                if (bondBar) bondBar.style.width = `${bondPct}%`;
+                if (cashBar) cashBar.style.width = `${cashPct}%`;
+                if (otherBar) otherBar.style.width = `${otherPct}%`;
+
+                if (valueElements[0]) valueElements[0].textContent = `${stockPct}%`;
+                if (valueElements[1]) valueElements[1].textContent = `${bondPct}%`;
+                if (valueElements[2]) valueElements[2].textContent = `${cashPct}%`;
+                if (valueElements[3]) valueElements[3].textContent = `${otherPct}%`;
+
+                if (cautionText) {
+                    cautionText.textContent = '若是以穩健收息為主「存股派」，適合不喜歡短期波動的投資者';
+                }
+            }
+        });
+    });
 }
 
 // ============================================
