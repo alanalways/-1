@@ -201,8 +201,9 @@ async function loadGlobalMarkets() {
         // 背景更新 (不顯示 Loading)
         const results = await Promise.all(symbols.map(async (item) => {
             try {
-                const url = `https://query1.finance.yahoo.com/v8/finance/chart/${item.symbol}?interval=1d&range=2d`;
-                const response = await fetchWithCORS(url);
+                // [修改] 改用本地 Server Proxy (/api/yahoo)
+                const url = `/api/yahoo/v8/finance/chart/${encodeURIComponent(item.symbol)}?interval=1d&range=2d`;
+                const response = await fetch(url); // 直接使用 fetch，無需 fetchWithCORS
                 const data = await response.json();
 
                 if (data.chart?.result?.[0]) {
@@ -443,7 +444,8 @@ async function updateVisiblePrices() {
             }
 
             try {
-                const response = await fetchWithCORS(`https://query1.finance.yahoo.com/v8/finance/chart/${yahooSymbol}`);
+                // [修改] 改用本地 Server Proxy (/api/yahoo)
+                const response = await fetch(`/api/yahoo/v8/finance/chart/${yahooSymbol}`);
                 const data = await response.json();
 
                 if (data.chart?.result?.[0]) {
