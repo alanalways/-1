@@ -45,17 +45,46 @@ export async function runDailyUpdate() {
         const analyzedStocks = analyzer.selectRecommendations(allStocks, allStocks.length);
         console.log(`✅ 分析完成：${analyzedStocks.length} 檔`);
 
+        // [新增] 強制保留重要股票 (確保 2330、ETF 等一定在名單中)
+        const mustHaveCodes = ['2330', '2317', '2454', '3034', '2881', '2882', '2884', '2886', '2891', '2892'];
+        const mustHaveStocks = allStocks.filter(s =>
+            // 保留指定的權值股
+            mustHaveCodes.includes(s.code) ||
+            // 保留所有 ETF (代碼 00 開頭)
+            s.code.startsWith('00')
+        );
+
+        // 把「推薦股」和「強制保留股」合併，並去除重複
+        const finalStockMap = new Map();
+        analyzedStocks.forEach(s => finalStockMap.set(s.code, s));
+
+        mustHaveStocks.forEach(mustHave => {
+            if (!finalStockMap.has(mustHave.code)) {
+                // 如果原本名單沒有，補進去並給予預設評分
+                const scored = analyzer.selectRecommendations([mustHave], 1)[0] || {
+                    ...mustHave,
+                    score: mustHave.score || 50,
+                    signal: mustHave.signal || 'NEUTRAL',
+                    analysis: `⚖️ **${mustHave.name}** [${mustHave.sector || '其他'}] ➤ 盤整觀望。`
+                };
+                finalStockMap.set(mustHave.code, scored);
+            }
+        });
+
+        const finalStockList = Array.from(finalStockMap.values());
+        console.log(`📊 合併後共 ${finalStockList.length} 檔 (原 ${analyzedStocks.length} + 強制保留 ${finalStockList.length - analyzedStocks.length})`);
+
         // === 3. 儲存到 Supabase ===
         if (supabaseClient.isSupabaseEnabled()) {
             console.log('\n💾 儲存到 Supabase...');
 
             // 儲存股票數據
-            await supabaseClient.saveStocks(analyzedStocks);
+            await supabaseClient.saveStocks(finalStockList);
 
             // [新增] 生成 Market Intelligence (與 generate-report.js 保持一致)
             let totalChange = 0;
             const sectorStats = {};
-            analyzedStocks.forEach(s => {
+            finalStockList.forEach(s => {
                 const change = parseFloat(s.changePercent || 0);
                 totalChange += change;
                 const sector = s.sector || '其他';
@@ -64,7 +93,7 @@ export async function runDailyUpdate() {
                 sectorStats[sector].count++;
             });
 
-            const avgChange = analyzedStocks.length > 0 ? (totalChange / analyzedStocks.length).toFixed(2) : '0.00';
+            const avgChange = finalStockList.length > 0 ? (totalChange / finalStockList.length).toFixed(2) : '0.00';
             let hotSector = { name: '分析中', avgChange: 0 };
             let maxChange = -Infinity;
 
@@ -83,8 +112,8 @@ export async function runDailyUpdate() {
                 {
                     icon: '📊',
                     category: '全市場掃描',
-                    title: `共掃描 ${analyzedStocks.length} 檔`,
-                    content: `看多 ${analyzedStocks.filter(s => s.signal === 'BULLISH').length} 檔 • 看空 ${analyzedStocks.filter(s => s.signal === 'BEARISH').length} 檔\n平均漲跌 ${avgChange}%`
+                    title: `共掃描 ${finalStockList.length} 檔`,
+                    content: `看多 ${finalStockList.filter(s => s.signal === 'BULLISH').length} 檔 • 看空 ${finalStockList.filter(s => s.signal === 'BEARISH').length} 檔\n平均漲跌 ${avgChange}%`
                 },
                 {
                     icon: '🔥',
@@ -103,16 +132,16 @@ export async function runDailyUpdate() {
                     category: 'SMC 訊號',
                     title: (() => {
                         // [修正] 計算實際 SMC 訊號數量
-                        const obCount = analyzedStocks.filter(s => s.patterns?.ob).length;
-                        const fvgCount = analyzedStocks.filter(s => s.patterns?.fvg).length;
-                        const sweepCount = analyzedStocks.filter(s => s.patterns?.sweep).length;
+                        const obCount = finalStockList.filter(s => s.patterns?.ob).length;
+                        const fvgCount = finalStockList.filter(s => s.patterns?.fvg).length;
+                        const sweepCount = finalStockList.filter(s => s.patterns?.sweep).length;
                         const total = obCount + fvgCount + sweepCount;
                         return `${total} 檔觸發`;
                     })(),
                     content: (() => {
-                        const obCount = analyzedStocks.filter(s => s.patterns?.ob).length;
-                        const fvgCount = analyzedStocks.filter(s => s.patterns?.fvg).length;
-                        const sweepCount = analyzedStocks.filter(s => s.patterns?.sweep).length;
+                        const obCount = finalStockList.filter(s => s.patterns?.ob).length;
+                        const fvgCount = finalStockList.filter(s => s.patterns?.fvg).length;
+                        const sweepCount = finalStockList.filter(s => s.patterns?.sweep).length;
                         return `OB: ${obCount} 檔 | FVG: ${fvgCount} 檔 | Sweep: ${sweepCount} 檔`;
                     })()
                 }
@@ -123,9 +152,9 @@ export async function runDailyUpdate() {
                 taiex: twIndex,
                 usIndices,
                 commodities,
-                totalStocks: analyzedStocks.length,
-                bullishCount: analyzedStocks.filter(s => s.signal === 'BULLISH').length,
-                bearishCount: analyzedStocks.filter(s => s.signal === 'BEARISH').length,
+                totalStocks: finalStockList.length,
+                bullishCount: finalStockList.filter(s => s.signal === 'BULLISH').length,
+                bearishCount: finalStockList.filter(s => s.signal === 'BEARISH').length,
                 marketIntelligence // [新增] 寫入此欄位
             };
             await supabaseClient.saveMarketSummary(marketSummary);
@@ -142,7 +171,7 @@ export async function runDailyUpdate() {
                 usIndices,
                 commodities
             },
-            stocks: analyzedStocks
+            stocks: finalStockList
         };
 
         // 確保目錄存在
@@ -157,11 +186,11 @@ export async function runDailyUpdate() {
 
         console.log('\n' + '='.repeat(50));
         console.log('✅ 每日更新完成！');
-        console.log(`   📊 股票數量: ${analyzedStocks.length}`);
-        console.log(`   📈 看多: ${analyzedStocks.filter(s => s.signal === 'BULLISH').length}`);
-        console.log(`   📉 看空: ${analyzedStocks.filter(s => s.signal === 'BEARISH').length}`);
+        console.log(`   📊 股票數量: ${finalStockList.length}`);
+        console.log(`   📈 看多: ${finalStockList.filter(s => s.signal === 'BULLISH').length}`);
+        console.log(`   📉 看空: ${finalStockList.filter(s => s.signal === 'BEARISH').length}`);
 
-        return { success: true, stockCount: analyzedStocks.length };
+        return { success: true, stockCount: finalStockList.length };
 
     } catch (error) {
         console.error('❌ 每日更新失敗:', error);
