@@ -101,8 +101,8 @@ app.use('/api/yahoo', async (req, res) => {
 // Gemini AI 分析端點 (Dynamic Keys from Supabase)
 // ========================================
 const GEMINI_MODELS = [
-    'gemini-2.5-flash-preview-05-20',   // Tier 1: 優先 (Latest)
-    'gemini-2.0-flash'                  // Tier 2: 備用 (Stable)
+    'gemini-3-flash-preview',           // Tier 1: 優先 (~5-15 RPM, ~20-100 RPD)
+    'gemini-2.5-flash-preview-09-2025'  // Tier 2: 備用 (15 RPM, 1500 RPD)
 ];
 
 // 動態 API Keys 管理 (從 Supabase 讀取)
