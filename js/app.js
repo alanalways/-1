@@ -842,13 +842,14 @@ function applyFiltersAndSort() {
     }
 
     state.filteredStocks = stocks;
-    visibleStockCount = 50; // [新增] 重置分頁計數
+    // [修正] 搜尋時顯示全部結果，否則重置為預設分頁數量
+    visibleStockCount = state.searchQuery ? stocks.length : 200;
     renderStockCards();
 }
 
-// [新增] 分頁狀態
-let visibleStockCount = 50;
-const STOCK_BATCH_SIZE = 50;
+// [新增] 分頁狀態 - 預設顯示 200 檔，搜尋時顯示全部
+let visibleStockCount = 200;
+const STOCK_BATCH_SIZE = 100;
 
 function loadMoreStocks() {
     visibleStockCount += STOCK_BATCH_SIZE;
