@@ -58,7 +58,7 @@ export async function runDailyUpdate() {
             analyzedStocks.forEach(s => {
                 const change = parseFloat(s.changePercent || 0);
                 totalChange += change;
-                const sector = s.industry || '其他';
+                const sector = s.sector || '其他';
                 if (!sectorStats[sector]) sectorStats[sector] = { sum: 0, count: 0 };
                 sectorStats[sector].sum += change;
                 sectorStats[sector].count++;
