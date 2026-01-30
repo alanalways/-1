@@ -269,13 +269,19 @@ function setupEventListeners() {
     elements.searchInput?.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
             e.preventDefault();
+            const input = e.target;
             // 如果找到結果，清空搜尋欄但保留結果
             if (state.filteredStocks.length > 0) {
                 const resultCount = state.filteredStocks.length;
-                e.target.value = ''; // 直接清空 DOM
+
+                // 使用 setTimeout 確保在事件循環後執行，避免被瀏覽器預設行為覆蓋
+                setTimeout(() => {
+                    input.value = '';
+                    input.blur();
+                }, 10);
+
                 // 保留 state.searchQuery，讓篩選結果維持
                 showToast(`🔍 已鎖定 ${resultCount} 檔搜尋結果`);
-                e.target.blur();
             } else {
                 showToast('❌ 找不到符合的股票', 'error');
             }
