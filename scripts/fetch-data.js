@@ -224,6 +224,30 @@ export async function fetchYahooQuotes(symbols) {
 // ========================================
 
 /**
+ * [修復] 處理 CSV 字串，正確處理引號內的逗號 (例如成交量 "35,000,000")
+ */
+function parseCSVLine(line) {
+    const result = [];
+    let current = '';
+    let inQuote = false;
+
+    for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        if (char === '"') {
+            inQuote = !inQuote;
+        } else if (char === ',' && !inQuote) {
+            result.push(current.trim().replace(/^"|"$/g, '').replace(/""/g, '"')); // 去除前後引號並處理跳脫
+            current = '';
+        } else {
+            current += char;
+        }
+    }
+    // Push last field
+    result.push(current.trim().replace(/^"|"$/g, '').replace(/""/g, '"'));
+    return result;
+}
+
+/**
  * 從證交所取得當日所有上市股票交易資料
  * 使用 STOCK_DAY_ALL API (股價) 為主，BWIBBU_d API (基本面) 為輔
  * 這樣可以包含 ETF (如 0050) 等沒有本益比的商品
@@ -251,35 +275,53 @@ export async function fetchTWSEAllStocks() {
                 const line = lines[i].trim();
                 if (!line) continue;
 
-                const cols = line.split(',').map(c => c.replace(/"/g, '').trim());
-                const code = cols[1];
-                const name = cols[2];
+                // [修正] 使用正確的 CSV 解析器，避免數字中的逗號導致欄位錯位
+                const cols = parseCSVLine(line);
+
+                // [修正] STOCK_DAY_ALL 格式：證券代號(0), 證券名稱(1), ...
+                // 之前誤用了 cols[1] 當代號 (那是名稱)，導致 "台積電" 被當作代號過濾掉
+                const code = cols[0];
+                const name = cols[1];
 
                 // 過濾 4-6 位數純數字代碼（包含 5 位數 ETF 如 00878, 00930, 00940 等）
                 if (!/^\d{4,6}$/.test(code)) continue;
 
-                const closePrice = parseNum(cols[8]);
-                const change = parseNum(cols[9]);
-                // [Fix] Calculate changePercent = (change / prevClose) * 100
-                // prevClose = closePrice - change
+                const closePrice = parseNum(cols[7]); // 收盤價通常在第 8 欄 (Index 7)
+                // 根據 STOCK_DAY_ALL 格式:
+                // 0:代號, 1:名稱, 2:成交股數, 3:成交金額, 4:開盤, 5:最高, 6:最低, 7:收盤, 8:漲跌, 9:筆數
+
+                // 漲跌價差 (Index 8) 
+                // 注意：STOCK_DAY_ALL 有時會帶有 +/- 符號，有時沒有
+                let changeStr = cols[8];
+                const change = parseNum(changeStr);
+
+                // 計算漲跌幅
+                // 昨收 = 收盤 - 漲跌
+                // 注意：如果漲跌為負， 昨收 = 收盤 - (-值) = 收盤 + 值 (錯)
+                // 正確：昨收 = 收盤 - 漲跌 (若漲跌是帶符號的數值)
+                // 但 API 有時回傳絕對值，需要配合前面的符號，這裡假設 parseNum 已處理好負號
+                // 若 API 回傳的是字串 "+5.00" 或 "-5.00"，parseFloat 沒問題
+
+                // 更安全的計算漲跌幅： (漲跌 / (收盤 - 漲跌)) * 100
                 const prevClose = closePrice - change;
                 const changePercent = prevClose !== 0 ? (change / prevClose) * 100 : 0;
 
                 stocks.push({
                     code: code,
                     name: name || '',
-                    openPrice: parseNum(cols[5]),
-                    highPrice: parseNum(cols[6]),
-                    lowPrice: parseNum(cols[7]),
+                    openPrice: parseNum(cols[4]),
+                    highPrice: parseNum(cols[5]),
+                    lowPrice: parseNum(cols[6]),
                     closePrice: closePrice,
-                    volume: parseNum(cols[3]),
-                    tradeValue: parseNum(cols[4]),
+                    volume: parseNum(cols[2]),
+                    tradeValue: parseNum(cols[3]),
                     change: change,
                     changePercent: parseFloat(changePercent.toFixed(2)),
-                    transactions: parseNum(cols[10]),
+                    transactions: parseNum(cols[9]),
                     peRatio: null,
                     pbRatio: null,
-                    dividendYield: null
+                    dividendYield: null,
+                    sector: null
                 });
             }
         }
