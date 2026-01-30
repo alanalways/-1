@@ -461,14 +461,25 @@ async function checkAndInitializeData() {
     console.log('🔍 Checking database status...');
     try {
         const summary = await getMarketSummary();
+        const stocks = await getStocks({ limit: 100 }); // Sample check
         const now = new Date();
         const oneDayCheck = 24 * 60 * 60 * 1000; // 24 hours
 
         // 條件：(1) 完全沒資料 或 (2) 資料過期超過 24 小時
-        const needsUpdate = !summary || !summary.updated_at || (now - new Date(summary.updated_at) > oneDayCheck);
+        let needsUpdate = !summary || !summary.updated_at || (now - new Date(summary.updated_at) > oneDayCheck);
+
+        // [新增] 條件：(3) 產業分類資料不正確 (大部分都是 '其他')
+        if (!needsUpdate && stocks && stocks.length > 0) {
+            const otherSectorCount = stocks.filter(s => s.sector === '其他' || !s.sector).length;
+            const otherRatio = otherSectorCount / stocks.length;
+            if (otherRatio > 0.8) { // 超過 80% 是 '其他'，表示需要更新
+                console.warn(`⚠️ Sector data looks incorrect (${(otherRatio * 100).toFixed(1)}% = '其他'). Forcing update...`);
+                needsUpdate = true;
+            }
+        }
 
         if (needsUpdate) {
-            console.warn('⚠️ Database empty or stale. Triggering immediate update...');
+            console.warn('⚠️ Database empty, stale, or sector data incorrect. Triggering immediate update...');
             console.log('🚀 Running Cold Start Update...');
 
             // 動態載入並執行更新
