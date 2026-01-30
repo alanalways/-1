@@ -24,6 +24,7 @@ const state = {
     currentFilter: 'all',
     currentSort: 'score',
     searchQuery: '',
+    sectorFilter: null, // [新增] 產業篩選
     analysisDate: null // 訊號分析日期
 };
 
@@ -257,10 +258,27 @@ function setupEventListeners() {
         });
     });
 
-    // Search
+    // Search (live filter as you type)
     elements.searchInput?.addEventListener('input', (e) => {
         state.searchQuery = e.target.value.trim().toLowerCase();
+        state.sectorFilter = null; // [新增] 搜尋時清除產業篩選
         applyFiltersAndSort();
+    });
+
+    // [新增] Search - 按 Enter 後清空搜尋欄（結果保留）
+    elements.searchInput?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            // 如果找到結果，清空搜尋欄但保留結果
+            if (state.filteredStocks.length > 0) {
+                const resultCount = state.filteredStocks.length;
+                elements.searchInput.value = ''; // 清空輸入欄
+                // 保留 state.searchQuery，讓篩選結果維持
+                showToast(`🔍 找到 ${resultCount} 檔股票`);
+            } else {
+                showToast('❌ 找不到符合的股票', 'error');
+            }
+        }
     });
 
     // Sort
@@ -275,6 +293,7 @@ function setupEventListeners() {
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             state.currentFilter = btn.dataset.filter;
+            state.sectorFilter = null; // [新增] 清除產業篩選
             applyFiltersAndSort();
         });
     });
@@ -367,6 +386,7 @@ function createStockCard(stock, index) {
                 <div class="stock-card-info">
                     <span class="stock-code">${stock.code || 'N/A'}</span>
                     <span class="stock-name">${stock.name || 'Unknown'}</span>
+                    <span class="stock-sector" title="${stock.sector || '其他'}">[${stock.sector || '其他'}]</span>
                 </div>
                 <div class="stock-card-actions">
                     <button class="action-btn ${isFavorited ? 'favorited' : ''}" data-action="favorite" data-code="${stock.code}" title="加入自選">
@@ -616,8 +636,15 @@ function renderMarketOverview() {
 
     if (!intelligence || intelligence.length === 0) return;
 
-    container.innerHTML = intelligence.map(item => `
-        <div class="market-card">
+    container.innerHTML = intelligence.map(item => {
+        // [新增] 熱門產業卡片可點擊篩選
+        const isHotSector = item.category === '熱門產業';
+        const sectorName = isHotSector ? (item.title?.replace(' 最強', '') || '') : '';
+        const clickable = isHotSector && sectorName && sectorName !== '市場觀望中';
+
+        return `
+        <div class="market-card${clickable ? ' clickable' : ''}" 
+             ${clickable ? `data-sector="${sectorName}" title="點擊篩選 ${sectorName} 相關股票"` : ''}>
             <div class="market-card-header">
                 <div class="market-card-icon">${item.icon}</div>
                 <span class="market-card-label">${item.category}</span>
@@ -625,7 +652,23 @@ function renderMarketOverview() {
             <div class="market-card-title">${item.title}</div>
             <div class="market-card-content">${item.content?.replace(/\n/g, '<br>') || ''}</div>
         </div>
-    `).join('');
+    `}).join('');
+
+    // [新增] 熱門產業卡片點擊事件
+    container.querySelectorAll('.market-card.clickable').forEach(card => {
+        card.addEventListener('click', () => {
+            const sector = card.dataset.sector;
+            if (sector) {
+                state.sectorFilter = sector;
+                state.searchQuery = ''; // 清除搜尋
+                elements.searchInput.value = ''; // 清空搜尋欄
+                // 移除其他篩選按鈕的 active 狀態
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                applyFiltersAndSort();
+                showToast(`🔥 顯示 ${sector} 相關股票`);
+            }
+        });
+    });
 }
 
 // [新增] 前端即時生成市場概覽數據 (Fallback)
@@ -715,11 +758,19 @@ function generateMarketIntelligenceFallback() {
 function applyFiltersAndSort() {
     let stocks = [...state.allStocks];
 
+    // [新增] Apply sector filter (from Hot Sectors card click)
+    if (state.sectorFilter) {
+        const beforeCount = stocks.length;
+        stocks = stocks.filter(s => s.sector === state.sectorFilter);
+        console.log(`🔥 產業篩選 [${state.sectorFilter}]: ${beforeCount} → ${stocks.length} 檔`);
+    }
+
     // Apply search filter
     if (state.searchQuery) {
         stocks = stocks.filter(s =>
             s.code?.toLowerCase().includes(state.searchQuery) ||
-            s.name?.toLowerCase().includes(state.searchQuery)
+            s.name?.toLowerCase().includes(state.searchQuery) ||
+            s.sector?.toLowerCase().includes(state.searchQuery) // [新增] 也可搜尋產業
         );
     }
 
@@ -886,6 +937,7 @@ function createStockCard(stock, index) {
                 <div class="stock-card-info">
                     <span class="stock-code">${stock.code || 'N/A'}</span>
                     <span class="stock-name">${stock.name || 'Unknown'}</span>
+                    <span class="stock-sector" title="${stock.sector || '其他'}">[${stock.sector || '其他'}]</span>
                 </div>
                 <div class="stock-card-actions">
                     <button class="action-btn ${isFavorited ? 'favorited' : ''}" data-action="favorite" data-code="${stock.code}" title="加入自選">

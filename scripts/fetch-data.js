@@ -244,8 +244,8 @@ export async function fetchTWSEAllStocks() {
                 const code = cols[1];
                 const name = cols[2];
 
-                // 只過濾 4 位數純數字代碼（包含 ETF 如 0050, 0056 等）
-                if (!/^\d{4}$/.test(code)) continue;
+                // 過濾 4-6 位數純數字代碼（包含 5 位數 ETF 如 00878, 00930, 00940 等）
+                if (!/^\d{4,6}$/.test(code)) continue;
 
                 const closePrice = parseNum(cols[8]);
                 const change = parseNum(cols[9]);
@@ -364,8 +364,8 @@ export async function fetchTPExAllStocks() {
         if (quotesResponse.data && Array.isArray(quotesResponse.data)) {
             for (const item of quotesResponse.data) {
                 const code = item.SecuritiesCompanyCode;
-                // 只過濾 4 位數純數字代碼
-                if (!/^\d{4}$/.test(code)) continue;
+                // 過濾 4-6 位數純數字代碼（包含 5 位數 ETF）
+                if (!/^\d{4,6}$/.test(code)) continue;
 
                 const closePrice = parseNum(item.Close);
                 const change = parseNum(item.Change);

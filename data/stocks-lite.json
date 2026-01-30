@@ -1,12 +1,12 @@
 {
-  "lastUpdated": "2026/1/30 下午5:10:41",
+  "lastUpdated": "2026/1/30 下午5:47:25",
   "analysisDate": "2026-01-30",
   "marketIntelligence": {
     "taiex": {
       "name": "加權指數",
       "index": "32,063.75",
       "change": "-472.52",
-      "amount": "934,078,917,805"
+      "amount": "941,320,964,545"
     },
     "usIndices": [
       {
@@ -40,16 +40,16 @@
       {
         "symbol": "VIX",
         "name": "VIX 恐慌指數",
-        "price": "18.61",
-        "change": "1.73",
-        "changePercent": "10.25"
+        "price": "18.82",
+        "change": "1.94",
+        "changePercent": "11.49"
       },
       {
         "symbol": "DXY",
         "name": "DXY 美元指數",
-        "price": "96.48",
-        "change": "0.20",
-        "changePercent": "0.21"
+        "price": "96.60",
+        "change": "0.32",
+        "changePercent": "0.33"
       }
     ],
     "commodities": [
@@ -57,25 +57,25 @@
         "symbol": "GC=F",
         "name": "黃金",
         "icon": "🥇",
-        "price": "5148.30",
-        "change": "-206.50",
-        "changePercent": "-3.86"
+        "price": "5069.70",
+        "change": "-285.10",
+        "changePercent": "-5.32"
       },
       {
         "symbol": "SI=F",
         "name": "白銀",
         "icon": "🥈",
-        "price": "104.09",
-        "change": "-10.34",
-        "changePercent": "-9.04"
+        "price": "101.11",
+        "change": "-13.32",
+        "changePercent": "-11.64"
       },
       {
         "symbol": "CL=F",
         "name": "原油",
         "icon": "🛢️",
-        "price": "64.57",
-        "change": "-0.85",
-        "changePercent": "-1.30"
+        "price": "64.84",
+        "change": "-0.58",
+        "changePercent": "-0.89"
       },
       {
         "symbol": "NG=F",
@@ -83,23 +83,23 @@
         "icon": "🔥",
         "price": "3.88",
         "change": "-0.04",
-        "changePercent": "-1.00"
+        "changePercent": "-1.02"
       },
       {
         "symbol": "BTC-USD",
         "name": "Bitcoin",
         "icon": "₿",
-        "price": "82597.06",
-        "change": "-1956.63",
-        "changePercent": "-2.31"
+        "price": "82340.21",
+        "change": "-2213.48",
+        "changePercent": "-2.62"
       },
       {
         "symbol": "ETH-USD",
         "name": "Ethereum",
         "icon": "Ξ",
-        "price": "2736.83",
-        "change": "-81.22",
-        "changePercent": "-2.88"
+        "price": "2722.71",
+        "change": "-95.34",
+        "changePercent": "-3.38"
       }
     ]
   },
@@ -767,11 +767,11 @@
       "highPrice": 195,
       "lowPrice": 184.5,
       "closePrice": 195,
-      "volume": 59347267,
-      "tradeValue": 11460172388,
+      "volume": 59444267,
+      "tradeValue": 11479087388,
       "change": 17.5,
       "changePercent": 9.86,
-      "transactions": 27879,
+      "transactions": 27880,
       "peRatio": null,
       "pbRatio": 1.97,
       "dividendYield": 0.83,
@@ -1559,6 +1559,56 @@
       ]
     },
     {
+      "code": "911622",
+      "name": "泰聚亨-DR",
+      "openPrice": 4.1,
+      "highPrice": 4.25,
+      "lowPrice": 4.06,
+      "closePrice": 4.25,
+      "volume": 65000,
+      "tradeValue": 270450,
+      "change": 0.15,
+      "changePercent": 3.66,
+      "transactions": 33,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "存託憑證",
+      "market": "上市",
+      "score": 95,
+      "signal": "BULLISH",
+      "signalType": "SMC_BUY",
+      "reasons": [
+        "🧱 Bullish OB",
+        "🕳️ Bullish FVG",
+        "🚀 Momentum Up"
+      ],
+      "patterns": {
+        "ob": "bullish-ob",
+        "fvg": "bullish-fvg",
+        "sweep": null
+      },
+      "analysis": "🚀 **泰聚亨-DR** [存託憑證] ➤ 🧱 Bullish OB + 🕳️ Bullish FVG + 🚀 Momentum Up。",
+      "tags": [
+        {
+          "label": "Bullish OB",
+          "type": "smc-ob"
+        },
+        {
+          "label": "Bullish FVG",
+          "type": "smc-fvg"
+        },
+        {
+          "label": "看多",
+          "type": "bullish"
+        },
+        {
+          "label": "存託憑證",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
       "code": "4304",
       "name": "勝昱",
       "closePrice": 30,
@@ -2273,11 +2323,11 @@
       "highPrice": 43.15,
       "lowPrice": 42.65,
       "closePrice": 43.05,
-      "volume": 36058885,
-      "tradeValue": 1550200118,
+      "volume": 37263885,
+      "tradeValue": 1602075368,
       "change": 0.1,
       "changePercent": 0.23,
-      "transactions": 9530,
+      "transactions": 9531,
       "peRatio": 13.72,
       "pbRatio": 1.36,
       "dividendYield": 4.1,
@@ -2585,6 +2635,56 @@
       ]
     },
     {
+      "code": "2838",
+      "name": "聯邦銀",
+      "openPrice": 18.65,
+      "highPrice": 18.7,
+      "lowPrice": 18.5,
+      "closePrice": 18.7,
+      "volume": 2210475,
+      "tradeValue": 42588439,
+      "change": 0.05,
+      "changePercent": 0.27,
+      "transactions": 778,
+      "peRatio": 13.36,
+      "pbRatio": 0.85,
+      "dividendYield": 5.81,
+      "sector": "金融保險",
+      "market": "上市",
+      "score": 85,
+      "signal": "BULLISH",
+      "signalType": "SMC_BUY",
+      "reasons": [
+        "🐢 Liq Sweep ↑",
+        "💰 Low PE",
+        "💵 High Yield"
+      ],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": "liquidity-sweep-bull"
+      },
+      "analysis": "🚀 **聯邦銀** [金融保險] ➤ 🐢 Liq Sweep ↑ + 💰 Low PE + 💵 High Yield。 (PE: 13.36)",
+      "tags": [
+        {
+          "label": "Liq Sweep ↑",
+          "type": "smc-liq"
+        },
+        {
+          "label": "看多",
+          "type": "bullish"
+        },
+        {
+          "label": "金融保險",
+          "type": "neutral"
+        },
+        {
+          "label": "Yield 5.81%",
+          "type": "bullish"
+        }
+      ]
+    },
+    {
       "code": "4167",
       "name": "松瑞藥",
       "closePrice": 20.7,
@@ -2664,56 +2764,6 @@
         },
         {
           "label": "Yield 10.73%",
-          "type": "bullish"
-        }
-      ]
-    },
-    {
-      "code": "2838",
-      "name": "聯邦銀",
-      "openPrice": 18.65,
-      "highPrice": 18.7,
-      "lowPrice": 18.5,
-      "closePrice": 18.7,
-      "volume": 1437475,
-      "tradeValue": 26741939,
-      "change": 0.05,
-      "changePercent": 0.27,
-      "transactions": 777,
-      "peRatio": 13.36,
-      "pbRatio": 0.85,
-      "dividendYield": 5.81,
-      "sector": "金融保險",
-      "market": "上市",
-      "score": 85,
-      "signal": "BULLISH",
-      "signalType": "SMC_BUY",
-      "reasons": [
-        "🐢 Liq Sweep ↑",
-        "💰 Low PE",
-        "💵 High Yield"
-      ],
-      "patterns": {
-        "ob": null,
-        "fvg": null,
-        "sweep": "liquidity-sweep-bull"
-      },
-      "analysis": "🚀 **聯邦銀** [金融保險] ➤ 🐢 Liq Sweep ↑ + 💰 Low PE + 💵 High Yield。 (PE: 13.36)",
-      "tags": [
-        {
-          "label": "Liq Sweep ↑",
-          "type": "smc-liq"
-        },
-        {
-          "label": "看多",
-          "type": "bullish"
-        },
-        {
-          "label": "金融保險",
-          "type": "neutral"
-        },
-        {
-          "label": "Yield 5.81%",
           "type": "bullish"
         }
       ]
@@ -3409,11 +3459,11 @@
       "highPrice": 282,
       "lowPrice": 274,
       "closePrice": 277.5,
-      "volume": 23704806,
-      "tradeValue": 6590379739,
+      "volume": 23880806,
+      "tradeValue": 6639219739,
       "change": 0.5,
       "changePercent": 0.18,
-      "transactions": 29543,
+      "transactions": 29544,
       "peRatio": 13.28,
       "pbRatio": 1.81,
       "dividendYield": 3.52,
@@ -5425,6 +5475,45 @@
       ]
     },
     {
+      "code": "020040",
+      "name": "元大上櫃ESG龍頭N",
+      "closePrice": 8.69,
+      "openPrice": 8.72,
+      "highPrice": 8.72,
+      "lowPrice": 8.55,
+      "volume": 13000,
+      "tradeValue": 112640,
+      "change": 0.1,
+      "changePercent": 1.16,
+      "transactions": 0,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "market": "上櫃",
+      "score": 80,
+      "signal": "BULLISH",
+      "signalType": "SMC_BUY",
+      "reasons": [
+        "🐢 Liq Sweep ↑"
+      ],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": "liquidity-sweep-bull"
+      },
+      "analysis": "🚀 **元大上櫃ESG龍頭N** [一般] ➤ 🐢 Liq Sweep ↑。",
+      "tags": [
+        {
+          "label": "Liq Sweep ↑",
+          "type": "smc-liq"
+        },
+        {
+          "label": "看多",
+          "type": "bullish"
+        }
+      ]
+    },
+    {
       "code": "5878",
       "name": "台名",
       "closePrice": 41.75,
@@ -5684,6 +5773,50 @@
       ]
     },
     {
+      "code": "00947",
+      "name": "台新臺灣IC設計",
+      "openPrice": 24.8,
+      "highPrice": 25.09,
+      "lowPrice": 24.32,
+      "closePrice": 24.87,
+      "volume": 26756134,
+      "tradeValue": 661823523,
+      "change": 0.1,
+      "changePercent": 0.4,
+      "transactions": 9832,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 75,
+      "signal": "BULLISH",
+      "signalType": "SMC_BUY",
+      "reasons": [
+        "🐢 Liq Sweep ↑"
+      ],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": "liquidity-sweep-bull"
+      },
+      "analysis": "🚀 **台新臺灣IC設計** [其他] ➤ 🐢 Liq Sweep ↑。",
+      "tags": [
+        {
+          "label": "Liq Sweep ↑",
+          "type": "smc-liq"
+        },
+        {
+          "label": "看多",
+          "type": "bullish"
+        },
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
       "code": "3715",
       "name": "定穎投控",
       "openPrice": 141.5,
@@ -5857,6 +5990,50 @@
       ]
     },
     {
+      "code": "00712",
+      "name": "復華富時不動產",
+      "openPrice": 9.68,
+      "highPrice": 9.69,
+      "lowPrice": 9.64,
+      "closePrice": 9.69,
+      "volume": 18571791,
+      "tradeValue": 179421714,
+      "change": 0.01,
+      "changePercent": 0.1,
+      "transactions": 2872,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 75,
+      "signal": "BULLISH",
+      "signalType": "SMC_BUY",
+      "reasons": [
+        "🐢 Liq Sweep ↑"
+      ],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": "liquidity-sweep-bull"
+      },
+      "analysis": "🚀 **復華富時不動產** [其他] ➤ 🐢 Liq Sweep ↑。",
+      "tags": [
+        {
+          "label": "Liq Sweep ↑",
+          "type": "smc-liq"
+        },
+        {
+          "label": "看多",
+          "type": "bullish"
+        },
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
       "code": "2485",
       "name": "兆赫",
       "openPrice": 40.5,
@@ -5901,17 +6078,56 @@
       ]
     },
     {
+      "code": "00887",
+      "name": "永豐中國科技50大",
+      "closePrice": 13.04,
+      "openPrice": 12.94,
+      "highPrice": 13.05,
+      "lowPrice": 12.7,
+      "volume": 15962000,
+      "tradeValue": 205626360,
+      "change": 0.04,
+      "changePercent": 0.31,
+      "transactions": 0,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "market": "上櫃",
+      "score": 75,
+      "signal": "BULLISH",
+      "signalType": "SMC_BUY",
+      "reasons": [
+        "🐢 Liq Sweep ↑"
+      ],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": "liquidity-sweep-bull"
+      },
+      "analysis": "🚀 **永豐中國科技50大** [一般] ➤ 🐢 Liq Sweep ↑。",
+      "tags": [
+        {
+          "label": "Liq Sweep ↑",
+          "type": "smc-liq"
+        },
+        {
+          "label": "看多",
+          "type": "bullish"
+        }
+      ]
+    },
+    {
       "code": "2412",
       "name": "中華電",
       "openPrice": 133.5,
       "highPrice": 134.5,
       "lowPrice": 133,
       "closePrice": 133.5,
-      "volume": 14635701,
-      "tradeValue": 1955736555,
+      "volume": 14876701,
+      "tradeValue": 1987910055,
       "change": 0,
       "changePercent": 0,
-      "transactions": 5593,
+      "transactions": 5594,
       "peRatio": 26.65,
       "pbRatio": 2.67,
       "dividendYield": 3.79,
@@ -6074,17 +6290,56 @@
       ]
     },
     {
+      "code": "00955",
+      "name": "中信日本商社",
+      "closePrice": 14.35,
+      "openPrice": 14.36,
+      "highPrice": 14.38,
+      "lowPrice": 14.2,
+      "volume": 6231000,
+      "tradeValue": 89041400,
+      "change": 0,
+      "changePercent": 0,
+      "transactions": 0,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "market": "上櫃",
+      "score": 75,
+      "signal": "BULLISH",
+      "signalType": "SMC_BUY",
+      "reasons": [
+        "🐢 Liq Sweep ↑"
+      ],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": "liquidity-sweep-bull"
+      },
+      "analysis": "🚀 **中信日本商社** [一般] ➤ 🐢 Liq Sweep ↑。",
+      "tags": [
+        {
+          "label": "Liq Sweep ↑",
+          "type": "smc-liq"
+        },
+        {
+          "label": "看多",
+          "type": "bullish"
+        }
+      ]
+    },
+    {
       "code": "6919",
       "name": "康霈*",
       "openPrice": 166.5,
       "highPrice": 167.5,
       "lowPrice": 161.5,
       "closePrice": 165.5,
-      "volume": 5578273,
-      "tradeValue": 915451369,
+      "volume": 5669273,
+      "tradeValue": 930511869,
       "change": 1,
       "changePercent": 0.61,
-      "transactions": 6513,
+      "transactions": 6514,
       "peRatio": null,
       "pbRatio": null,
       "dividendYield": null,
@@ -6113,6 +6368,50 @@
         },
         {
           "label": "生技醫療",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "00885",
+      "name": "富邦越南",
+      "openPrice": 18,
+      "highPrice": 18.31,
+      "lowPrice": 18,
+      "closePrice": 18.3,
+      "volume": 5301167,
+      "tradeValue": 96442256,
+      "change": 0.31,
+      "changePercent": 1.72,
+      "transactions": 1929,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 75,
+      "signal": "BULLISH",
+      "signalType": "SMC_BUY",
+      "reasons": [
+        "🧱 Bullish OB"
+      ],
+      "patterns": {
+        "ob": "bullish-ob",
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "🚀 **富邦越南** [其他] ➤ 🧱 Bullish OB。",
+      "tags": [
+        {
+          "label": "Bullish OB",
+          "type": "smc-ob"
+        },
+        {
+          "label": "看多",
+          "type": "bullish"
+        },
+        {
+          "label": "其他",
           "type": "neutral"
         }
       ]
@@ -6850,6 +7149,138 @@
       ]
     },
     {
+      "code": "00963",
+      "name": "中信全球高股息",
+      "openPrice": 12.15,
+      "highPrice": 12.15,
+      "lowPrice": 12.11,
+      "closePrice": 12.14,
+      "volume": 1258214,
+      "tradeValue": 15265420,
+      "change": 0.04,
+      "changePercent": 0.33,
+      "transactions": 415,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 75,
+      "signal": "BULLISH",
+      "signalType": "SMC_BUY",
+      "reasons": [
+        "🐢 Liq Sweep ↑"
+      ],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": "liquidity-sweep-bull"
+      },
+      "analysis": "🚀 **中信全球高股息** [其他] ➤ 🐢 Liq Sweep ↑。",
+      "tags": [
+        {
+          "label": "Liq Sweep ↑",
+          "type": "smc-liq"
+        },
+        {
+          "label": "看多",
+          "type": "bullish"
+        },
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "00949",
+      "name": "復華日本龍頭",
+      "openPrice": 18.97,
+      "highPrice": 19.02,
+      "lowPrice": 18.87,
+      "closePrice": 19.01,
+      "volume": 1028321,
+      "tradeValue": 19482124,
+      "change": 0.06,
+      "changePercent": 0.32,
+      "transactions": 462,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 75,
+      "signal": "BULLISH",
+      "signalType": "SMC_BUY",
+      "reasons": [
+        "🐢 Liq Sweep ↑"
+      ],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": "liquidity-sweep-bull"
+      },
+      "analysis": "🚀 **復華日本龍頭** [其他] ➤ 🐢 Liq Sweep ↑。",
+      "tags": [
+        {
+          "label": "Liq Sweep ↑",
+          "type": "smc-liq"
+        },
+        {
+          "label": "看多",
+          "type": "bullish"
+        },
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "009812",
+      "name": "野村日本東證",
+      "openPrice": 11.32,
+      "highPrice": 11.36,
+      "lowPrice": 11.23,
+      "closePrice": 11.34,
+      "volume": 1026953,
+      "tradeValue": 11605102,
+      "change": 0.05,
+      "changePercent": 0.44,
+      "transactions": 219,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 75,
+      "signal": "BULLISH",
+      "signalType": "SMC_BUY",
+      "reasons": [
+        "🐢 Liq Sweep ↑"
+      ],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": "liquidity-sweep-bull"
+      },
+      "analysis": "🚀 **野村日本東證** [其他] ➤ 🐢 Liq Sweep ↑。",
+      "tags": [
+        {
+          "label": "Liq Sweep ↑",
+          "type": "smc-liq"
+        },
+        {
+          "label": "看多",
+          "type": "bullish"
+        },
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
       "code": "5475",
       "name": "德宏",
       "closePrice": 106.5,
@@ -7252,6 +7683,50 @@
       ]
     },
     {
+      "code": "00645",
+      "name": "富邦日本",
+      "openPrice": 49.93,
+      "highPrice": 50,
+      "lowPrice": 49.59,
+      "closePrice": 50,
+      "volume": 579580,
+      "tradeValue": 28825425,
+      "change": 0.36,
+      "changePercent": 0.73,
+      "transactions": 333,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 75,
+      "signal": "BULLISH",
+      "signalType": "SMC_BUY",
+      "reasons": [
+        "🐢 Liq Sweep ↑"
+      ],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": "liquidity-sweep-bull"
+      },
+      "analysis": "🚀 **富邦日本** [其他] ➤ 🐢 Liq Sweep ↑。",
+      "tags": [
+        {
+          "label": "Liq Sweep ↑",
+          "type": "smc-liq"
+        },
+        {
+          "label": "看多",
+          "type": "bullish"
+        },
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
       "code": "6830",
       "name": "汎銓",
       "openPrice": 174.5,
@@ -7419,6 +7894,50 @@
         },
         {
           "label": "化學工業",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "00956",
+      "name": "中信日經高股息",
+      "openPrice": 12.02,
+      "highPrice": 12.03,
+      "lowPrice": 11.93,
+      "closePrice": 12.01,
+      "volume": 460953,
+      "tradeValue": 5523311,
+      "change": 0.03,
+      "changePercent": 0.25,
+      "transactions": 222,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 75,
+      "signal": "BULLISH",
+      "signalType": "SMC_BUY",
+      "reasons": [
+        "🐢 Liq Sweep ↑"
+      ],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": "liquidity-sweep-bull"
+      },
+      "analysis": "🚀 **中信日經高股息** [其他] ➤ 🐢 Liq Sweep ↑。",
+      "tags": [
+        {
+          "label": "Liq Sweep ↑",
+          "type": "smc-liq"
+        },
+        {
+          "label": "看多",
+          "type": "bullish"
+        },
+        {
+          "label": "其他",
           "type": "neutral"
         }
       ]
@@ -7660,6 +8179,50 @@
         },
         {
           "label": "觀光事業",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "006207",
+      "name": "復華滬深",
+      "openPrice": 31.63,
+      "highPrice": 31.76,
+      "lowPrice": 31.09,
+      "closePrice": 31.55,
+      "volume": 287763,
+      "tradeValue": 9059357,
+      "change": 0.12,
+      "changePercent": 0.38,
+      "transactions": 160,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 75,
+      "signal": "BULLISH",
+      "signalType": "SMC_BUY",
+      "reasons": [
+        "🐢 Liq Sweep ↑"
+      ],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": "liquidity-sweep-bull"
+      },
+      "analysis": "🚀 **復華滬深** [其他] ➤ 🐢 Liq Sweep ↑。",
+      "tags": [
+        {
+          "label": "Liq Sweep ↑",
+          "type": "smc-liq"
+        },
+        {
+          "label": "看多",
+          "type": "bullish"
+        },
+        {
+          "label": "其他",
           "type": "neutral"
         }
       ]
@@ -8125,6 +8688,94 @@
         {
           "label": "看多",
           "type": "bullish"
+        }
+      ]
+    },
+    {
+      "code": "00668",
+      "name": "國泰美國道瓊",
+      "openPrice": 56,
+      "highPrice": 56.05,
+      "lowPrice": 55.95,
+      "closePrice": 56,
+      "volume": 138203,
+      "tradeValue": 7733009,
+      "change": 0.1,
+      "changePercent": 0.18,
+      "transactions": 122,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 75,
+      "signal": "BULLISH",
+      "signalType": "SMC_BUY",
+      "reasons": [
+        "🐢 Liq Sweep ↑"
+      ],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": "liquidity-sweep-bull"
+      },
+      "analysis": "🚀 **國泰美國道瓊** [其他] ➤ 🐢 Liq Sweep ↑。",
+      "tags": [
+        {
+          "label": "Liq Sweep ↑",
+          "type": "smc-liq"
+        },
+        {
+          "label": "看多",
+          "type": "bullish"
+        },
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "00739",
+      "name": "元大MSCI A股",
+      "openPrice": 27.3,
+      "highPrice": 27.35,
+      "lowPrice": 26.95,
+      "closePrice": 27.25,
+      "volume": 130457,
+      "tradeValue": 3544462,
+      "change": 0.07,
+      "changePercent": 0.26,
+      "transactions": 143,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 75,
+      "signal": "BULLISH",
+      "signalType": "SMC_BUY",
+      "reasons": [
+        "🐢 Liq Sweep ↑"
+      ],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": "liquidity-sweep-bull"
+      },
+      "analysis": "🚀 **元大MSCI A股** [其他] ➤ 🐢 Liq Sweep ↑。",
+      "tags": [
+        {
+          "label": "Liq Sweep ↑",
+          "type": "smc-liq"
+        },
+        {
+          "label": "看多",
+          "type": "bullish"
+        },
+        {
+          "label": "其他",
+          "type": "neutral"
         }
       ]
     },
@@ -9286,6 +9937,45 @@
         {
           "label": "Bullish FVG",
           "type": "smc-fvg"
+        },
+        {
+          "label": "看多",
+          "type": "bullish"
+        }
+      ]
+    },
+    {
+      "code": "020027",
+      "name": "元大上櫃ESG成長N",
+      "closePrice": 7.68,
+      "openPrice": 7.7,
+      "highPrice": 7.72,
+      "lowPrice": 7.57,
+      "volume": 18000,
+      "tradeValue": 138240,
+      "change": 0.03,
+      "changePercent": 0.39,
+      "transactions": 0,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "market": "上櫃",
+      "score": 75,
+      "signal": "BULLISH",
+      "signalType": "SMC_BUY",
+      "reasons": [
+        "🐢 Liq Sweep ↑"
+      ],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": "liquidity-sweep-bull"
+      },
+      "analysis": "🚀 **元大上櫃ESG成長N** [一般] ➤ 🐢 Liq Sweep ↑。",
+      "tags": [
+        {
+          "label": "Liq Sweep ↑",
+          "type": "smc-liq"
         },
         {
           "label": "看多",
@@ -10643,11 +11333,11 @@
       "highPrice": 234,
       "lowPrice": 217,
       "closePrice": 233.5,
-      "volume": 10017070,
-      "tradeValue": 2300788878,
+      "volume": 11326070,
+      "tradeValue": 2606440378,
       "change": 9,
       "changePercent": 4.01,
-      "transactions": 15478,
+      "transactions": 15480,
       "peRatio": 21.7,
       "pbRatio": 5.31,
       "dividendYield": 3.19,
@@ -16699,11 +17389,11 @@
       "highPrice": 23.05,
       "lowPrice": 22.55,
       "closePrice": 22.7,
-      "volume": 58214164,
-      "tradeValue": 1320886948,
+      "volume": 60661164,
+      "tradeValue": 1376433848,
       "change": -0.15,
       "changePercent": -0.66,
-      "transactions": 11998,
+      "transactions": 11999,
       "peRatio": 15.33,
       "pbRatio": 1.14,
       "dividendYield": 5.43,
@@ -16775,11 +17465,11 @@
       "highPrice": 18.3,
       "lowPrice": 17.85,
       "closePrice": 18.05,
-      "volume": 46470052,
-      "tradeValue": 838879398,
+      "volume": 48099052,
+      "tradeValue": 868282848,
       "change": -0.1,
       "changePercent": -0.55,
-      "transactions": 8043,
+      "transactions": 8044,
       "peRatio": 11.79,
       "pbRatio": 1.02,
       "dividendYield": 3.03,
@@ -16847,11 +17537,11 @@
       "highPrice": 33.65,
       "lowPrice": 33.1,
       "closePrice": 33.4,
-      "volume": 36349721,
-      "tradeValue": 1212152880,
+      "volume": 37969721,
+      "tradeValue": 1266260880,
       "change": -0.3,
       "changePercent": -0.89,
-      "transactions": 18404,
+      "transactions": 18405,
       "peRatio": 18.45,
       "pbRatio": 1.86,
       "dividendYield": 4.99,
@@ -16919,11 +17609,11 @@
       "highPrice": 92.5,
       "lowPrice": 90.9,
       "closePrice": 90.9,
-      "volume": 23800566,
-      "tradeValue": 2170475545,
+      "volume": 25423566,
+      "tradeValue": 2318207745,
       "change": -1.4,
       "changePercent": -1.52,
-      "transactions": 17672,
+      "transactions": 17674,
       "peRatio": 12.66,
       "pbRatio": 1.41,
       "dividendYield": 2.77,
@@ -16989,11 +17679,11 @@
       "highPrice": 76.4,
       "lowPrice": 75.1,
       "closePrice": 75.4,
-      "volume": 20385706,
-      "tradeValue": 1537112095,
+      "volume": 21688706,
+      "tradeValue": 1635315995,
       "change": -1,
       "changePercent": -1.31,
-      "transactions": 9660,
+      "transactions": 9662,
       "peRatio": 11.94,
       "pbRatio": 1.23,
       "dividendYield": 3.01,
@@ -17257,6 +17947,42 @@
       ]
     },
     {
+      "code": "5876",
+      "name": "上海商銀",
+      "openPrice": 39.75,
+      "highPrice": 39.75,
+      "lowPrice": 39.3,
+      "closePrice": 39.5,
+      "volume": 10239345,
+      "tradeValue": 404100032,
+      "change": -0.25,
+      "changePercent": -0.63,
+      "transactions": 2948,
+      "peRatio": 17.55,
+      "pbRatio": 1,
+      "dividendYield": 4.66,
+      "sector": "金融保險",
+      "market": "上市",
+      "score": 55,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [
+        "💵 High Yield"
+      ],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **上海商銀** [金融保險] ➤ 💵 High Yield。 (PE: 17.55)",
+      "tags": [
+        {
+          "label": "金融保險",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
       "code": "2431",
       "name": "聯昌",
       "openPrice": 15.55,
@@ -17286,42 +18012,6 @@
       "tags": [
         {
           "label": "電子零組件業",
-          "type": "neutral"
-        }
-      ]
-    },
-    {
-      "code": "5876",
-      "name": "上海商銀",
-      "openPrice": 39.75,
-      "highPrice": 39.75,
-      "lowPrice": 39.3,
-      "closePrice": 39.5,
-      "volume": 9373345,
-      "tradeValue": 369893032,
-      "change": -0.25,
-      "changePercent": -0.63,
-      "transactions": 2947,
-      "peRatio": 17.55,
-      "pbRatio": 1,
-      "dividendYield": 4.66,
-      "sector": "金融保險",
-      "market": "上市",
-      "score": 55,
-      "signal": "NEUTRAL",
-      "signalType": "NEUTRAL",
-      "reasons": [
-        "💵 High Yield"
-      ],
-      "patterns": {
-        "ob": null,
-        "fvg": null,
-        "sweep": null
-      },
-      "analysis": "⚖️ **上海商銀** [金融保險] ➤ 💵 High Yield。 (PE: 17.55)",
-      "tags": [
-        {
-          "label": "金融保險",
           "type": "neutral"
         }
       ]
@@ -17634,6 +18324,34 @@
           "type": "neutral"
         }
       ]
+    },
+    {
+      "code": "00877",
+      "name": "復華中國5G",
+      "closePrice": 27.41,
+      "openPrice": 26.95,
+      "highPrice": 27.43,
+      "lowPrice": 26.41,
+      "volume": 5724000,
+      "tradeValue": 154127810,
+      "change": 0.36,
+      "changePercent": 1.33,
+      "transactions": 0,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "market": "上櫃",
+      "score": 55,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **復華中國5G** [一般] ➤ 盤整觀望。",
+      "tags": []
     },
     {
       "code": "2347",
@@ -17984,6 +18702,40 @@
       "tags": [
         {
           "label": "貿易百貨",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "00636",
+      "name": "國泰中國A50",
+      "openPrice": 26.56,
+      "highPrice": 26.75,
+      "lowPrice": 26.4,
+      "closePrice": 26.73,
+      "volume": 2783715,
+      "tradeValue": 74064113,
+      "change": 0.29,
+      "changePercent": 1.1,
+      "transactions": 387,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 55,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **國泰中國A50** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
           "type": "neutral"
         }
       ]
@@ -18403,6 +19155,40 @@
         {
           "label": "Yield 5.02%",
           "type": "bullish"
+        }
+      ]
+    },
+    {
+      "code": "00639",
+      "name": "富邦深100",
+      "openPrice": 15.21,
+      "highPrice": 15.43,
+      "lowPrice": 15.07,
+      "closePrice": 15.39,
+      "volume": 1235311,
+      "tradeValue": 18859820,
+      "change": 0.18,
+      "changePercent": 1.18,
+      "transactions": 324,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 55,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **富邦深100** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
         }
       ]
     },
@@ -20648,6 +21434,40 @@
         {
           "label": "Yield 5.5%",
           "type": "bullish"
+        }
+      ]
+    },
+    {
+      "code": "00972",
+      "name": "野村日本動能高息",
+      "openPrice": 18.96,
+      "highPrice": 19.05,
+      "lowPrice": 18.91,
+      "closePrice": 19.05,
+      "volume": 179939,
+      "tradeValue": 3413056,
+      "change": 0.23,
+      "changePercent": 1.22,
+      "transactions": 61,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 55,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **野村日本動能高息** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
         }
       ]
     },
@@ -23848,6 +24668,40 @@
       ]
     },
     {
+      "code": "911608",
+      "name": "明輝-DR",
+      "openPrice": 2.83,
+      "highPrice": 2.9,
+      "lowPrice": 2.83,
+      "closePrice": 2.87,
+      "volume": 5034,
+      "tradeValue": 14363,
+      "change": 0.04,
+      "changePercent": 1.41,
+      "transactions": 4,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "存託憑證",
+      "market": "上市",
+      "score": 55,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **明輝-DR** [存託憑證] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "存託憑證",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
       "code": "3168",
       "name": "眾福科",
       "openPrice": 40.35,
@@ -24500,11 +25354,11 @@
       "highPrice": 223.5,
       "lowPrice": 218.5,
       "closePrice": 220.5,
-      "volume": 71105288,
-      "tradeValue": 15651999312,
+      "volume": 72547288,
+      "tradeValue": 15969960312,
       "change": -3.5,
       "changePercent": -1.56,
-      "transactions": 68560,
+      "transactions": 68562,
       "peRatio": 16.95,
       "pbRatio": 1.7,
       "dividendYield": 2.88,
@@ -24636,11 +25490,11 @@
       "highPrice": 1800,
       "lowPrice": 1775,
       "closePrice": 1775,
-      "volume": 43813932,
-      "tradeValue": 78198866060,
+      "volume": 46341867,
+      "tradeValue": 82692717518,
       "change": -30,
       "changePercent": -1.66,
-      "transactions": 155475,
+      "transactions": 155495,
       "peRatio": 26.88,
       "pbRatio": 6.55,
       "dividendYield": 1.36,
@@ -24659,6 +25513,40 @@
       "tags": [
         {
           "label": "半導體業",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "00940",
+      "name": "元大台灣價值高息",
+      "openPrice": 9.8,
+      "highPrice": 9.8,
+      "lowPrice": 9.62,
+      "closePrice": 9.7,
+      "volume": 41635392,
+      "tradeValue": 403263555,
+      "change": -0.15,
+      "changePercent": -1.52,
+      "transactions": 6734,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **元大台灣價值高息** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
           "type": "neutral"
         }
       ]
@@ -24698,17 +25586,79 @@
       ]
     },
     {
+      "code": "009815",
+      "name": "大華美國MAG7+",
+      "closePrice": 10.02,
+      "openPrice": 10.02,
+      "highPrice": 10.02,
+      "lowPrice": 9.98,
+      "volume": 35303000,
+      "tradeValue": 353173060,
+      "change": -0.08,
+      "changePercent": -0.79,
+      "transactions": 0,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "market": "上櫃",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **大華美國MAG7+** [一般] ➤ 盤整觀望。",
+      "tags": []
+    },
+    {
+      "code": "00881",
+      "name": "國泰台灣科技龍頭",
+      "openPrice": 34.27,
+      "highPrice": 34.27,
+      "lowPrice": 33.8,
+      "closePrice": 34.03,
+      "volume": 33336343,
+      "tradeValue": 1133768052,
+      "change": -0.58,
+      "changePercent": -1.68,
+      "transactions": 21698,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **國泰台灣科技龍頭** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
       "code": "5880",
       "name": "合庫金",
       "openPrice": 23.8,
       "highPrice": 23.85,
       "lowPrice": 23.55,
       "closePrice": 23.55,
-      "volume": 32072389,
-      "tradeValue": 756884713,
+      "volume": 33224389,
+      "tradeValue": 784014313,
       "change": -0.3,
       "changePercent": -1.26,
-      "transactions": 11160,
+      "transactions": 11161,
       "peRatio": 21.4,
       "pbRatio": 1.56,
       "dividendYield": 3.86,
@@ -24727,6 +25677,40 @@
       "tags": [
         {
           "label": "金融保險",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "00918",
+      "name": "大華優利高填息30",
+      "openPrice": 23.21,
+      "highPrice": 23.21,
+      "lowPrice": 22.83,
+      "closePrice": 22.92,
+      "volume": 32727078,
+      "tradeValue": 751018956,
+      "change": -0.44,
+      "changePercent": -1.88,
+      "transactions": 15014,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **大華優利高填息30** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
           "type": "neutral"
         }
       ]
@@ -24872,11 +25856,11 @@
       "highPrice": 283,
       "lowPrice": 276.5,
       "closePrice": 280,
-      "volume": 17304894,
-      "tradeValue": 4830534317,
+      "volume": 19845894,
+      "tradeValue": 5541322667,
       "change": -3,
       "changePercent": -1.06,
-      "transactions": 49293,
+      "transactions": 49295,
       "peRatio": 20.25,
       "pbRatio": 5.47,
       "dividendYield": 3.41,
@@ -24895,6 +25879,40 @@
       "tags": [
         {
           "label": "電腦及週邊設備業",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "00882",
+      "name": "中信中國高股息",
+      "openPrice": 15.8,
+      "highPrice": 15.9,
+      "lowPrice": 15.56,
+      "closePrice": 15.64,
+      "volume": 18587886,
+      "tradeValue": 292330558,
+      "change": -0.16,
+      "changePercent": -1.01,
+      "transactions": 2703,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **中信中國高股息** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
           "type": "neutral"
         }
       ]
@@ -24968,6 +25986,74 @@
       ]
     },
     {
+      "code": "00830",
+      "name": "國泰費城半導體",
+      "openPrice": 57.5,
+      "highPrice": 57.55,
+      "lowPrice": 56.85,
+      "closePrice": 57.55,
+      "volume": 15035042,
+      "tradeValue": 861285456,
+      "change": -0.35,
+      "changePercent": -0.6,
+      "transactions": 16325,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **國泰費城半導體** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "009805",
+      "name": "新光美國電力基建",
+      "openPrice": 13.52,
+      "highPrice": 13.53,
+      "lowPrice": 13.4,
+      "closePrice": 13.49,
+      "volume": 14775805,
+      "tradeValue": 198780073,
+      "change": -0.01,
+      "changePercent": -0.07,
+      "transactions": 3793,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **新光美國電力基建** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
       "code": "1402",
       "name": "遠東新",
       "openPrice": 28.3,
@@ -25002,6 +26088,40 @@
       ]
     },
     {
+      "code": "00922",
+      "name": "國泰台灣領袖50",
+      "openPrice": 28.7,
+      "highPrice": 28.7,
+      "lowPrice": 28.36,
+      "closePrice": 28.49,
+      "volume": 12774263,
+      "tradeValue": 364000816,
+      "change": -0.49,
+      "changePercent": -1.69,
+      "transactions": 9176,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **國泰台灣領袖50** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
       "code": "1216",
       "name": "統一",
       "openPrice": 72.6,
@@ -25031,6 +26151,74 @@
       "tags": [
         {
           "label": "食品工業",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "00713",
+      "name": "元大台灣高息低波",
+      "openPrice": 51.75,
+      "highPrice": 51.75,
+      "lowPrice": 51.15,
+      "closePrice": 51.3,
+      "volume": 10617286,
+      "tradeValue": 545327189,
+      "change": -0.65,
+      "changePercent": -1.25,
+      "transactions": 9679,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **元大台灣高息低波** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "00900",
+      "name": "富邦特選高股息30",
+      "openPrice": 14.6,
+      "highPrice": 14.6,
+      "lowPrice": 14.37,
+      "closePrice": 14.42,
+      "volume": 10385978,
+      "tradeValue": 149973429,
+      "change": -0.19,
+      "changePercent": -1.3,
+      "transactions": 3072,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **富邦特選高股息30** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
           "type": "neutral"
         }
       ]
@@ -25161,6 +26349,40 @@
       "tags": [
         {
           "label": "光電業",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "00904",
+      "name": "新光臺灣半導體30",
+      "openPrice": 28.06,
+      "highPrice": 28.14,
+      "lowPrice": 27.53,
+      "closePrice": 27.91,
+      "volume": 7881497,
+      "tradeValue": 219592070,
+      "change": -0.3,
+      "changePercent": -1.06,
+      "transactions": 2386,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **新光臺灣半導體30** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
           "type": "neutral"
         }
       ]
@@ -25330,6 +26552,74 @@
       ]
     },
     {
+      "code": "009813",
+      "name": "貝萊德標普卓越50",
+      "openPrice": 10.49,
+      "highPrice": 10.49,
+      "lowPrice": 10.41,
+      "closePrice": 10.45,
+      "volume": 6863005,
+      "tradeValue": 71644570,
+      "change": -0.05,
+      "changePercent": -0.48,
+      "transactions": 1728,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **貝萊德標普卓越50** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "006208",
+      "name": "富邦台50",
+      "openPrice": 168.5,
+      "highPrice": 168.8,
+      "lowPrice": 167.35,
+      "closePrice": 168.05,
+      "volume": 6850570,
+      "tradeValue": 1151987206,
+      "change": -2.7,
+      "changePercent": -1.58,
+      "transactions": 25576,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **富邦台50** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
       "code": "2331",
       "name": "精英",
       "openPrice": 27.3,
@@ -25364,6 +26654,74 @@
       ]
     },
     {
+      "code": "00662",
+      "name": "富邦NASDAQ",
+      "openPrice": 104.1,
+      "highPrice": 104.1,
+      "lowPrice": 103.2,
+      "closePrice": 103.6,
+      "volume": 6624401,
+      "tradeValue": 686554442,
+      "change": -1.05,
+      "changePercent": -1,
+      "transactions": 4169,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **富邦NASDAQ** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "3045",
+      "name": "台灣大",
+      "openPrice": 106,
+      "highPrice": 106,
+      "lowPrice": 105.5,
+      "closePrice": 105.5,
+      "volume": 6489844,
+      "tradeValue": 685051945,
+      "change": 0,
+      "changePercent": 0,
+      "transactions": 3049,
+      "peRatio": 27.32,
+      "pbRatio": 4.46,
+      "dividendYield": 3.74,
+      "sector": "通信網路業",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **台灣大** [通信網路業] ➤ 盤整觀望。 (PE: 27.32)",
+      "tags": [
+        {
+          "label": "通信網路業",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
       "code": "8069",
       "name": "元太",
       "closePrice": 175,
@@ -25390,40 +26748,6 @@
       },
       "analysis": "⚖️ **元太** [一般] ➤ 盤整觀望。 (PE: 15.72)",
       "tags": []
-    },
-    {
-      "code": "3045",
-      "name": "台灣大",
-      "openPrice": 106,
-      "highPrice": 106,
-      "lowPrice": 105.5,
-      "closePrice": 105.5,
-      "volume": 6248844,
-      "tradeValue": 659619215,
-      "change": 0,
-      "changePercent": 0,
-      "transactions": 3048,
-      "peRatio": 27.32,
-      "pbRatio": 4.46,
-      "dividendYield": 3.74,
-      "sector": "通信網路業",
-      "market": "上市",
-      "score": 50,
-      "signal": "NEUTRAL",
-      "signalType": "NEUTRAL",
-      "reasons": [],
-      "patterns": {
-        "ob": null,
-        "fvg": null,
-        "sweep": null
-      },
-      "analysis": "⚖️ **台灣大** [通信網路業] ➤ 盤整觀望。 (PE: 27.32)",
-      "tags": [
-        {
-          "label": "通信網路業",
-          "type": "neutral"
-        }
-      ]
     },
     {
       "code": "2455",
@@ -25455,6 +26779,74 @@
       "tags": [
         {
           "label": "通信網路業",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "009811",
+      "name": "統一美國50",
+      "openPrice": 11.7,
+      "highPrice": 11.7,
+      "lowPrice": 11.62,
+      "closePrice": 11.65,
+      "volume": 5946585,
+      "tradeValue": 69292363,
+      "change": -0.07,
+      "changePercent": -0.6,
+      "transactions": 1375,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **統一美國50** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "00951",
+      "name": "台新日本半導體",
+      "openPrice": 14.2,
+      "highPrice": 14.2,
+      "lowPrice": 13.97,
+      "closePrice": 14.07,
+      "volume": 5926670,
+      "tradeValue": 83180101,
+      "change": -0.22,
+      "changePercent": -1.54,
+      "transactions": 2321,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **台新日本半導體** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
           "type": "neutral"
         }
       ]
@@ -25522,6 +26914,40 @@
       "tags": []
     },
     {
+      "code": "00646",
+      "name": "元大S&P500",
+      "openPrice": 68.45,
+      "highPrice": 68.45,
+      "lowPrice": 68.1,
+      "closePrice": 68.3,
+      "volume": 5691194,
+      "tradeValue": 388477062,
+      "change": -0.25,
+      "changePercent": -0.36,
+      "transactions": 3773,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **元大S&P500** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
       "code": "6488",
       "name": "環球晶",
       "closePrice": 497,
@@ -25548,6 +26974,40 @@
       },
       "analysis": "⚖️ **環球晶** [一般] ➤ 盤整觀望。 (PE: 42.98)",
       "tags": []
+    },
+    {
+      "code": "009802",
+      "name": "富邦旗艦50",
+      "openPrice": 12.57,
+      "highPrice": 12.57,
+      "lowPrice": 12.31,
+      "closePrice": 12.39,
+      "volume": 5497217,
+      "tradeValue": 68196482,
+      "change": -0.25,
+      "changePercent": -1.98,
+      "transactions": 1090,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **富邦旗艦50** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
     },
     {
       "code": "2542",
@@ -25613,6 +27073,74 @@
       "tags": [
         {
           "label": "塑膠工業",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "00965",
+      "name": "元大航太防衛科技",
+      "openPrice": 25.58,
+      "highPrice": 25.58,
+      "lowPrice": 25.25,
+      "closePrice": 25.53,
+      "volume": 5349472,
+      "tradeValue": 136002374,
+      "change": -0.06,
+      "changePercent": -0.23,
+      "transactions": 3591,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **元大航太防衛科技** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "00910",
+      "name": "第一金太空衛星",
+      "openPrice": 57.75,
+      "highPrice": 57.85,
+      "lowPrice": 56.95,
+      "closePrice": 57.8,
+      "volume": 5249222,
+      "tradeValue": 301721909,
+      "change": -1.15,
+      "changePercent": -1.95,
+      "transactions": 7729,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **第一金太空衛星** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
           "type": "neutral"
         }
       ]
@@ -25686,6 +27214,40 @@
       ]
     },
     {
+      "code": "00923",
+      "name": "群益台ESG低碳50",
+      "openPrice": 29.08,
+      "highPrice": 29.08,
+      "lowPrice": 28.76,
+      "closePrice": 28.9,
+      "volume": 4622157,
+      "tradeValue": 133576671,
+      "change": -0.44,
+      "changePercent": -1.5,
+      "transactions": 3402,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **群益台ESG低碳50** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
       "code": "2646",
       "name": "星宇航空",
       "openPrice": 23.05,
@@ -25715,6 +27277,40 @@
       "tags": [
         {
           "label": "航運業",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "00915",
+      "name": "凱基優選高股息30",
+      "openPrice": 23.89,
+      "highPrice": 23.89,
+      "lowPrice": 23.46,
+      "closePrice": 23.63,
+      "volume": 4402699,
+      "tradeValue": 103828215,
+      "change": -0.46,
+      "changePercent": -1.91,
+      "transactions": 2125,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **凱基優選高股息30** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
           "type": "neutral"
         }
       ]
@@ -25783,6 +27379,74 @@
       "tags": [
         {
           "label": "化學工業",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "00643",
+      "name": "群益深証中小",
+      "openPrice": 17.91,
+      "highPrice": 17.91,
+      "lowPrice": 17.43,
+      "closePrice": 17.76,
+      "volume": 3993676,
+      "tradeValue": 70597824,
+      "change": -0.16,
+      "changePercent": -0.89,
+      "transactions": 284,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **群益深証中小** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "00934",
+      "name": "中信成長高股息",
+      "openPrice": 22.75,
+      "highPrice": 22.78,
+      "lowPrice": 22.4,
+      "closePrice": 22.55,
+      "volume": 3946059,
+      "tradeValue": 89028465,
+      "change": -0.27,
+      "changePercent": -1.18,
+      "transactions": 973,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **中信成長高股息** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
           "type": "neutral"
         }
       ]
@@ -25890,6 +27554,40 @@
       ]
     },
     {
+      "code": "00960",
+      "name": "野村全球航運龍頭",
+      "openPrice": 15.37,
+      "highPrice": 15.43,
+      "lowPrice": 15.34,
+      "closePrice": 15.4,
+      "volume": 3662286,
+      "tradeValue": 56364201,
+      "change": 0.1,
+      "changePercent": 0.65,
+      "transactions": 1004,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **野村全球航運龍頭** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
       "code": "1319",
       "name": "東陽",
       "openPrice": 108,
@@ -25958,6 +27656,40 @@
       ]
     },
     {
+      "code": "00964",
+      "name": "中信亞太高股息",
+      "openPrice": 13.05,
+      "highPrice": 13.09,
+      "lowPrice": 12.88,
+      "closePrice": 13.04,
+      "volume": 3492997,
+      "tradeValue": 45327136,
+      "change": -0.01,
+      "changePercent": -0.08,
+      "transactions": 376,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **中信亞太高股息** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
       "code": "1714",
       "name": "和桐",
       "openPrice": 9.19,
@@ -25987,6 +27719,40 @@
       "tags": [
         {
           "label": "化學工業",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "00924",
+      "name": "復華S&P500成長",
+      "openPrice": 29.4,
+      "highPrice": 29.4,
+      "lowPrice": 29.18,
+      "closePrice": 29.3,
+      "volume": 3336284,
+      "tradeValue": 97722638,
+      "change": -0.18,
+      "changePercent": -0.61,
+      "transactions": 2489,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **復華S&P500成長** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
           "type": "neutral"
         }
       ]
@@ -26026,6 +27792,40 @@
       ]
     },
     {
+      "code": "00961",
+      "name": "FT臺灣永續高息",
+      "openPrice": 10.13,
+      "highPrice": 10.13,
+      "lowPrice": 9.93,
+      "closePrice": 9.98,
+      "volume": 3205201,
+      "tradeValue": 31956515,
+      "change": -0.17,
+      "changePercent": -1.67,
+      "transactions": 390,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **FT臺灣永續高息** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
       "code": "1229",
       "name": "聯華",
       "openPrice": 46.35,
@@ -26055,6 +27855,74 @@
       "tags": [
         {
           "label": "食品工業",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "00954",
+      "name": "中信日本半導體",
+      "openPrice": 15.26,
+      "highPrice": 15.26,
+      "lowPrice": 14.9,
+      "closePrice": 15.11,
+      "volume": 3054360,
+      "tradeValue": 45937671,
+      "change": -0.24,
+      "changePercent": -1.56,
+      "transactions": 1049,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **中信日本半導體** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "00896",
+      "name": "中信綠能及電動車",
+      "openPrice": 21.17,
+      "highPrice": 21.17,
+      "lowPrice": 20.78,
+      "closePrice": 20.88,
+      "volume": 3024264,
+      "tradeValue": 63214598,
+      "change": -0.4,
+      "changePercent": -1.88,
+      "transactions": 1358,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **中信綠能及電動車** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
           "type": "neutral"
         }
       ]
@@ -26274,6 +28142,40 @@
       "tags": []
     },
     {
+      "code": "00941",
+      "name": "中信上游半導體",
+      "openPrice": 20.92,
+      "highPrice": 20.92,
+      "lowPrice": 20.64,
+      "closePrice": 20.79,
+      "volume": 2714292,
+      "tradeValue": 56360086,
+      "change": -0.23,
+      "changePercent": -1.09,
+      "transactions": 2048,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **中信上游半導體** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
       "code": "1727",
       "name": "中華化",
       "openPrice": 44.1,
@@ -26370,6 +28272,34 @@
       "tags": []
     },
     {
+      "code": "009814",
+      "name": "富邦標普500",
+      "closePrice": 10.15,
+      "openPrice": 10.16,
+      "highPrice": 10.16,
+      "lowPrice": 10.12,
+      "volume": 2498000,
+      "tradeValue": 25327530,
+      "change": -0.02,
+      "changePercent": -0.2,
+      "transactions": 0,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "market": "上櫃",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **富邦標普500** [一般] ➤ 盤整觀望。",
+      "tags": []
+    },
+    {
       "code": "9907",
       "name": "統一實",
       "openPrice": 18.1,
@@ -26430,6 +28360,40 @@
       },
       "analysis": "⚖️ **金居** [一般] ➤ 盤整觀望。 (PE: 75.5)",
       "tags": []
+    },
+    {
+      "code": "00936",
+      "name": "台新永續高息中小",
+      "openPrice": 17.43,
+      "highPrice": 17.45,
+      "lowPrice": 17.17,
+      "closePrice": 17.32,
+      "volume": 2446720,
+      "tradeValue": 42294619,
+      "change": -0.32,
+      "changePercent": -1.81,
+      "transactions": 741,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **台新永續高息中小** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
     },
     {
       "code": "3013",
@@ -26500,6 +28464,108 @@
       ]
     },
     {
+      "code": "00902",
+      "name": "中信電池及儲能",
+      "openPrice": 14.38,
+      "highPrice": 14.38,
+      "lowPrice": 13.99,
+      "closePrice": 14.21,
+      "volume": 2401671,
+      "tradeValue": 34022926,
+      "change": -0.2,
+      "changePercent": -1.39,
+      "transactions": 1037,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **中信電池及儲能** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "00733",
+      "name": "富邦臺灣中小",
+      "openPrice": 51.25,
+      "highPrice": 51.5,
+      "lowPrice": 49.44,
+      "closePrice": 50.75,
+      "volume": 2373199,
+      "tradeValue": 119192770,
+      "change": -0.5,
+      "changePercent": -0.98,
+      "transactions": 1602,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **富邦臺灣中小** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "00905",
+      "name": "FT臺灣Smart",
+      "openPrice": 18.92,
+      "highPrice": 18.92,
+      "lowPrice": 18.65,
+      "closePrice": 18.74,
+      "volume": 2350859,
+      "tradeValue": 44067431,
+      "change": -0.29,
+      "changePercent": -1.52,
+      "transactions": 1536,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **FT臺灣Smart** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
       "code": "2543",
       "name": "皇昌",
       "openPrice": 65.8,
@@ -26562,6 +28628,142 @@
       "tags": []
     },
     {
+      "code": "00757",
+      "name": "統一FANG+",
+      "openPrice": 114.3,
+      "highPrice": 114.3,
+      "lowPrice": 113.4,
+      "closePrice": 114.1,
+      "volume": 2234452,
+      "tradeValue": 254540610,
+      "change": -1.6,
+      "changePercent": -1.38,
+      "transactions": 7329,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **統一FANG+** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "00752",
+      "name": "中信中國50",
+      "openPrice": 27.64,
+      "highPrice": 27.64,
+      "lowPrice": 27.21,
+      "closePrice": 27.3,
+      "volume": 2222953,
+      "tradeValue": 60807993,
+      "change": -0.34,
+      "changePercent": -1.23,
+      "transactions": 814,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **中信中國50** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "009801",
+      "name": "中信美國創新科技",
+      "openPrice": 11.04,
+      "highPrice": 11.05,
+      "lowPrice": 10.96,
+      "closePrice": 10.99,
+      "volume": 2179622,
+      "tradeValue": 23970155,
+      "change": -0.12,
+      "changePercent": -1.08,
+      "transactions": 556,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **中信美國創新科技** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "00912",
+      "name": "中信臺灣智慧50",
+      "openPrice": 23.35,
+      "highPrice": 23.35,
+      "lowPrice": 22.96,
+      "closePrice": 23.03,
+      "volume": 2157059,
+      "tradeValue": 49697285,
+      "change": -0.32,
+      "changePercent": -1.37,
+      "transactions": 1177,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **中信臺灣智慧50** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
       "code": "3056",
       "name": "富華新",
       "openPrice": 17.1,
@@ -26591,6 +28793,40 @@
       "tags": [
         {
           "label": "建材營造",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "009803",
+      "name": "保德信市值動能50",
+      "openPrice": 14.7,
+      "highPrice": 14.7,
+      "lowPrice": 14.5,
+      "closePrice": 14.55,
+      "volume": 2108347,
+      "tradeValue": 30727813,
+      "change": -0.25,
+      "changePercent": -1.69,
+      "transactions": 798,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **保德信市值動能50** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
           "type": "neutral"
         }
       ]
@@ -26800,6 +29036,40 @@
       ]
     },
     {
+      "code": "00893",
+      "name": "國泰智能電動車",
+      "openPrice": 34.79,
+      "highPrice": 34.8,
+      "lowPrice": 34.5,
+      "closePrice": 34.68,
+      "volume": 1674262,
+      "tradeValue": 58121218,
+      "change": -0.18,
+      "changePercent": -0.52,
+      "transactions": 730,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **國泰智能電動車** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
       "code": "1909",
       "name": "榮成",
       "openPrice": 10.05,
@@ -26964,6 +29234,108 @@
       ]
     },
     {
+      "code": "00917",
+      "name": "中信特選金融",
+      "openPrice": 22.04,
+      "highPrice": 22.1,
+      "lowPrice": 22.02,
+      "closePrice": 22.05,
+      "volume": 1490322,
+      "tradeValue": 32866070,
+      "change": 0.06,
+      "changePercent": 0.27,
+      "transactions": 827,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **中信特選金融** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "00932",
+      "name": "兆豐永續高息等權",
+      "openPrice": 15.16,
+      "highPrice": 15.16,
+      "lowPrice": 14.93,
+      "closePrice": 15.07,
+      "volume": 1371749,
+      "tradeValue": 20609088,
+      "change": -0.11,
+      "changePercent": -0.72,
+      "transactions": 355,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **兆豐永續高息等權** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "009808",
+      "name": "華南永昌優選50",
+      "openPrice": 21.87,
+      "highPrice": 21.87,
+      "lowPrice": 21.62,
+      "closePrice": 21.7,
+      "volume": 1367798,
+      "tradeValue": 29693258,
+      "change": -0.37,
+      "changePercent": -1.68,
+      "transactions": 190,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **華南永昌優選50** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
       "code": "3545",
       "name": "敦泰",
       "openPrice": 54.3,
@@ -26993,6 +29365,40 @@
       "tags": [
         {
           "label": "半導體業",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "00930",
+      "name": "永豐ESG低碳高息",
+      "openPrice": 18.18,
+      "highPrice": 18.18,
+      "lowPrice": 17.84,
+      "closePrice": 17.94,
+      "volume": 1337604,
+      "tradeValue": 24014583,
+      "change": -0.36,
+      "changePercent": -1.97,
+      "transactions": 485,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **永豐ESG低碳高息** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
           "type": "neutral"
         }
       ]
@@ -27030,6 +29436,34 @@
           "type": "neutral"
         }
       ]
+    },
+    {
+      "code": "00928",
+      "name": "中信上櫃ESG 30",
+      "closePrice": 21.92,
+      "openPrice": 22.17,
+      "highPrice": 22.17,
+      "lowPrice": 21.83,
+      "volume": 1328000,
+      "tradeValue": 29242060,
+      "change": -0.33,
+      "changePercent": -1.48,
+      "transactions": 0,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "market": "上櫃",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **中信上櫃ESG 30** [一般] ➤ 盤整觀望。",
+      "tags": []
     },
     {
       "code": "2537",
@@ -27230,6 +29664,108 @@
       ]
     },
     {
+      "code": "00692",
+      "name": "富邦公司治理",
+      "openPrice": 64.3,
+      "highPrice": 64.35,
+      "lowPrice": 63.85,
+      "closePrice": 64.05,
+      "volume": 1100504,
+      "tradeValue": 70512169,
+      "change": -0.9,
+      "changePercent": -1.39,
+      "transactions": 1927,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **富邦公司治理** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "00901",
+      "name": "永豐智能車供應鏈",
+      "openPrice": 28.63,
+      "highPrice": 28.63,
+      "lowPrice": 28.13,
+      "closePrice": 28.36,
+      "volume": 1065088,
+      "tradeValue": 30181019,
+      "change": -0.46,
+      "changePercent": -1.6,
+      "transactions": 347,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **永豐智能車供應鏈** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "00897",
+      "name": "富邦基因免疫生技",
+      "openPrice": 9.65,
+      "highPrice": 9.65,
+      "lowPrice": 9.52,
+      "closePrice": 9.57,
+      "volume": 1036944,
+      "tradeValue": 9904364,
+      "change": 0.01,
+      "changePercent": 0.1,
+      "transactions": 245,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **富邦基因免疫生技** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
       "code": "2305",
       "name": "全友",
       "openPrice": 13.65,
@@ -27332,6 +29868,40 @@
       ]
     },
     {
+      "code": "00971",
+      "name": "野村美國研發龍頭",
+      "openPrice": 16,
+      "highPrice": 16,
+      "lowPrice": 15.85,
+      "closePrice": 15.91,
+      "volume": 1004793,
+      "tradeValue": 15980531,
+      "change": -0.17,
+      "changePercent": -1.06,
+      "transactions": 536,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **野村美國研發龍頭** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
       "code": "6438",
       "name": "迅得",
       "openPrice": 147.5,
@@ -27361,6 +29931,40 @@
       "tags": [
         {
           "label": "其他電子業",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "009804",
+      "name": "聯邦台精彩50",
+      "openPrice": 16.17,
+      "highPrice": 16.17,
+      "lowPrice": 15.98,
+      "closePrice": 16.06,
+      "volume": 975569,
+      "tradeValue": 15663488,
+      "change": -0.27,
+      "changePercent": -1.65,
+      "transactions": 455,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **聯邦台精彩50** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
           "type": "neutral"
         }
       ]
@@ -27490,6 +30094,34 @@
       ]
     },
     {
+      "code": "00858",
+      "name": "永豐美國500大",
+      "closePrice": 32.72,
+      "openPrice": 32.77,
+      "highPrice": 32.77,
+      "lowPrice": 32.65,
+      "volume": 904000,
+      "tradeValue": 29558080,
+      "change": -0.09,
+      "changePercent": -0.27,
+      "transactions": 0,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "market": "上櫃",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **永豐美國500大** [一般] ➤ 盤整觀望。",
+      "tags": []
+    },
+    {
       "code": "3050",
       "name": "鈺德",
       "openPrice": 13.85,
@@ -27550,6 +30182,40 @@
       },
       "analysis": "⚖️ **力麒** [一般] ➤ 盤整觀望。 (PE: 66.42)",
       "tags": []
+    },
+    {
+      "code": "00690",
+      "name": "兆豐藍籌30",
+      "openPrice": 50.8,
+      "highPrice": 50.8,
+      "lowPrice": 50,
+      "closePrice": 50.3,
+      "volume": 858053,
+      "tradeValue": 43113242,
+      "change": -1,
+      "changePercent": -1.95,
+      "transactions": 838,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **兆豐藍籌30** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
     },
     {
       "code": "3024",
@@ -27654,6 +30320,142 @@
       ]
     },
     {
+      "code": "00895",
+      "name": "富邦未來車",
+      "openPrice": 41.85,
+      "highPrice": 41.85,
+      "lowPrice": 41.48,
+      "closePrice": 41.71,
+      "volume": 791045,
+      "tradeValue": 32925209,
+      "change": -0.15,
+      "changePercent": -0.36,
+      "transactions": 588,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **富邦未來車** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "00850",
+      "name": "元大臺灣ESG永續",
+      "openPrice": 61.2,
+      "highPrice": 61.2,
+      "lowPrice": 60.35,
+      "closePrice": 60.7,
+      "volume": 785196,
+      "tradeValue": 47606558,
+      "change": -0.85,
+      "changePercent": -1.38,
+      "transactions": 1772,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **元大臺灣ESG永續** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "009810",
+      "name": "保德信全球藍籌",
+      "openPrice": 18.81,
+      "highPrice": 18.81,
+      "lowPrice": 18.72,
+      "closePrice": 18.77,
+      "volume": 778177,
+      "tradeValue": 14595719,
+      "change": -0.1,
+      "changePercent": -0.53,
+      "transactions": 103,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **保德信全球藍籌** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "00770",
+      "name": "國泰北美科技",
+      "openPrice": 54.45,
+      "highPrice": 54.45,
+      "lowPrice": 54,
+      "closePrice": 54.3,
+      "volume": 770402,
+      "tradeValue": 41795623,
+      "change": -0.7,
+      "changePercent": -1.27,
+      "transactions": 1148,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **國泰北美科技** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
       "code": "2427",
       "name": "三商電",
       "openPrice": 25.8,
@@ -27717,6 +30519,74 @@
       "tags": [
         {
           "label": "半導體業",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "00661",
+      "name": "元大日經225",
+      "openPrice": 69.05,
+      "highPrice": 69.1,
+      "lowPrice": 68.15,
+      "closePrice": 68.9,
+      "volume": 697156,
+      "tradeValue": 47782907,
+      "change": -0.05,
+      "changePercent": -0.07,
+      "transactions": 201,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **元大日經225** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "00898",
+      "name": "國泰基因免疫革命",
+      "openPrice": 8.27,
+      "highPrice": 8.27,
+      "lowPrice": 8.21,
+      "closePrice": 8.25,
+      "volume": 695461,
+      "tradeValue": 5724135,
+      "change": -0.02,
+      "changePercent": -0.24,
+      "transactions": 253,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **國泰基因免疫革命** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
           "type": "neutral"
         }
       ]
@@ -27902,6 +30772,74 @@
       "tags": []
     },
     {
+      "code": "00962",
+      "name": "台新AI優息動能",
+      "openPrice": 11.38,
+      "highPrice": 11.38,
+      "lowPrice": 11.14,
+      "closePrice": 11.26,
+      "volume": 616289,
+      "tradeValue": 6906523,
+      "change": -0.2,
+      "changePercent": -1.75,
+      "transactions": 233,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **台新AI優息動能** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "00926",
+      "name": "凱基全球菁英55",
+      "openPrice": 24.05,
+      "highPrice": 24.05,
+      "lowPrice": 23.88,
+      "closePrice": 23.98,
+      "volume": 595712,
+      "tradeValue": 14258981,
+      "change": -0.14,
+      "changePercent": -0.58,
+      "transactions": 463,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **凱基全球菁英55** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
       "code": "6164",
       "name": "華興",
       "openPrice": 12.5,
@@ -28066,6 +31004,40 @@
       ]
     },
     {
+      "code": "006205",
+      "name": "富邦上証",
+      "openPrice": 41.16,
+      "highPrice": 41.42,
+      "lowPrice": 40.35,
+      "closePrice": 40.91,
+      "volume": 541586,
+      "tradeValue": 22258096,
+      "change": -0.05,
+      "changePercent": -0.12,
+      "transactions": 261,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **富邦上証** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
       "code": "3615",
       "name": "安可",
       "closePrice": 25.75,
@@ -28128,6 +31100,74 @@
       ]
     },
     {
+      "code": "00907",
+      "name": "永豐優息存股",
+      "openPrice": 15.64,
+      "highPrice": 15.64,
+      "lowPrice": 15.41,
+      "closePrice": 15.45,
+      "volume": 499898,
+      "tradeValue": 7732480,
+      "change": -0.2,
+      "changePercent": -1.28,
+      "transactions": 340,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **永豐優息存股** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "00911",
+      "name": "兆豐洲際半導體",
+      "openPrice": 38.22,
+      "highPrice": 38.28,
+      "lowPrice": 38.01,
+      "closePrice": 38.22,
+      "volume": 489112,
+      "tradeValue": 18670194,
+      "change": -0.15,
+      "changePercent": -0.39,
+      "transactions": 2713,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **兆豐洲際半導體** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
       "code": "6620",
       "name": "漢達",
       "closePrice": 82.6,
@@ -28185,6 +31225,40 @@
       "tags": [
         {
           "label": "電子零組件業",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "00920",
+      "name": "富邦ESG綠色電力",
+      "openPrice": 20.65,
+      "highPrice": 20.65,
+      "lowPrice": 20.35,
+      "closePrice": 20.46,
+      "volume": 481204,
+      "tradeValue": 9846511,
+      "change": -0.35,
+      "changePercent": -1.68,
+      "transactions": 512,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **富邦ESG綠色電力** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
           "type": "neutral"
         }
       ]
@@ -28314,6 +31388,74 @@
       "tags": []
     },
     {
+      "code": "00921",
+      "name": "兆豐龍頭等權重",
+      "openPrice": 18.4,
+      "highPrice": 18.4,
+      "lowPrice": 18.18,
+      "closePrice": 18.18,
+      "volume": 459883,
+      "tradeValue": 8395159,
+      "change": -0.28,
+      "changePercent": -1.52,
+      "transactions": 257,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **兆豐龍頭等權重** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "00657",
+      "name": "國泰日經225",
+      "openPrice": 63.15,
+      "highPrice": 63.15,
+      "lowPrice": 62.45,
+      "closePrice": 63.1,
+      "volume": 454498,
+      "tradeValue": 28516446,
+      "change": -0.1,
+      "changePercent": -0.16,
+      "transactions": 132,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **國泰日經225** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
       "code": "6405",
       "name": "悅城",
       "openPrice": 30.3,
@@ -28343,6 +31485,40 @@
       "tags": [
         {
           "label": "光電業",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "911868",
+      "name": "同方友友-DR",
+      "openPrice": 1.29,
+      "highPrice": 1.3,
+      "lowPrice": 1.29,
+      "closePrice": 1.3,
+      "volume": 452888,
+      "tradeValue": 586200,
+      "change": 0,
+      "changePercent": 0,
+      "transactions": 37,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "存託憑證",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **同方友友-DR** [存託憑證] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "存託憑證",
           "type": "neutral"
         }
       ]
@@ -29032,6 +32208,68 @@
       ]
     },
     {
+      "code": "00678",
+      "name": "群益那斯達克生技",
+      "openPrice": 35.61,
+      "highPrice": 35.62,
+      "lowPrice": 35.47,
+      "closePrice": 35.54,
+      "volume": 307183,
+      "tradeValue": 10927941,
+      "change": 0,
+      "changePercent": 0,
+      "transactions": 159,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **群益那斯達克生技** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "020025",
+      "name": "統一亞洲半導體N",
+      "closePrice": 23.32,
+      "openPrice": 23.5,
+      "highPrice": 23.65,
+      "lowPrice": 23.1,
+      "volume": 307000,
+      "tradeValue": 7172480,
+      "change": 0.04,
+      "changePercent": 0.17,
+      "transactions": 0,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "market": "上櫃",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **統一亞洲半導體N** [一般] ➤ 盤整觀望。",
+      "tags": []
+    },
+    {
       "code": "6712",
       "name": "長聖",
       "closePrice": 154.5,
@@ -29086,6 +32324,40 @@
       },
       "analysis": "⚖️ **寶碩** [一般] ➤ 盤整觀望。 (PE: 32.81)",
       "tags": []
+    },
+    {
+      "code": "00652",
+      "name": "富邦印度",
+      "openPrice": 36,
+      "highPrice": 36.08,
+      "lowPrice": 35.84,
+      "closePrice": 35.91,
+      "volume": 300088,
+      "tradeValue": 10783257,
+      "change": 0.19,
+      "changePercent": 0.53,
+      "transactions": 322,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **富邦印度** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
     },
     {
       "code": "8071",
@@ -29280,6 +32552,68 @@
       ]
     },
     {
+      "code": "00943",
+      "name": "兆豐電子高息等權",
+      "openPrice": 15.04,
+      "highPrice": 15.04,
+      "lowPrice": 14.77,
+      "closePrice": 14.89,
+      "volume": 267302,
+      "tradeValue": 3971808,
+      "change": -0.23,
+      "changePercent": -1.52,
+      "transactions": 141,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **兆豐電子高息等權** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "006201",
+      "name": "元大富櫃50",
+      "closePrice": 29.63,
+      "openPrice": 29.26,
+      "highPrice": 29.84,
+      "lowPrice": 29.2,
+      "volume": 263000,
+      "tradeValue": 7760380,
+      "change": -0.36,
+      "changePercent": -1.2,
+      "transactions": 0,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "market": "上櫃",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **元大富櫃50** [一般] ➤ 盤整觀望。",
+      "tags": []
+    },
+    {
       "code": "7751",
       "name": "竑騰",
       "closePrice": 837,
@@ -29421,6 +32755,40 @@
       "tags": [
         {
           "label": "電子零組件業",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "00700",
+      "name": "富邦恒生國企",
+      "openPrice": 19.26,
+      "highPrice": 19.29,
+      "lowPrice": 18.95,
+      "closePrice": 19,
+      "volume": 246752,
+      "tradeValue": 4717145,
+      "change": -0.26,
+      "changePercent": -1.35,
+      "transactions": 186,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **富邦恒生國企** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
           "type": "neutral"
         }
       ]
@@ -29607,6 +32975,40 @@
       "tags": [
         {
           "label": "汽車工業",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "00903",
+      "name": "富邦元宇宙",
+      "openPrice": 17.53,
+      "highPrice": 17.75,
+      "lowPrice": 17.53,
+      "closePrice": 17.65,
+      "volume": 230332,
+      "tradeValue": 4061981,
+      "change": -0.22,
+      "changePercent": -1.23,
+      "transactions": 165,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **富邦元宇宙** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
           "type": "neutral"
         }
       ]
@@ -29894,6 +33296,40 @@
       ]
     },
     {
+      "code": "00717",
+      "name": "富邦美國特別股",
+      "openPrice": 15.19,
+      "highPrice": 15.19,
+      "lowPrice": 15.16,
+      "closePrice": 15.18,
+      "volume": 215589,
+      "tradeValue": 3271665,
+      "change": -0.03,
+      "changePercent": -0.2,
+      "transactions": 78,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **富邦美國特別股** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
       "code": "2536",
       "name": "宏普",
       "openPrice": 22.5,
@@ -29923,6 +33359,40 @@
       "tags": [
         {
           "label": "建材營造",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "00916",
+      "name": "國泰全球品牌50",
+      "openPrice": 26.83,
+      "highPrice": 26.85,
+      "lowPrice": 26.75,
+      "closePrice": 26.79,
+      "volume": 211653,
+      "tradeValue": 5672918,
+      "change": -0.25,
+      "changePercent": -0.92,
+      "transactions": 339,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **國泰全球品牌50** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
           "type": "neutral"
         }
       ]
@@ -30121,6 +33591,74 @@
       "tags": [
         {
           "label": "建材營造",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "00876",
+      "name": "元大全球5G",
+      "openPrice": 59.45,
+      "highPrice": 59.7,
+      "lowPrice": 58.8,
+      "closePrice": 59.65,
+      "volume": 200063,
+      "tradeValue": 11873933,
+      "change": -0.35,
+      "changePercent": -0.58,
+      "transactions": 1650,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **元大全球5G** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "00938",
+      "name": "凱基優選30",
+      "openPrice": 18.58,
+      "highPrice": 18.58,
+      "lowPrice": 18.35,
+      "closePrice": 18.4,
+      "volume": 193064,
+      "tradeValue": 3555401,
+      "change": -0.27,
+      "changePercent": -1.45,
+      "transactions": 283,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **凱基優選30** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
           "type": "neutral"
         }
       ]
@@ -30882,6 +34420,74 @@
       "tags": []
     },
     {
+      "code": "00736",
+      "name": "國泰新興市場",
+      "openPrice": 29.38,
+      "highPrice": 29.38,
+      "lowPrice": 29.24,
+      "closePrice": 29.38,
+      "volume": 140498,
+      "tradeValue": 4121730,
+      "change": -0.13,
+      "changePercent": -0.44,
+      "transactions": 35,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **國泰新興市場** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "00714",
+      "name": "群益道瓊美國地產",
+      "openPrice": 20.24,
+      "highPrice": 20.25,
+      "lowPrice": 20.23,
+      "closePrice": 20.25,
+      "volume": 136970,
+      "tradeValue": 2772216,
+      "change": 0.2,
+      "changePercent": 1,
+      "transactions": 94,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **群益道瓊美國地產** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
       "code": "6174",
       "name": "安碁",
       "closePrice": 22.05,
@@ -31322,6 +34928,34 @@
       ]
     },
     {
+      "code": "009806",
+      "name": "台新標普500",
+      "closePrice": 12.11,
+      "openPrice": 12.1,
+      "highPrice": 12.12,
+      "lowPrice": 12.09,
+      "volume": 118000,
+      "tradeValue": 1428050,
+      "change": -0.05,
+      "changePercent": -0.41,
+      "transactions": 0,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "market": "上櫃",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **台新標普500** [一般] ➤ 盤整觀望。",
+      "tags": []
+    },
+    {
       "code": "7740",
       "name": "熙特爾-創",
       "openPrice": 154.5,
@@ -31382,6 +35016,40 @@
       },
       "analysis": "⚖️ **台生材** [一般] ➤ 盤整觀望。 (PE: 36.93)",
       "tags": []
+    },
+    {
+      "code": "00702",
+      "name": "國泰標普低波高息",
+      "openPrice": 23.2,
+      "highPrice": 23.23,
+      "lowPrice": 23.2,
+      "closePrice": 23.23,
+      "volume": 116182,
+      "tradeValue": 2696515,
+      "change": 0.03,
+      "changePercent": 0.13,
+      "transactions": 83,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **國泰標普低波高息** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
     },
     {
       "code": "8201",
@@ -31673,6 +35341,40 @@
       "tags": [
         {
           "label": "食品工業",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "00709",
+      "name": "富邦歐洲",
+      "openPrice": 38.77,
+      "highPrice": 38.77,
+      "lowPrice": 38.59,
+      "closePrice": 38.68,
+      "volume": 101474,
+      "tradeValue": 3924531,
+      "change": -0.03,
+      "changePercent": -0.08,
+      "transactions": 201,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **富邦歐洲** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
           "type": "neutral"
         }
       ]
@@ -32564,6 +36266,34 @@
       ]
     },
     {
+      "code": "009807",
+      "name": "台新標普科技精選",
+      "closePrice": 13.12,
+      "openPrice": 13.17,
+      "highPrice": 13.17,
+      "lowPrice": 13.07,
+      "volume": 68000,
+      "tradeValue": 891580,
+      "change": -0.2,
+      "changePercent": -1.5,
+      "transactions": 0,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "market": "上櫃",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **台新標普科技精選** [一般] ➤ 盤整觀望。",
+      "tags": []
+    },
+    {
       "code": "3669",
       "name": "圓展",
       "openPrice": 36.6,
@@ -32902,6 +36632,40 @@
       ]
     },
     {
+      "code": "00908",
+      "name": "富邦入息REITs+",
+      "openPrice": 14.05,
+      "highPrice": 14.2,
+      "lowPrice": 14.05,
+      "closePrice": 14.18,
+      "volume": 59624,
+      "tradeValue": 845208,
+      "change": 0.13,
+      "changePercent": 0.93,
+      "transactions": 80,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **富邦入息REITs+** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
       "code": "5460",
       "name": "同協",
       "closePrice": 15.7,
@@ -32956,6 +36720,40 @@
       },
       "analysis": "⚖️ **中華食** [一般] ➤ 盤整觀望。 (PE: 18.68)",
       "tags": []
+    },
+    {
+      "code": "00861",
+      "name": "元大全球未來通訊",
+      "openPrice": 61.7,
+      "highPrice": 61.85,
+      "lowPrice": 61.2,
+      "closePrice": 61.35,
+      "volume": 57764,
+      "tradeValue": 3544607,
+      "change": -0.25,
+      "changePercent": -0.41,
+      "transactions": 231,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **元大全球未來通訊** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
     },
     {
       "code": "6794",
@@ -34306,6 +38104,40 @@
       "tags": []
     },
     {
+      "code": "00771",
+      "name": "元大US高息特別股",
+      "openPrice": 16.16,
+      "highPrice": 16.16,
+      "lowPrice": 16.12,
+      "closePrice": 16.12,
+      "volume": 33672,
+      "tradeValue": 543288,
+      "change": -0.04,
+      "changePercent": -0.25,
+      "transactions": 21,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **元大US高息特別股** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
       "code": "6264",
       "name": "富裔",
       "closePrice": 7.02,
@@ -34976,6 +38808,40 @@
       ]
     },
     {
+      "code": "00660",
+      "name": "元大歐洲50",
+      "openPrice": 43.55,
+      "highPrice": 43.55,
+      "lowPrice": 43.29,
+      "closePrice": 43.36,
+      "volume": 23897,
+      "tradeValue": 1037532,
+      "change": -0.25,
+      "changePercent": -0.57,
+      "transactions": 101,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **元大歐洲50** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
       "code": "2849",
       "name": "安泰銀",
       "openPrice": 13.35,
@@ -35246,6 +39112,74 @@
       ]
     },
     {
+      "code": "020028",
+      "name": "元大特選電動車N",
+      "openPrice": 13.76,
+      "highPrice": 13.83,
+      "lowPrice": 13.76,
+      "closePrice": 13.8,
+      "volume": 21000,
+      "tradeValue": 289170,
+      "change": -0.22,
+      "changePercent": -1.57,
+      "transactions": 7,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **元大特選電動車N** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "020030",
+      "name": "統一智慧電動車N",
+      "openPrice": 9.78,
+      "highPrice": 9.85,
+      "lowPrice": 9.78,
+      "closePrice": 9.85,
+      "volume": 21000,
+      "tradeValue": 205600,
+      "change": -0.11,
+      "changePercent": -1.1,
+      "transactions": 4,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **統一智慧電動車N** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
       "code": "3332",
       "name": "幸康",
       "closePrice": 55.9,
@@ -35300,6 +39234,40 @@
       },
       "analysis": "⚖️ **萬達光電** [一般] ➤ 盤整觀望。",
       "tags": []
+    },
+    {
+      "code": "00851",
+      "name": "台新全球AI",
+      "openPrice": 59.35,
+      "highPrice": 59.35,
+      "lowPrice": 58.8,
+      "closePrice": 59.2,
+      "volume": 20900,
+      "tradeValue": 1233495,
+      "change": -0.65,
+      "changePercent": -1.09,
+      "transactions": 107,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **台新全球AI** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
     },
     {
       "code": "2756",
@@ -35736,6 +39704,40 @@
       ]
     },
     {
+      "code": "020032",
+      "name": "元大綠能N",
+      "openPrice": 8.76,
+      "highPrice": 8.76,
+      "lowPrice": 8.64,
+      "closePrice": 8.65,
+      "volume": 14000,
+      "tradeValue": 121380,
+      "change": -0.17,
+      "changePercent": -1.93,
+      "transactions": 4,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **元大綠能N** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
       "code": "8087",
       "name": "麗升能源",
       "closePrice": 29.1,
@@ -35860,6 +39862,34 @@
       ]
     },
     {
+      "code": "00886",
+      "name": "永豐美國科技",
+      "closePrice": 37.09,
+      "openPrice": 36.72,
+      "highPrice": 37.09,
+      "lowPrice": 36.72,
+      "volume": 13000,
+      "tradeValue": 481590,
+      "change": -0.3,
+      "changePercent": -0.8,
+      "transactions": 0,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "market": "上櫃",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **永豐美國科技** [一般] ➤ 盤整觀望。",
+      "tags": []
+    },
+    {
       "code": "2754",
       "name": "亞洲藏壽司",
       "closePrice": 78.2,
@@ -35886,6 +39916,74 @@
       },
       "analysis": "⚖️ **亞洲藏壽司** [一般] ➤ 盤整觀望。 (PE: 36.51)",
       "tags": []
+    },
+    {
+      "code": "020037",
+      "name": "元大金融高股息N",
+      "openPrice": 8.45,
+      "highPrice": 8.45,
+      "lowPrice": 8.41,
+      "closePrice": 8.41,
+      "volume": 11000,
+      "tradeValue": 92910,
+      "change": -0.04,
+      "changePercent": -0.47,
+      "transactions": 3,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **元大金融高股息N** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "020020",
+      "name": "元大台股領航N",
+      "openPrice": 17.39,
+      "highPrice": 17.39,
+      "lowPrice": 17.32,
+      "closePrice": 17.38,
+      "volume": 10000,
+      "tradeValue": 173640,
+      "change": -0.2,
+      "changePercent": -1.14,
+      "transactions": 5,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **元大台股領航N** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
     },
     {
       "code": "6906",
@@ -35950,6 +40048,40 @@
       "tags": []
     },
     {
+      "code": "006204",
+      "name": "永豐臺灣加權",
+      "openPrice": 163.2,
+      "highPrice": 164.3,
+      "lowPrice": 163.2,
+      "closePrice": 164.3,
+      "volume": 8682,
+      "tradeValue": 1420355,
+      "change": -1.95,
+      "changePercent": -1.17,
+      "transactions": 117,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **永豐臺灣加權** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
       "code": "1813",
       "name": "寶利徠",
       "closePrice": 13.4,
@@ -36004,6 +40136,40 @@
       },
       "analysis": "⚖️ **耀億** [一般] ➤ 盤整觀望。",
       "tags": []
+    },
+    {
+      "code": "020039",
+      "name": "元大加權N",
+      "openPrice": 10.28,
+      "highPrice": 10.28,
+      "lowPrice": 10.16,
+      "closePrice": 10.16,
+      "volume": 6000,
+      "tradeValue": 61120,
+      "change": -0.14,
+      "changePercent": -1.36,
+      "transactions": 6,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **元大加權N** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
     },
     {
       "code": "4747",
@@ -36158,6 +40324,40 @@
       ]
     },
     {
+      "code": "020029",
+      "name": "元大ESG高股息N",
+      "openPrice": 10.37,
+      "highPrice": 10.38,
+      "lowPrice": 10.37,
+      "closePrice": 10.38,
+      "volume": 5000,
+      "tradeValue": 51870,
+      "change": 0,
+      "changePercent": 0,
+      "transactions": 4,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **元大ESG高股息N** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
       "code": "1742",
       "name": "台蠟",
       "closePrice": 15.8,
@@ -36268,6 +40468,40 @@
       },
       "analysis": "⚖️ **保銳** [一般] ➤ 盤整觀望。",
       "tags": []
+    },
+    {
+      "code": "006203",
+      "name": "元大MSCI台灣",
+      "openPrice": 133.2,
+      "highPrice": 133.2,
+      "lowPrice": 132.35,
+      "closePrice": 132.35,
+      "volume": 4558,
+      "tradeValue": 602223,
+      "change": -0.85,
+      "changePercent": -0.64,
+      "transactions": 117,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **元大MSCI台灣** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
     },
     {
       "code": "9918",
@@ -36392,6 +40626,40 @@
       },
       "analysis": "⚖️ **夠麻吉** [一般] ➤ 盤整觀望。",
       "tags": []
+    },
+    {
+      "code": "910322",
+      "name": "康師傅-DR",
+      "openPrice": 23.8,
+      "highPrice": 23.8,
+      "lowPrice": 23.7,
+      "closePrice": 23.7,
+      "volume": 3746,
+      "tradeValue": 88808,
+      "change": 0.1,
+      "changePercent": 0.42,
+      "transactions": 14,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "存託憑證",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **康師傅-DR** [存託憑證] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "存託憑證",
+          "type": "neutral"
+        }
+      ]
     },
     {
       "code": "1235",
@@ -36599,6 +40867,34 @@
         "sweep": null
       },
       "analysis": "⚖️ **大恭** [一般] ➤ 盤整觀望。 (PE: 160)",
+      "tags": []
+    },
+    {
+      "code": "020033",
+      "name": "統一恒生科期N",
+      "closePrice": 4.59,
+      "openPrice": 4.59,
+      "highPrice": 4.59,
+      "lowPrice": 4.59,
+      "volume": 2000,
+      "tradeValue": 9180,
+      "change": -0.09,
+      "changePercent": -1.92,
+      "transactions": 0,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "market": "上櫃",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **統一恒生科期N** [一般] ➤ 盤整觀望。",
       "tags": []
     },
     {
@@ -37036,6 +41332,142 @@
       ]
     },
     {
+      "code": "020000",
+      "name": "富邦特選蘋果N",
+      "openPrice": 0,
+      "highPrice": 0,
+      "lowPrice": 0,
+      "closePrice": 0,
+      "volume": 0,
+      "tradeValue": 0,
+      "change": 0,
+      "changePercent": 0,
+      "transactions": 0,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **富邦特選蘋果N** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "020011",
+      "name": "統一微波高息20N",
+      "openPrice": 0,
+      "highPrice": 0,
+      "lowPrice": 0,
+      "closePrice": 0,
+      "volume": 0,
+      "tradeValue": 0,
+      "change": 0,
+      "changePercent": 0,
+      "transactions": 0,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **統一微波高息20N** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "020012",
+      "name": "富邦行動通訊N",
+      "openPrice": 0,
+      "highPrice": 0,
+      "lowPrice": 0,
+      "closePrice": 0,
+      "volume": 0,
+      "tradeValue": 0,
+      "change": 0,
+      "changePercent": 0,
+      "transactions": 0,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **富邦行動通訊N** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "020036",
+      "name": "元大金融配息N",
+      "openPrice": 0,
+      "highPrice": 0,
+      "lowPrice": 0,
+      "closePrice": 0,
+      "volume": 0,
+      "tradeValue": 0,
+      "change": 0,
+      "changePercent": 0,
+      "transactions": 0,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **元大金融配息N** [其他] ➤ 盤整觀望。",
+      "tags": [
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
       "code": "1470",
       "name": "大統新創",
       "openPrice": 0,
@@ -37207,6 +41639,34 @@
         "sweep": null
       },
       "analysis": "⚖️ **欣泰** [一般] ➤ 盤整觀望。 (PE: 26.5)",
+      "tags": []
+    },
+    {
+      "code": "020041",
+      "name": "兆豐半導體氣候N",
+      "closePrice": 0,
+      "openPrice": 0,
+      "highPrice": 0,
+      "lowPrice": 0,
+      "volume": 0,
+      "tradeValue": 0,
+      "change": 0,
+      "changePercent": 0,
+      "transactions": 0,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "market": "上櫃",
+      "score": 50,
+      "signal": "NEUTRAL",
+      "signalType": "NEUTRAL",
+      "reasons": [],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "⚖️ **兆豐半導體氣候N** [一般] ➤ 盤整觀望。",
       "tags": []
     },
     {
@@ -39765,11 +44225,11 @@
       "highPrice": 65.4,
       "lowPrice": 61.6,
       "closePrice": 62.4,
-      "volume": 372112245,
-      "tradeValue": 23395695688,
+      "volume": 372865245,
+      "tradeValue": 23442682888,
       "change": -6,
       "changePercent": -8.77,
-      "transactions": 152530,
+      "transactions": 152531,
       "peRatio": 12.63,
       "pbRatio": 1.89,
       "dividendYield": 5.58,
@@ -39810,6 +44270,94 @@
       ]
     },
     {
+      "code": "00919",
+      "name": "群益台灣精選高息",
+      "openPrice": 23.76,
+      "highPrice": 23.82,
+      "lowPrice": 23.36,
+      "closePrice": 23.44,
+      "volume": 120081055,
+      "tradeValue": 2822444650,
+      "change": -0.55,
+      "changePercent": -2.29,
+      "transactions": 53990,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 35,
+      "signal": "BEARISH",
+      "signalType": "NEUTRAL",
+      "reasons": [
+        "🕳️ Bearish FVG"
+      ],
+      "patterns": {
+        "ob": null,
+        "fvg": "bearish-fvg",
+        "sweep": null
+      },
+      "analysis": "🐻 **群益台灣精選高息** [其他] ➤ 🕳️ Bearish FVG。",
+      "tags": [
+        {
+          "label": "Bearish FVG",
+          "type": "bearish"
+        },
+        {
+          "label": "看空",
+          "type": "bearish"
+        },
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "00878",
+      "name": "國泰永續高股息",
+      "openPrice": 23.09,
+      "highPrice": 23.09,
+      "lowPrice": 22.71,
+      "closePrice": 22.81,
+      "volume": 97628439,
+      "tradeValue": 2228743174,
+      "change": -0.48,
+      "changePercent": -2.06,
+      "transactions": 53747,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 35,
+      "signal": "BEARISH",
+      "signalType": "NEUTRAL",
+      "reasons": [
+        "🕳️ Bearish FVG"
+      ],
+      "patterns": {
+        "ob": null,
+        "fvg": "bearish-fvg",
+        "sweep": null
+      },
+      "analysis": "🐻 **國泰永續高股息** [其他] ➤ 🕳️ Bearish FVG。",
+      "tags": [
+        {
+          "label": "Bearish FVG",
+          "type": "bearish"
+        },
+        {
+          "label": "看空",
+          "type": "bearish"
+        },
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
       "code": "5347",
       "name": "世界",
       "closePrice": 143.5,
@@ -39845,6 +44393,182 @@
         {
           "label": "看空",
           "type": "bearish"
+        }
+      ]
+    },
+    {
+      "code": "00929",
+      "name": "復華台灣科技優息",
+      "openPrice": 19.8,
+      "highPrice": 19.8,
+      "lowPrice": 19.35,
+      "closePrice": 19.56,
+      "volume": 57260171,
+      "tradeValue": 1118329423,
+      "change": -0.45,
+      "changePercent": -2.25,
+      "transactions": 16880,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 35,
+      "signal": "BEARISH",
+      "signalType": "NEUTRAL",
+      "reasons": [
+        "🕳️ Bearish FVG"
+      ],
+      "patterns": {
+        "ob": null,
+        "fvg": "bearish-fvg",
+        "sweep": null
+      },
+      "analysis": "🐻 **復華台灣科技優息** [其他] ➤ 🕳️ Bearish FVG。",
+      "tags": [
+        {
+          "label": "Bearish FVG",
+          "type": "bearish"
+        },
+        {
+          "label": "看空",
+          "type": "bearish"
+        },
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "00935",
+      "name": "野村臺灣新科技50",
+      "openPrice": 35.65,
+      "highPrice": 35.65,
+      "lowPrice": 35.05,
+      "closePrice": 35.29,
+      "volume": 23818641,
+      "tradeValue": 840767399,
+      "change": -0.76,
+      "changePercent": -2.11,
+      "transactions": 12960,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 35,
+      "signal": "BEARISH",
+      "signalType": "NEUTRAL",
+      "reasons": [
+        "🕳️ Bearish FVG"
+      ],
+      "patterns": {
+        "ob": null,
+        "fvg": "bearish-fvg",
+        "sweep": null
+      },
+      "analysis": "🐻 **野村臺灣新科技50** [其他] ➤ 🕳️ Bearish FVG。",
+      "tags": [
+        {
+          "label": "Bearish FVG",
+          "type": "bearish"
+        },
+        {
+          "label": "看空",
+          "type": "bearish"
+        },
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "00891",
+      "name": "中信關鍵半導體",
+      "openPrice": 23.74,
+      "highPrice": 23.74,
+      "lowPrice": 23.4,
+      "closePrice": 23.5,
+      "volume": 21909336,
+      "tradeValue": 516160644,
+      "change": -0.52,
+      "changePercent": -2.16,
+      "transactions": 10450,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 35,
+      "signal": "BEARISH",
+      "signalType": "NEUTRAL",
+      "reasons": [
+        "🕳️ Bearish FVG"
+      ],
+      "patterns": {
+        "ob": null,
+        "fvg": "bearish-fvg",
+        "sweep": null
+      },
+      "analysis": "🐻 **中信關鍵半導體** [其他] ➤ 🕳️ Bearish FVG。",
+      "tags": [
+        {
+          "label": "Bearish FVG",
+          "type": "bearish"
+        },
+        {
+          "label": "看空",
+          "type": "bearish"
+        },
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "00927",
+      "name": "群益半導體收益",
+      "openPrice": 25.32,
+      "highPrice": 25.34,
+      "lowPrice": 24.72,
+      "closePrice": 25,
+      "volume": 19826401,
+      "tradeValue": 495326065,
+      "change": -0.59,
+      "changePercent": -2.31,
+      "transactions": 8300,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 35,
+      "signal": "BEARISH",
+      "signalType": "NEUTRAL",
+      "reasons": [
+        "🕳️ Bearish FVG"
+      ],
+      "patterns": {
+        "ob": null,
+        "fvg": "bearish-fvg",
+        "sweep": null
+      },
+      "analysis": "🐻 **群益半導體收益** [其他] ➤ 🕳️ Bearish FVG。",
+      "tags": [
+        {
+          "label": "Bearish FVG",
+          "type": "bearish"
+        },
+        {
+          "label": "看空",
+          "type": "bearish"
+        },
+        {
+          "label": "其他",
+          "type": "neutral"
         }
       ]
     },
@@ -40161,6 +44885,50 @@
       ]
     },
     {
+      "code": "00946",
+      "name": "群益科技高息成長",
+      "openPrice": 10.34,
+      "highPrice": 10.35,
+      "lowPrice": 10.1,
+      "closePrice": 10.21,
+      "volume": 10430703,
+      "tradeValue": 106229325,
+      "change": -0.28,
+      "changePercent": -2.67,
+      "transactions": 3690,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 35,
+      "signal": "BEARISH",
+      "signalType": "NEUTRAL",
+      "reasons": [
+        "🕳️ Bearish FVG"
+      ],
+      "patterns": {
+        "ob": null,
+        "fvg": "bearish-fvg",
+        "sweep": null
+      },
+      "analysis": "🐻 **群益科技高息成長** [其他] ➤ 🕳️ Bearish FVG。",
+      "tags": [
+        {
+          "label": "Bearish FVG",
+          "type": "bearish"
+        },
+        {
+          "label": "看空",
+          "type": "bearish"
+        },
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
       "code": "1785",
       "name": "光洋科",
       "closePrice": 63.9,
@@ -40430,11 +45198,11 @@
       "highPrice": 1495,
       "lowPrice": 1400,
       "closePrice": 1460,
-      "volume": 6877370,
-      "tradeValue": 9894153945,
+      "volume": 6913370,
+      "tradeValue": 9946713945,
       "change": -35,
       "changePercent": -2.34,
-      "transactions": 18336,
+      "transactions": 18337,
       "peRatio": 34.22,
       "pbRatio": 9.46,
       "dividendYield": 1.18,
@@ -40606,11 +45374,11 @@
       "highPrice": 2670,
       "lowPrice": 2540,
       "closePrice": 2620,
-      "volume": 4572235,
-      "tradeValue": 11923195200,
+      "volume": 4579235,
+      "tradeValue": 11941535200,
       "change": -75,
       "changePercent": -2.78,
-      "transactions": 12245,
+      "transactions": 12246,
       "peRatio": 44.61,
       "pbRatio": 15.69,
       "dividendYield": 1.27,
@@ -40938,6 +45706,50 @@
         },
         {
           "label": "光電業",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "00952",
+      "name": "凱基台灣AI50",
+      "openPrice": 12.81,
+      "highPrice": 12.81,
+      "lowPrice": 12.43,
+      "closePrice": 12.62,
+      "volume": 3129124,
+      "tradeValue": 39419523,
+      "change": -0.28,
+      "changePercent": -2.17,
+      "transactions": 910,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 35,
+      "signal": "BEARISH",
+      "signalType": "NEUTRAL",
+      "reasons": [
+        "🕳️ Bearish FVG"
+      ],
+      "patterns": {
+        "ob": null,
+        "fvg": "bearish-fvg",
+        "sweep": null
+      },
+      "analysis": "🐻 **凱基台灣AI50** [其他] ➤ 🕳️ Bearish FVG。",
+      "tags": [
+        {
+          "label": "Bearish FVG",
+          "type": "bearish"
+        },
+        {
+          "label": "看空",
+          "type": "bearish"
+        },
+        {
+          "label": "其他",
           "type": "neutral"
         }
       ]
@@ -41457,6 +46269,50 @@
       ]
     },
     {
+      "code": "00892",
+      "name": "富邦台灣半導體",
+      "openPrice": 25.34,
+      "highPrice": 25.35,
+      "lowPrice": 24.94,
+      "closePrice": 25.03,
+      "volume": 1503403,
+      "tradeValue": 37818104,
+      "change": -0.62,
+      "changePercent": -2.42,
+      "transactions": 824,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 35,
+      "signal": "BEARISH",
+      "signalType": "NEUTRAL",
+      "reasons": [
+        "🕳️ Bearish FVG"
+      ],
+      "patterns": {
+        "ob": null,
+        "fvg": "bearish-fvg",
+        "sweep": null
+      },
+      "analysis": "🐻 **富邦台灣半導體** [其他] ➤ 🕳️ Bearish FVG。",
+      "tags": [
+        {
+          "label": "Bearish FVG",
+          "type": "bearish"
+        },
+        {
+          "label": "看空",
+          "type": "bearish"
+        },
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
       "code": "3533",
       "name": "嘉澤",
       "openPrice": 1450,
@@ -41544,6 +46400,45 @@
         {
           "label": "電子零組件業",
           "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "00888",
+      "name": "永豐台灣ESG",
+      "closePrice": 22.4,
+      "openPrice": 22.54,
+      "highPrice": 22.58,
+      "lowPrice": 22.23,
+      "volume": 1366000,
+      "tradeValue": 30553000,
+      "change": -0.55,
+      "changePercent": -2.4,
+      "transactions": 0,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "market": "上櫃",
+      "score": 35,
+      "signal": "BEARISH",
+      "signalType": "NEUTRAL",
+      "reasons": [
+        "🕳️ Bearish FVG"
+      ],
+      "patterns": {
+        "ob": null,
+        "fvg": "bearish-fvg",
+        "sweep": null
+      },
+      "analysis": "🐻 **永豐台灣ESG** [一般] ➤ 🕳️ Bearish FVG。",
+      "tags": [
+        {
+          "label": "Bearish FVG",
+          "type": "bearish"
+        },
+        {
+          "label": "看空",
+          "type": "bearish"
         }
       ]
     },
@@ -42194,6 +47089,50 @@
       ]
     },
     {
+      "code": "00913",
+      "name": "兆豐台灣晶圓製造",
+      "openPrice": 30.43,
+      "highPrice": 30.55,
+      "lowPrice": 30.06,
+      "closePrice": 30.17,
+      "volume": 800563,
+      "tradeValue": 24232560,
+      "change": -0.66,
+      "changePercent": -2.14,
+      "transactions": 308,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 35,
+      "signal": "BEARISH",
+      "signalType": "NEUTRAL",
+      "reasons": [
+        "🕳️ Bearish FVG"
+      ],
+      "patterns": {
+        "ob": null,
+        "fvg": "bearish-fvg",
+        "sweep": null
+      },
+      "analysis": "🐻 **兆豐台灣晶圓製造** [其他] ➤ 🕳️ Bearish FVG。",
+      "tags": [
+        {
+          "label": "Bearish FVG",
+          "type": "bearish"
+        },
+        {
+          "label": "看空",
+          "type": "bearish"
+        },
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
       "code": "6234",
       "name": "高僑",
       "closePrice": 26.3,
@@ -42399,6 +47338,50 @@
       ]
     },
     {
+      "code": "00731",
+      "name": "復華富時高息低波",
+      "openPrice": 72.3,
+      "highPrice": 72.4,
+      "lowPrice": 71.25,
+      "closePrice": 71.25,
+      "volume": 715956,
+      "tradeValue": 51293390,
+      "change": -1.55,
+      "changePercent": -2.13,
+      "transactions": 327,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 35,
+      "signal": "BEARISH",
+      "signalType": "NEUTRAL",
+      "reasons": [
+        "🕳️ Bearish FVG"
+      ],
+      "patterns": {
+        "ob": null,
+        "fvg": "bearish-fvg",
+        "sweep": null
+      },
+      "analysis": "🐻 **復華富時高息低波** [其他] ➤ 🕳️ Bearish FVG。",
+      "tags": [
+        {
+          "label": "Bearish FVG",
+          "type": "bearish"
+        },
+        {
+          "label": "看空",
+          "type": "bearish"
+        },
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
       "code": "1532",
       "name": "勤美",
       "openPrice": 24.8,
@@ -42479,6 +47462,50 @@
         {
           "label": "看空",
           "type": "bearish"
+        }
+      ]
+    },
+    {
+      "code": "00783",
+      "name": "富邦中証500",
+      "openPrice": 29.1,
+      "highPrice": 29.1,
+      "lowPrice": 28.06,
+      "closePrice": 28.63,
+      "volume": 660040,
+      "tradeValue": 18852915,
+      "change": -0.62,
+      "changePercent": -2.12,
+      "transactions": 182,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 35,
+      "signal": "BEARISH",
+      "signalType": "NEUTRAL",
+      "reasons": [
+        "🕳️ Bearish FVG"
+      ],
+      "patterns": {
+        "ob": null,
+        "fvg": "bearish-fvg",
+        "sweep": null
+      },
+      "analysis": "🐻 **富邦中証500** [其他] ➤ 🕳️ Bearish FVG。",
+      "tags": [
+        {
+          "label": "Bearish FVG",
+          "type": "bearish"
+        },
+        {
+          "label": "看空",
+          "type": "bearish"
+        },
+        {
+          "label": "其他",
+          "type": "neutral"
         }
       ]
     },
@@ -42605,6 +47632,50 @@
         },
         {
           "label": "電子零組件業",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "00762",
+      "name": "元大全球AI",
+      "openPrice": 86.95,
+      "highPrice": 86.95,
+      "lowPrice": 86,
+      "closePrice": 86.6,
+      "volume": 586348,
+      "tradeValue": 50722799,
+      "change": -1.95,
+      "changePercent": -2.2,
+      "transactions": 845,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 35,
+      "signal": "BEARISH",
+      "signalType": "NEUTRAL",
+      "reasons": [
+        "🕳️ Bearish FVG"
+      ],
+      "patterns": {
+        "ob": null,
+        "fvg": "bearish-fvg",
+        "sweep": null
+      },
+      "analysis": "🐻 **元大全球AI** [其他] ➤ 🕳️ Bearish FVG。",
+      "tags": [
+        {
+          "label": "Bearish FVG",
+          "type": "bearish"
+        },
+        {
+          "label": "看空",
+          "type": "bearish"
+        },
+        {
+          "label": "其他",
           "type": "neutral"
         }
       ]
@@ -42815,6 +47886,50 @@
         },
         {
           "label": "造紙工業",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "00899",
+      "name": "FT潔淨能源",
+      "openPrice": 23.15,
+      "highPrice": 23.15,
+      "lowPrice": 22.8,
+      "closePrice": 23,
+      "volume": 497729,
+      "tradeValue": 11433178,
+      "change": -0.56,
+      "changePercent": -2.38,
+      "transactions": 917,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 35,
+      "signal": "BEARISH",
+      "signalType": "NEUTRAL",
+      "reasons": [
+        "🕳️ Bearish FVG"
+      ],
+      "patterns": {
+        "ob": null,
+        "fvg": "bearish-fvg",
+        "sweep": null
+      },
+      "analysis": "🐻 **FT潔淨能源** [其他] ➤ 🕳️ Bearish FVG。",
+      "tags": [
+        {
+          "label": "Bearish FVG",
+          "type": "bearish"
+        },
+        {
+          "label": "看空",
+          "type": "bearish"
+        },
+        {
+          "label": "其他",
           "type": "neutral"
         }
       ]
@@ -43198,6 +48313,94 @@
       ]
     },
     {
+      "code": "00728",
+      "name": "第一金工業30",
+      "openPrice": 41.71,
+      "highPrice": 41.74,
+      "lowPrice": 41.1,
+      "closePrice": 41.32,
+      "volume": 301416,
+      "tradeValue": 12496146,
+      "change": -0.95,
+      "changePercent": -2.25,
+      "transactions": 398,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 35,
+      "signal": "BEARISH",
+      "signalType": "NEUTRAL",
+      "reasons": [
+        "🕳️ Bearish FVG"
+      ],
+      "patterns": {
+        "ob": null,
+        "fvg": "bearish-fvg",
+        "sweep": null
+      },
+      "analysis": "🐻 **第一金工業30** [其他] ➤ 🕳️ Bearish FVG。",
+      "tags": [
+        {
+          "label": "Bearish FVG",
+          "type": "bearish"
+        },
+        {
+          "label": "看空",
+          "type": "bearish"
+        },
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "009809",
+      "name": "富邦淨零ESG50",
+      "openPrice": 11.93,
+      "highPrice": 11.93,
+      "lowPrice": 11.75,
+      "closePrice": 11.78,
+      "volume": 283236,
+      "tradeValue": 3342015,
+      "change": -0.26,
+      "changePercent": -2.16,
+      "transactions": 183,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 35,
+      "signal": "BEARISH",
+      "signalType": "NEUTRAL",
+      "reasons": [
+        "🕳️ Bearish FVG"
+      ],
+      "patterns": {
+        "ob": null,
+        "fvg": "bearish-fvg",
+        "sweep": null
+      },
+      "analysis": "🐻 **富邦淨零ESG50** [其他] ➤ 🕳️ Bearish FVG。",
+      "tags": [
+        {
+          "label": "Bearish FVG",
+          "type": "bearish"
+        },
+        {
+          "label": "看空",
+          "type": "bearish"
+        },
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
       "code": "4543",
       "name": "萬在",
       "closePrice": 31.55,
@@ -43562,6 +48765,50 @@
         },
         {
           "label": "金融保險",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "00875",
+      "name": "國泰網路資安",
+      "openPrice": 37.58,
+      "highPrice": 37.59,
+      "lowPrice": 37.38,
+      "closePrice": 37.52,
+      "volume": 176023,
+      "tradeValue": 6606220,
+      "change": -0.94,
+      "changePercent": -2.44,
+      "transactions": 235,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 35,
+      "signal": "BEARISH",
+      "signalType": "NEUTRAL",
+      "reasons": [
+        "🕳️ Bearish FVG"
+      ],
+      "patterns": {
+        "ob": null,
+        "fvg": "bearish-fvg",
+        "sweep": null
+      },
+      "analysis": "🐻 **國泰網路資安** [其他] ➤ 🕳️ Bearish FVG。",
+      "tags": [
+        {
+          "label": "Bearish FVG",
+          "type": "bearish"
+        },
+        {
+          "label": "看空",
+          "type": "bearish"
+        },
+        {
+          "label": "其他",
           "type": "neutral"
         }
       ]
@@ -45441,6 +50688,50 @@
       ]
     },
     {
+      "code": "020034",
+      "name": "元大IC設計N",
+      "openPrice": 8.47,
+      "highPrice": 8.47,
+      "lowPrice": 8.35,
+      "closePrice": 8.35,
+      "volume": 12000,
+      "tradeValue": 100780,
+      "change": -0.25,
+      "changePercent": -2.91,
+      "transactions": 5,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 35,
+      "signal": "BEARISH",
+      "signalType": "NEUTRAL",
+      "reasons": [
+        "🕳️ Bearish FVG"
+      ],
+      "patterns": {
+        "ob": null,
+        "fvg": "bearish-fvg",
+        "sweep": null
+      },
+      "analysis": "🐻 **元大IC設計N** [其他] ➤ 🕳️ Bearish FVG。",
+      "tags": [
+        {
+          "label": "Bearish FVG",
+          "type": "bearish"
+        },
+        {
+          "label": "看空",
+          "type": "bearish"
+        },
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
       "code": "8067",
       "name": "志旭",
       "closePrice": 13.95,
@@ -45608,17 +50899,100 @@
       ]
     },
     {
+      "code": "020031",
+      "name": "統一IC設計臺灣N",
+      "openPrice": 6.72,
+      "highPrice": 6.72,
+      "lowPrice": 6.67,
+      "closePrice": 6.67,
+      "volume": 2000,
+      "tradeValue": 13390,
+      "change": -0.18,
+      "changePercent": -2.63,
+      "transactions": 2,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 35,
+      "signal": "BEARISH",
+      "signalType": "NEUTRAL",
+      "reasons": [
+        "🕳️ Bearish FVG"
+      ],
+      "patterns": {
+        "ob": null,
+        "fvg": "bearish-fvg",
+        "sweep": null
+      },
+      "analysis": "🐻 **統一IC設計臺灣N** [其他] ➤ 🕳️ Bearish FVG。",
+      "tags": [
+        {
+          "label": "Bearish FVG",
+          "type": "bearish"
+        },
+        {
+          "label": "看空",
+          "type": "bearish"
+        },
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "020001",
+      "name": "富邦存股雙十N",
+      "closePrice": 17.29,
+      "openPrice": 17.29,
+      "highPrice": 17.29,
+      "lowPrice": 17.29,
+      "volume": 2000,
+      "tradeValue": 34580,
+      "change": -0.37,
+      "changePercent": -2.1,
+      "transactions": 0,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "market": "上櫃",
+      "score": 35,
+      "signal": "BEARISH",
+      "signalType": "NEUTRAL",
+      "reasons": [
+        "🕳️ Bearish FVG"
+      ],
+      "patterns": {
+        "ob": null,
+        "fvg": "bearish-fvg",
+        "sweep": null
+      },
+      "analysis": "🐻 **富邦存股雙十N** [一般] ➤ 🕳️ Bearish FVG。",
+      "tags": [
+        {
+          "label": "Bearish FVG",
+          "type": "bearish"
+        },
+        {
+          "label": "看空",
+          "type": "bearish"
+        }
+      ]
+    },
+    {
       "code": "2344",
       "name": "華邦電",
       "openPrice": 132.5,
       "highPrice": 136,
       "lowPrice": 128.5,
       "closePrice": 128.5,
-      "volume": 250261126,
-      "tradeValue": 33043213630,
+      "volume": 250735126,
+      "tradeValue": 33104122630,
       "change": -1.5,
       "changePercent": -1.15,
-      "transactions": 130853,
+      "transactions": 130854,
       "peRatio": 118.61,
       "pbRatio": 0.97,
       "dividendYield": null,
@@ -46889,6 +52263,50 @@
       ]
     },
     {
+      "code": "00701",
+      "name": "國泰股利精選30",
+      "openPrice": 29.29,
+      "highPrice": 29.29,
+      "lowPrice": 28.72,
+      "closePrice": 28.8,
+      "volume": 1091830,
+      "tradeValue": 31524662,
+      "change": -0.52,
+      "changePercent": -1.77,
+      "transactions": 1244,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 30,
+      "signal": "BEARISH",
+      "signalType": "SMC_SELL",
+      "reasons": [
+        "🧱 Bearish OB"
+      ],
+      "patterns": {
+        "ob": "bearish-ob",
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "🐻 **國泰股利精選30** [其他] ➤ 🧱 Bearish OB。",
+      "tags": [
+        {
+          "label": "Bearish OB",
+          "type": "bearish"
+        },
+        {
+          "label": "看空",
+          "type": "bearish"
+        },
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
       "code": "6414",
       "name": "樺漢",
       "openPrice": 289.5,
@@ -46928,6 +52346,50 @@
         },
         {
           "label": "電腦及週邊設備業",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "912000",
+      "name": "晨訊科-DR",
+      "openPrice": 2.77,
+      "highPrice": 2.77,
+      "lowPrice": 2.71,
+      "closePrice": 2.72,
+      "volume": 865791,
+      "tradeValue": 2350866,
+      "change": -0.01,
+      "changePercent": -0.37,
+      "transactions": 106,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "存託憑證",
+      "market": "上市",
+      "score": 30,
+      "signal": "BEARISH",
+      "signalType": "SMC_SELL",
+      "reasons": [
+        "🧱 Bearish OB"
+      ],
+      "patterns": {
+        "ob": "bearish-ob",
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "🐻 **晨訊科-DR** [存託憑證] ➤ 🧱 Bearish OB。",
+      "tags": [
+        {
+          "label": "Bearish OB",
+          "type": "bearish"
+        },
+        {
+          "label": "看空",
+          "type": "bearish"
+        },
+        {
+          "label": "存託憑證",
           "type": "neutral"
         }
       ]
@@ -47269,6 +52731,50 @@
         "sweep": null
       },
       "analysis": "🐻 **百和興業-KY** [其他] ➤ 🧱 Bearish OB。",
+      "tags": [
+        {
+          "label": "Bearish OB",
+          "type": "bearish"
+        },
+        {
+          "label": "看空",
+          "type": "bearish"
+        },
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "00730",
+      "name": "富邦臺灣優質高息",
+      "openPrice": 23.44,
+      "highPrice": 23.44,
+      "lowPrice": 22.92,
+      "closePrice": 22.96,
+      "volume": 481660,
+      "tradeValue": 11081931,
+      "change": -0.46,
+      "changePercent": -1.96,
+      "transactions": 552,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 30,
+      "signal": "BEARISH",
+      "signalType": "SMC_SELL",
+      "reasons": [
+        "🧱 Bearish OB"
+      ],
+      "patterns": {
+        "ob": "bearish-ob",
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "🐻 **富邦臺灣優質高息** [其他] ➤ 🧱 Bearish OB。",
       "tags": [
         {
           "label": "Bearish OB",
@@ -48163,6 +53669,50 @@
       ]
     },
     {
+      "code": "910861",
+      "name": "神州-DR",
+      "openPrice": 5.6,
+      "highPrice": 5.6,
+      "lowPrice": 5.48,
+      "closePrice": 5.5,
+      "volume": 123332,
+      "tradeValue": 680639,
+      "change": -0.09,
+      "changePercent": -1.61,
+      "transactions": 53,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "存託憑證",
+      "market": "上市",
+      "score": 30,
+      "signal": "BEARISH",
+      "signalType": "SMC_SELL",
+      "reasons": [
+        "🧱 Bearish OB"
+      ],
+      "patterns": {
+        "ob": "bearish-ob",
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "🐻 **神州-DR** [存託憑證] ➤ 🧱 Bearish OB。",
+      "tags": [
+        {
+          "label": "Bearish OB",
+          "type": "bearish"
+        },
+        {
+          "label": "看空",
+          "type": "bearish"
+        },
+        {
+          "label": "存託憑證",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
       "code": "6167",
       "name": "久正",
       "closePrice": 11.95,
@@ -48607,6 +54157,50 @@
         {
           "label": "看空",
           "type": "bearish"
+        }
+      ]
+    },
+    {
+      "code": "00703",
+      "name": "台新MSCI中國",
+      "openPrice": 22.8,
+      "highPrice": 22.8,
+      "lowPrice": 22.4,
+      "closePrice": 22.42,
+      "volume": 56025,
+      "tradeValue": 1260434,
+      "change": -0.26,
+      "changePercent": -1.15,
+      "transactions": 89,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 30,
+      "signal": "BEARISH",
+      "signalType": "SMC_SELL",
+      "reasons": [
+        "🧱 Bearish OB"
+      ],
+      "patterns": {
+        "ob": "bearish-ob",
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "🐻 **台新MSCI中國** [其他] ➤ 🧱 Bearish OB。",
+      "tags": [
+        {
+          "label": "Bearish OB",
+          "type": "bearish"
+        },
+        {
+          "label": "看空",
+          "type": "bearish"
+        },
+        {
+          "label": "其他",
+          "type": "neutral"
         }
       ]
     },
@@ -49059,6 +54653,45 @@
       "tags": [
         {
           "label": "Bearish FVG",
+          "type": "bearish"
+        },
+        {
+          "label": "看空",
+          "type": "bearish"
+        }
+      ]
+    },
+    {
+      "code": "020035",
+      "name": "元大上櫃ESG高息N",
+      "closePrice": 11.17,
+      "openPrice": 11.42,
+      "highPrice": 11.42,
+      "lowPrice": 11.1,
+      "volume": 13000,
+      "tradeValue": 147160,
+      "change": -0.01,
+      "changePercent": -0.09,
+      "transactions": 0,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "market": "上櫃",
+      "score": 30,
+      "signal": "BEARISH",
+      "signalType": "SMC_SELL",
+      "reasons": [
+        "🧱 Bearish OB"
+      ],
+      "patterns": {
+        "ob": "bearish-ob",
+        "fvg": null,
+        "sweep": null
+      },
+      "analysis": "🐻 **元大上櫃ESG高息N** [一般] ➤ 🧱 Bearish OB。",
+      "tags": [
+        {
+          "label": "Bearish OB",
           "type": "bearish"
         },
         {
@@ -49529,61 +55162,17 @@
       ]
     },
     {
-      "code": "1717",
-      "name": "長興",
-      "openPrice": 61.6,
-      "highPrice": 64.5,
-      "lowPrice": 61.1,
-      "closePrice": 61.7,
-      "volume": 38905719,
-      "tradeValue": 2434467390,
-      "change": -0.8,
-      "changePercent": -1.28,
-      "transactions": 22021,
-      "peRatio": 21.21,
-      "pbRatio": 1.52,
-      "dividendYield": 2.34,
-      "sector": "化學工業",
-      "market": "上市",
-      "score": 25,
-      "signal": "BEARISH",
-      "signalType": "SMC_SELL",
-      "reasons": [
-        "🐢 Liq Sweep ↓"
-      ],
-      "patterns": {
-        "ob": null,
-        "fvg": null,
-        "sweep": "liquidity-sweep-bear"
-      },
-      "analysis": "🐻 **長興** [化學工業] ➤ 🐢 Liq Sweep ↓。 (PE: 21.21)",
-      "tags": [
-        {
-          "label": "Liq Sweep ↓",
-          "type": "bearish"
-        },
-        {
-          "label": "看空",
-          "type": "bearish"
-        },
-        {
-          "label": "化學工業",
-          "type": "neutral"
-        }
-      ]
-    },
-    {
       "code": "2891",
       "name": "中信金",
       "openPrice": 52,
       "highPrice": 52.1,
       "lowPrice": 50.8,
       "closePrice": 50.9,
-      "volume": 37328408,
-      "tradeValue": 1908591657,
+      "volume": 40572408,
+      "tradeValue": 2074301707,
       "change": -1.1,
       "changePercent": -2.12,
-      "transactions": 10793,
+      "transactions": 10795,
       "peRatio": 10.75,
       "pbRatio": 1.52,
       "dividendYield": 5.23,
@@ -49624,6 +55213,50 @@
         {
           "label": "Yield 5.23%",
           "type": "bullish"
+        }
+      ]
+    },
+    {
+      "code": "1717",
+      "name": "長興",
+      "openPrice": 61.6,
+      "highPrice": 64.5,
+      "lowPrice": 61.1,
+      "closePrice": 61.7,
+      "volume": 38905719,
+      "tradeValue": 2434467390,
+      "change": -0.8,
+      "changePercent": -1.28,
+      "transactions": 22021,
+      "peRatio": 21.21,
+      "pbRatio": 1.52,
+      "dividendYield": 2.34,
+      "sector": "化學工業",
+      "market": "上市",
+      "score": 25,
+      "signal": "BEARISH",
+      "signalType": "SMC_SELL",
+      "reasons": [
+        "🐢 Liq Sweep ↓"
+      ],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": "liquidity-sweep-bear"
+      },
+      "analysis": "🐻 **長興** [化學工業] ➤ 🐢 Liq Sweep ↓。 (PE: 21.21)",
+      "tags": [
+        {
+          "label": "Liq Sweep ↓",
+          "type": "bearish"
+        },
+        {
+          "label": "看空",
+          "type": "bearish"
+        },
+        {
+          "label": "化學工業",
+          "type": "neutral"
         }
       ]
     },
@@ -50773,6 +56406,51 @@
       ]
     },
     {
+      "code": "00909",
+      "name": "國泰數位支付服務",
+      "openPrice": 43.5,
+      "highPrice": 43.5,
+      "lowPrice": 42.65,
+      "closePrice": 42.88,
+      "volume": 4920308,
+      "tradeValue": 211265354,
+      "change": -1.51,
+      "changePercent": -3.4,
+      "transactions": 4416,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 25,
+      "signal": "BEARISH",
+      "signalType": "NEUTRAL",
+      "reasons": [
+        "🕳️ Bearish FVG",
+        "📉 Momentum Down"
+      ],
+      "patterns": {
+        "ob": null,
+        "fvg": "bearish-fvg",
+        "sweep": null
+      },
+      "analysis": "🐻 **國泰數位支付服務** [其他] ➤ 🕳️ Bearish FVG + 📉 Momentum Down。",
+      "tags": [
+        {
+          "label": "Bearish FVG",
+          "type": "bearish"
+        },
+        {
+          "label": "看空",
+          "type": "bearish"
+        },
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
       "code": "8103",
       "name": "瀚荃",
       "openPrice": 90,
@@ -51037,11 +56715,11 @@
       "highPrice": 1370,
       "lowPrice": 1280,
       "closePrice": 1300,
-      "volume": 4090150,
-      "tradeValue": 5339943125,
+      "volume": 4140150,
+      "tradeValue": 5405028175,
       "change": -65,
       "changePercent": -4.76,
-      "transactions": 10476,
+      "transactions": 10478,
       "peRatio": 27.12,
       "pbRatio": 2.93,
       "dividendYield": 1.9,
@@ -51156,6 +56834,51 @@
         },
         {
           "label": "電子通路業",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "00735",
+      "name": "國泰臺韓科技",
+      "openPrice": 64.5,
+      "highPrice": 64.5,
+      "lowPrice": 62.95,
+      "closePrice": 63.35,
+      "volume": 3867665,
+      "tradeValue": 246270940,
+      "change": -2.45,
+      "changePercent": -3.72,
+      "transactions": 2854,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 25,
+      "signal": "BEARISH",
+      "signalType": "NEUTRAL",
+      "reasons": [
+        "🕳️ Bearish FVG",
+        "📉 Momentum Down"
+      ],
+      "patterns": {
+        "ob": null,
+        "fvg": "bearish-fvg",
+        "sweep": null
+      },
+      "analysis": "🐻 **國泰臺韓科技** [其他] ➤ 🕳️ Bearish FVG + 📉 Momentum Down。",
+      "tags": [
+        {
+          "label": "Bearish FVG",
+          "type": "bearish"
+        },
+        {
+          "label": "看空",
+          "type": "bearish"
+        },
+        {
+          "label": "其他",
           "type": "neutral"
         }
       ]
@@ -51285,6 +57008,50 @@
         },
         {
           "label": "電機機械",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "009800",
+      "name": "中信NASDAQ",
+      "openPrice": 11.25,
+      "highPrice": 11.28,
+      "lowPrice": 11.2,
+      "closePrice": 11.24,
+      "volume": 3498898,
+      "tradeValue": 39337162,
+      "change": -0.11,
+      "changePercent": -0.97,
+      "transactions": 1142,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 25,
+      "signal": "BEARISH",
+      "signalType": "SMC_SELL",
+      "reasons": [
+        "🐢 Liq Sweep ↓"
+      ],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": "liquidity-sweep-bear"
+      },
+      "analysis": "🐻 **中信NASDAQ** [其他] ➤ 🐢 Liq Sweep ↓。",
+      "tags": [
+        {
+          "label": "Liq Sweep ↓",
+          "type": "bearish"
+        },
+        {
+          "label": "看空",
+          "type": "bearish"
+        },
+        {
+          "label": "其他",
           "type": "neutral"
         }
       ]
@@ -51781,6 +57548,50 @@
         {
           "label": "看空",
           "type": "bearish"
+        }
+      ]
+    },
+    {
+      "code": "00894",
+      "name": "中信小資高價30",
+      "openPrice": 30.65,
+      "highPrice": 30.85,
+      "lowPrice": 30.4,
+      "closePrice": 30.64,
+      "volume": 1959114,
+      "tradeValue": 59946014,
+      "change": -0.4,
+      "changePercent": -1.29,
+      "transactions": 1654,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 25,
+      "signal": "BEARISH",
+      "signalType": "SMC_SELL",
+      "reasons": [
+        "🐢 Liq Sweep ↓"
+      ],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": "liquidity-sweep-bear"
+      },
+      "analysis": "🐻 **中信小資高價30** [其他] ➤ 🐢 Liq Sweep ↓。",
+      "tags": [
+        {
+          "label": "Liq Sweep ↓",
+          "type": "bearish"
+        },
+        {
+          "label": "看空",
+          "type": "bearish"
+        },
+        {
+          "label": "其他",
+          "type": "neutral"
         }
       ]
     },
@@ -55179,6 +60990,50 @@
         },
         {
           "label": "生技醫療",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "006206",
+      "name": "元大上證50",
+      "openPrice": 37.94,
+      "highPrice": 38.21,
+      "lowPrice": 37.51,
+      "closePrice": 37.76,
+      "volume": 144060,
+      "tradeValue": 5461504,
+      "change": -0.01,
+      "changePercent": -0.03,
+      "transactions": 188,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 25,
+      "signal": "BEARISH",
+      "signalType": "SMC_SELL",
+      "reasons": [
+        "🐢 Liq Sweep ↓"
+      ],
+      "patterns": {
+        "ob": null,
+        "fvg": null,
+        "sweep": "liquidity-sweep-bear"
+      },
+      "analysis": "🐻 **元大上證50** [其他] ➤ 🐢 Liq Sweep ↓。",
+      "tags": [
+        {
+          "label": "Liq Sweep ↓",
+          "type": "bearish"
+        },
+        {
+          "label": "看空",
+          "type": "bearish"
+        },
+        {
+          "label": "其他",
           "type": "neutral"
         }
       ]
@@ -60263,11 +66118,11 @@
       "highPrice": 1255,
       "lowPrice": 1215,
       "closePrice": 1220,
-      "volume": 10868513,
-      "tradeValue": 13352207630,
+      "volume": 10993513,
+      "tradeValue": 13504707630,
       "change": -35,
       "changePercent": -2.79,
-      "transactions": 30979,
+      "transactions": 30980,
       "peRatio": 29.02,
       "pbRatio": 4.79,
       "dividendYield": 1.69,
@@ -60301,6 +66156,55 @@
         },
         {
           "label": "電子零組件業",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "00939",
+      "name": "統一台灣高息動能",
+      "openPrice": 15.85,
+      "highPrice": 15.85,
+      "lowPrice": 15.53,
+      "closePrice": 15.6,
+      "volume": 10780759,
+      "tradeValue": 168596190,
+      "change": -0.4,
+      "changePercent": -2.5,
+      "transactions": 2692,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 15,
+      "signal": "BEARISH",
+      "signalType": "SMC_SELL",
+      "reasons": [
+        "🧱 Bearish OB",
+        "🕳️ Bearish FVG"
+      ],
+      "patterns": {
+        "ob": "bearish-ob",
+        "fvg": "bearish-fvg",
+        "sweep": null
+      },
+      "analysis": "🐻 **統一台灣高息動能** [其他] ➤ 🧱 Bearish OB + 🕳️ Bearish FVG。",
+      "tags": [
+        {
+          "label": "Bearish OB",
+          "type": "bearish"
+        },
+        {
+          "label": "Bearish FVG",
+          "type": "bearish"
+        },
+        {
+          "label": "看空",
+          "type": "bearish"
+        },
+        {
+          "label": "其他",
           "type": "neutral"
         }
       ]
@@ -63275,6 +69179,55 @@
       ]
     },
     {
+      "code": "00944",
+      "name": "野村趨勢動能高息",
+      "openPrice": 15.27,
+      "highPrice": 15.27,
+      "lowPrice": 15.01,
+      "closePrice": 15.02,
+      "volume": 521616,
+      "tradeValue": 7848859,
+      "change": -0.34,
+      "changePercent": -2.21,
+      "transactions": 206,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 15,
+      "signal": "BEARISH",
+      "signalType": "SMC_SELL",
+      "reasons": [
+        "🧱 Bearish OB",
+        "🕳️ Bearish FVG"
+      ],
+      "patterns": {
+        "ob": "bearish-ob",
+        "fvg": "bearish-fvg",
+        "sweep": null
+      },
+      "analysis": "🐻 **野村趨勢動能高息** [其他] ➤ 🧱 Bearish OB + 🕳️ Bearish FVG。",
+      "tags": [
+        {
+          "label": "Bearish OB",
+          "type": "bearish"
+        },
+        {
+          "label": "Bearish FVG",
+          "type": "bearish"
+        },
+        {
+          "label": "看空",
+          "type": "bearish"
+        },
+        {
+          "label": "其他",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
       "code": "6233",
       "name": "旺玖",
       "closePrice": 23.7,
@@ -63839,6 +69792,55 @@
         {
           "label": "看空",
           "type": "bearish"
+        }
+      ]
+    },
+    {
+      "code": "00737",
+      "name": "國泰AI機器人",
+      "openPrice": 36.7,
+      "highPrice": 36.7,
+      "lowPrice": 35.98,
+      "closePrice": 36.14,
+      "volume": 364848,
+      "tradeValue": 13188652,
+      "change": -0.77,
+      "changePercent": -2.09,
+      "transactions": 340,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 15,
+      "signal": "BEARISH",
+      "signalType": "SMC_SELL",
+      "reasons": [
+        "🧱 Bearish OB",
+        "🕳️ Bearish FVG"
+      ],
+      "patterns": {
+        "ob": "bearish-ob",
+        "fvg": "bearish-fvg",
+        "sweep": null
+      },
+      "analysis": "🐻 **國泰AI機器人** [其他] ➤ 🧱 Bearish OB + 🕳️ Bearish FVG。",
+      "tags": [
+        {
+          "label": "Bearish OB",
+          "type": "bearish"
+        },
+        {
+          "label": "Bearish FVG",
+          "type": "bearish"
+        },
+        {
+          "label": "看空",
+          "type": "bearish"
+        },
+        {
+          "label": "其他",
+          "type": "neutral"
         }
       ]
     },
@@ -68381,11 +74383,11 @@
       "highPrice": 305.5,
       "lowPrice": 295.5,
       "closePrice": 297,
-      "volume": 25884896,
-      "tradeValue": 7724849894,
+      "volume": 25945896,
+      "tradeValue": 7742982144,
       "change": -13,
       "changePercent": -4.19,
-      "transactions": 19897,
+      "transactions": 19898,
       "peRatio": 20.63,
       "pbRatio": 2.16,
       "dividendYield": 3.44,
@@ -69791,11 +75793,11 @@
       "highPrice": 502,
       "lowPrice": 483.5,
       "closePrice": 483.5,
-      "volume": 6654708,
-      "tradeValue": 3255492720,
+      "volume": 6750708,
+      "tradeValue": 3301908720,
       "change": -27.5,
       "changePercent": -5.38,
-      "transactions": 13432,
+      "transactions": 13433,
       "peRatio": 19.69,
       "pbRatio": 5.39,
       "dividendYield": 3.29,
@@ -70216,11 +76218,11 @@
       "highPrice": 447.5,
       "lowPrice": 429.5,
       "closePrice": 429.5,
-      "volume": 4417075,
-      "tradeValue": 1918094589,
+      "volume": 4485075,
+      "tradeValue": 1947300589,
       "change": -13.5,
       "changePercent": -3.05,
-      "transactions": 4813,
+      "transactions": 4814,
       "peRatio": 30.05,
       "pbRatio": 4.46,
       "dividendYield": 2.31,
@@ -70266,11 +76268,11 @@
       "highPrice": 1180,
       "lowPrice": 1110,
       "closePrice": 1115,
-      "volume": 4274349,
-      "tradeValue": 4828840220,
+      "volume": 4328349,
+      "tradeValue": 4889050220,
       "change": -55,
       "changePercent": -4.7,
-      "transactions": 11944,
+      "transactions": 11945,
       "peRatio": 31.39,
       "pbRatio": 11.06,
       "dividendYield": 1.88,
@@ -73300,6 +79302,56 @@
       ]
     },
     {
+      "code": "6669",
+      "name": "緯穎",
+      "openPrice": 3725,
+      "highPrice": 3750,
+      "lowPrice": 3575,
+      "closePrice": 3575,
+      "volume": 1199013,
+      "tradeValue": 4378786355,
+      "change": -145,
+      "changePercent": -3.9,
+      "transactions": 10378,
+      "peRatio": 19.31,
+      "pbRatio": 6.49,
+      "dividendYield": 2.45,
+      "sector": "電腦及週邊設備業",
+      "market": "上市",
+      "score": 5,
+      "signal": "BEARISH",
+      "signalType": "SMC_SELL",
+      "reasons": [
+        "🧱 Bearish OB",
+        "🕳️ Bearish FVG",
+        "📉 Momentum Down"
+      ],
+      "patterns": {
+        "ob": "bearish-ob",
+        "fvg": "bearish-fvg",
+        "sweep": null
+      },
+      "analysis": "🐻 **緯穎** [電腦及週邊設備業] ➤ 🧱 Bearish OB + 🕳️ Bearish FVG + 📉 Momentum Down。 (PE: 19.31)",
+      "tags": [
+        {
+          "label": "Bearish OB",
+          "type": "bearish"
+        },
+        {
+          "label": "Bearish FVG",
+          "type": "bearish"
+        },
+        {
+          "label": "看空",
+          "type": "bearish"
+        },
+        {
+          "label": "電腦及週邊設備業",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
       "code": "3131",
       "name": "弘塑",
       "closePrice": 1670,
@@ -73375,56 +79427,6 @@
         "sweep": null
       },
       "analysis": "🐻 **振樺電** [電腦及週邊設備業] ➤ 🧱 Bearish OB + 🕳️ Bearish FVG + 📉 Momentum Down。 (PE: 29.1)",
-      "tags": [
-        {
-          "label": "Bearish OB",
-          "type": "bearish"
-        },
-        {
-          "label": "Bearish FVG",
-          "type": "bearish"
-        },
-        {
-          "label": "看空",
-          "type": "bearish"
-        },
-        {
-          "label": "電腦及週邊設備業",
-          "type": "neutral"
-        }
-      ]
-    },
-    {
-      "code": "6669",
-      "name": "緯穎",
-      "openPrice": 3725,
-      "highPrice": 3750,
-      "lowPrice": 3575,
-      "closePrice": 3575,
-      "volume": 1187013,
-      "tradeValue": 4335886355,
-      "change": -145,
-      "changePercent": -3.9,
-      "transactions": 10377,
-      "peRatio": 19.31,
-      "pbRatio": 6.49,
-      "dividendYield": 2.45,
-      "sector": "電腦及週邊設備業",
-      "market": "上市",
-      "score": 5,
-      "signal": "BEARISH",
-      "signalType": "SMC_SELL",
-      "reasons": [
-        "🧱 Bearish OB",
-        "🕳️ Bearish FVG",
-        "📉 Momentum Down"
-      ],
-      "patterns": {
-        "ob": "bearish-ob",
-        "fvg": "bearish-fvg",
-        "sweep": null
-      },
-      "analysis": "🐻 **緯穎** [電腦及週邊設備業] ➤ 🧱 Bearish OB + 🕳️ Bearish FVG + 📉 Momentum Down。 (PE: 19.31)",
       "tags": [
         {
           "label": "Bearish OB",
@@ -78660,6 +84662,56 @@
         },
         {
           "label": "半導體業",
+          "type": "neutral"
+        }
+      ]
+    },
+    {
+      "code": "020038",
+      "name": "元大ESG配息N",
+      "openPrice": 8,
+      "highPrice": 8.01,
+      "lowPrice": 8,
+      "closePrice": 8,
+      "volume": 16000,
+      "tradeValue": 128100,
+      "change": -0.25,
+      "changePercent": -3.03,
+      "transactions": 4,
+      "peRatio": null,
+      "pbRatio": null,
+      "dividendYield": null,
+      "sector": "其他",
+      "market": "上市",
+      "score": 0,
+      "signal": "BEARISH",
+      "signalType": "SMC_SELL",
+      "reasons": [
+        "🕳️ Bearish FVG",
+        "🐢 Liq Sweep ↓",
+        "📉 Momentum Down"
+      ],
+      "patterns": {
+        "ob": null,
+        "fvg": "bearish-fvg",
+        "sweep": "liquidity-sweep-bear"
+      },
+      "analysis": "🐻 **元大ESG配息N** [其他] ➤ 🕳️ Bearish FVG + 🐢 Liq Sweep ↓ + 📉 Momentum Down。",
+      "tags": [
+        {
+          "label": "Bearish FVG",
+          "type": "bearish"
+        },
+        {
+          "label": "Liq Sweep ↓",
+          "type": "bearish"
+        },
+        {
+          "label": "看空",
+          "type": "bearish"
+        },
+        {
+          "label": "其他",
           "type": "neutral"
         }
       ]
