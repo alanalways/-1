@@ -178,9 +178,15 @@ async function callGeminiAPI(prompt) {
                 console.log(`🤖 Gemini Attempt: ${model} with Key ending ...${keyState.key.slice(-4)}`);
                 const response = await fetch(url, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-goog-api-key': keyState.key
+                    },
                     body: JSON.stringify({
-                        contents: [{ parts: [{ text: prompt }] }],
+                        contents: [{
+                            role: 'user',
+                            parts: [{ text: prompt }]
+                        }],
                         generationConfig: {
                             temperature: 0.7,
                             maxOutputTokens: 4096,
