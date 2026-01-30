@@ -230,16 +230,24 @@ export async function fetchTWSEAllStocks() {
                 // 只過濾 4 位數純數字代碼（包含 ETF 如 0050, 0056 等）
                 if (!/^\d{4}$/.test(code)) continue;
 
+                const closePrice = parseNum(cols[8]);
+                const change = parseNum(cols[9]);
+                // [Fix] Calculate changePercent = (change / prevClose) * 100
+                // prevClose = closePrice - change
+                const prevClose = closePrice - change;
+                const changePercent = prevClose !== 0 ? (change / prevClose) * 100 : 0;
+
                 stocks.push({
                     code: code,
                     name: name || '',
                     openPrice: parseNum(cols[5]),
                     highPrice: parseNum(cols[6]),
                     lowPrice: parseNum(cols[7]),
-                    closePrice: parseNum(cols[8]),
+                    closePrice: closePrice,
                     volume: parseNum(cols[3]),
                     tradeValue: parseNum(cols[4]),
-                    change: parseNum(cols[9]),
+                    change: change,
+                    changePercent: parseFloat(changePercent.toFixed(2)),
                     transactions: parseNum(cols[10]),
                     peRatio: null,
                     pbRatio: null,
@@ -342,16 +350,23 @@ export async function fetchTPExAllStocks() {
                 // 只過濾 4 位數純數字代碼
                 if (!/^\d{4}$/.test(code)) continue;
 
+                const closePrice = parseNum(item.Close);
+                const change = parseNum(item.Change);
+                // [Fix] Calculate changePercent = (change / prevClose) * 100
+                const prevClose = closePrice - change;
+                const changePercent = prevClose !== 0 ? (change / prevClose) * 100 : 0;
+
                 stocks.push({
                     code: code,
                     name: item.CompanyName || '',
-                    closePrice: parseNum(item.Close),
+                    closePrice: closePrice,
                     openPrice: parseNum(item.Open),
                     highPrice: parseNum(item.High),
                     lowPrice: parseNum(item.Low),
                     volume: parseNum(item.TradingShares),
                     tradeValue: parseNum(item.TransactionAmount),
-                    change: parseNum(item.Change),
+                    change: change,
+                    changePercent: parseFloat(changePercent.toFixed(2)),
                     transactions: parseNum(item.Transaction),
                     peRatio: null,
                     pbRatio: null,
