@@ -133,40 +133,28 @@ export async function fetchTWSESectorList() {
         const sectorMap = new Map();
         if (response.data && Array.isArray(response.data)) {
             response.data.forEach(item => {
-                // 欄位名稱：公司代號、產業別 (代碼如 '01', '24' 等)
                 const code = (item['公司代號'] || item.code || '').trim();
-                // const name = cols[2]; // This line was problematic in the instruction, `cols` is not defined. Removed.
-
-                // [修正] 產業分類邏輯
-                const industryCode = item['產業別'] || ''; // Reverted to original as `cols[4]` was incorrect here.
+                const industryCode = item['產業別'] || '';
+                // [修正] 這裡需要引入 INDUSTRY_CODE_MAP (請確認檔案上方有定義)
                 let sector = INDUSTRY_CODE_MAP[industryCode] || '其他';
 
-                // [新增] 強制將 00 開頭的代碼歸類為 ETF (若尚未被歸類)
-                // 必須先 trim，避免 " 0050" 導致漏判
+                // 排除權證 (通常 03-08 開頭且長度為 6)
+                if (code.length === 6 &&
+                    (code.startsWith('03') || code.startsWith('04') ||
+                        code.startsWith('05') || code.startsWith('06') ||
+                        code.startsWith('07') || code.startsWith('08'))) {
+                    return; // Skip warrants
+                }
+
                 if (code.startsWith('00')) {
                     sector = 'ETF';
                 }
 
-                // 排除權證 (03-08開頭6碼) 但保留 ETFs (00開頭)
-                // The original instruction had a syntax error `continue;ctorMap.set`.
-                // Assuming the intent was to skip certain codes and then set the map.
-                // Reconstructed to be syntactically correct and logically sound based on the comment.
-                if (code.length === 6 && !code.startsWith('00') && !code.startsWith('01') && !code.startsWith('02') && !code.startsWith('03')) {
-                    // This condition is a bit ambiguous from the instruction "03-08開頭6碼".
-                    // For now, I'll interpret it as skipping 6-digit codes that are not 00, 01, 02, 03.
-                    // If 03-08 means a range, it needs more specific logic.
-                    // Given the context of "排除權證", it's likely targeting specific types of securities.
-                    // For now, I'll keep the original logic for setting the map, and only apply the ETF override.
-                    // The instruction's `continue;ctorMap.set` was a syntax error and unclear intent.
-                    // I will apply the `if (code) sectorMap.set(code.trim(), sector);` as the final action for valid codes.
-                }
-
-                if (code) sectorMap.set(code.trim(), sector);
+                if (code) sectorMap.set(code, sector);
             });
-            console.log(`✅ TWSE 產業分類對照表: ${sectorMap.size} 檔`);
-            // 驗證幾檔主要股票
-            console.log(`   📊 驗證: 2330=${sectorMap.get('2330')}, 2317=${sectorMap.get('2317')}, 2881=${sectorMap.get('2881')}`);
-        }
+        } console.log(`✅ TWSE 產業分類對照表: ${sectorMap.size} 檔`);
+        // 驗證幾檔主要股票
+        console.log(`   📊 驗證: 2330=${sectorMap.get('2330')}, 2317=${sectorMap.get('2317')}, 2881=${sectorMap.get('2881')}`);
         return sectorMap;
     } catch (error) {
         console.error('TWSE 產業分類 API 失敗:', error.message);
@@ -330,28 +318,30 @@ export async function fetchTWSEAllStocks() {
 
         console.log(`✅ TWSE 共 ${stocks.length} 檔上市股票 (含 ETF)`);
 
-        // 3. [新增] 補充產業分類資料
+        // 3. [修正 Point 1 & 3] 產業分類與 ETF 強制歸類
         try {
             const sectorMap = await fetchTWSESectorList();
-            let sectorCount = 0;
+
             for (const stock of stocks) {
+                // 優先使用官方產業分類
                 const sector = sectorMap.get(stock.code);
-                if (sector && sector !== '其他') {
-                    stock.sector = sector;
-                    sectorCount++;
-                } else if (stock.code.startsWith('00')) {
-                    // [Fix] Double verification for ETFs
+
+                if (stock.code.startsWith('00')) {
+                    // [強制] 只要是 00 開頭，強制歸類為 ETF，覆蓋任何其他分類
                     stock.sector = 'ETF';
-                    sectorCount++;
+                } else if (sector && sector !== '其他') {
+                    stock.sector = sector;
                 } else {
-                    stock.sector = '其他'; // 未分類
+                    stock.sector = '其他';
                 }
             }
-            console.log(`   🏭 補充產業分類: ${sectorCount} 檔`);
         } catch (sectorError) {
-            console.warn('產業分類資料獲取失敗（不影響主要數據）:', sectorError.message);
-            // 預設為「其他」
-            stocks.forEach(s => s.sector = s.sector || '其他');
+            console.warn('產業分類資料獲取失敗，使用基本判斷:', sectorError.message);
+            // Fallback
+            stocks.forEach(s => {
+                if (s.code.startsWith('00')) s.sector = 'ETF';
+                else s.sector = s.sector || '其他';
+            });
         }
 
         // 驗證 0050 和 2330

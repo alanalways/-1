@@ -264,27 +264,32 @@ function setupEventListeners() {
     // Search (live filter as you type)
     elements.searchInput?.addEventListener('input', (e) => {
         state.searchQuery = e.target.value.trim().toLowerCase();
-        state.sectorFilter = null; // [新增] 搜尋時清除產業篩選
+        // 當使用者開始新的輸入時，清除之前的產業鎖定，讓搜尋重新基於全市場
+        if (state.searchQuery) {
+            state.sectorFilter = null;
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            // 恢復 "全部" 按鈕活性
+            document.querySelector('.filter-btn[data-filter="all"]')?.classList.add('active');
+        }
         applyFiltersAndSort();
     });
 
-    // [新增] Search - 按 Enter 後清空搜尋欄（結果保留）
+    // [修正 Point 2] Search - 按 Enter 後清空搜尋欄 (UI 清空，但保留篩選結果)
     elements.searchInput?.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
             e.preventDefault();
             const input = e.target;
-            // 如果找到結果，清空搜尋欄但保留結果
+
+            // 如果有搜尋結果，則鎖定畫面
             if (state.filteredStocks.length > 0) {
                 const resultCount = state.filteredStocks.length;
 
-                // 使用 setTimeout 確保在事件循環後執行，避免被瀏覽器預設行為覆蓋
-                setTimeout(() => {
-                    input.value = '';
-                    input.blur();
-                }, 10);
+                // 視覺上清空輸入框，但在 state 中保留 searchQuery 以維持篩選結果
+                // 注意：這裡不清除 state.searchQuery
+                input.value = '';
+                input.blur();
 
-                // 保留 state.searchQuery，讓篩選結果維持
-                showToast(`🔍 已鎖定 ${resultCount} 檔搜尋結果`);
+                showToast(`🔍 已鎖定 ${resultCount} 檔搜尋結果 (輸入新文字以重置)`);
             } else {
                 showToast('❌ 找不到符合的股票', 'error');
             }
@@ -362,9 +367,11 @@ async function fetchWithCORS(url) {
 
 // === Stock Card Factory ===
 
+// [修正 Point 3] 每個股票顯示分類，且點擊可篩選同產業
 function createStockCard(stock, index) {
     const isFavorited = state.watchlist.includes(stock.code);
     const changeClass = stock.changePercent > 0 ? 'positive' : (stock.changePercent < 0 ? 'negative' : '');
+    const sector = stock.sector || '其他';
 
     // [新增] 自動補全 SMC Tags (若 patterns 有值但 tags 沒寫)
     let displayTags = [...(stock.tags || [])];
@@ -393,13 +400,16 @@ function createStockCard(stock, index) {
 
     return `
         <div class="stock-card" data-stock-code="${stock.code}" style="animation-delay: ${index * 0.05}s">
+            <div class="stock-card-header">
                 <div class="stock-card-info">
                     <span class="stock-code">${stock.code || 'N/A'}</span>
                     <span class="stock-name">${stock.name || 'Unknown'}</span>
-                    <span class="stock-sector" title="${stock.sector || '其他'}">[${stock.sector || '其他'}]</span>
+                    <span class="stock-sector clickable-sector" data-sector="${sector}" title="點擊查看所有 ${sector} 股">
+                        [${sector}]
+                    </span>
                 </div>
                 <div class="stock-card-actions">
-                    <button class="action-btn ${isFavorited ? 'favorited' : ''}" data-action="favorite" data-code="${stock.code}" title="加入自選">
+                     <button class="action-btn ${isFavorited ? 'favorited' : ''}" data-action="favorite" data-code="${stock.code}" title="加入自選">
                         ${isFavorited ? '⭐' : '☆'}
                     </button>
                     <button class="action-btn" data-action="analyze" data-code="${stock.code}" title="深度分析">
@@ -896,6 +906,30 @@ function renderStockCards() {
         container.appendChild(loadMoreContainer);
     }
 
+    // [修正 Point 3] 綁定產業標籤點擊事件
+    container.querySelectorAll('.clickable-sector').forEach(el => {
+        el.addEventListener('click', (e) => {
+            e.stopPropagation(); // 避免觸發卡片點擊
+            const sector = e.target.dataset.sector;
+            if (sector) {
+                // 1. 設定產業篩選
+                state.sectorFilter = sector;
+                // 2. 清除搜尋關鍵字 (讓使用者看到該產業所有股票，而非只有搜尋的那檔)
+                state.searchQuery = '';
+                elements.searchInput.value = '';
+                // 3. 移除其他篩選按鈕活性
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+
+                // 4. 執行篩選
+                applyFiltersAndSort();
+                showToast(`🔥 已顯示所有「${sector}」股票`);
+
+                // 5. 滾動到頂部
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        });
+    });
+
     // Add event listeners to action buttons
     container.querySelectorAll('.action-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
@@ -928,69 +962,7 @@ function renderStockCards() {
     });
 }
 
-function createStockCard(stock, index) {
-    const isFavorited = state.watchlist.includes(stock.code);
-    const changeClass = stock.changePercent > 0 ? 'positive' : (stock.changePercent < 0 ? 'negative' : '');
 
-    // Generate tags HTML
-    const tagsHtml = (stock.tags || []).map(tag => {
-        let className = 'tag';
-        if (tag.type === 'bullish') className += ' bullish';
-        else if (tag.type === 'bearish') className += ' bearish';
-        else if (tag.type === 'neutral') className += ' neutral';
-        else if (tag.type === 'smc-ob') className += ' smc-ob';
-        else if (tag.type === 'smc-fvg') className += ' smc-fvg';
-        else if (tag.type === 'smc-liq') className += ' smc-liq';
-        else if (tag.type === 'wyckoff') className += ' wyckoff';
-
-        return `<span class="${className}">${tag.label}</span>`;
-    }).join('');
-
-    return `
-        <div class="stock-card" data-stock-code="${stock.code}" style="animation-delay: ${index * 0.05}s">
-            <div class="stock-card-header">
-                <div class="stock-card-info">
-                    <span class="stock-code">${stock.code || 'N/A'}</span>
-                    <span class="stock-name">${stock.name || 'Unknown'}</span>
-                    <span class="stock-sector" title="${stock.sector || '其他'}">[${stock.sector || '其他'}]</span>
-                </div>
-                <div class="stock-card-actions">
-                    <button class="action-btn ${isFavorited ? 'favorited' : ''}" data-action="favorite" data-code="${stock.code}" title="加入自選">
-                        ${isFavorited ? '⭐' : '☆'}
-                    </button>
-                    <button class="action-btn" data-action="analyze" data-code="${stock.code}" title="深度分析">
-                        📊
-                    </button>
-                    <button class="action-btn" data-action="chart" data-code="${stock.code}" title="開啟走勢圖">
-                        📈
-                    </button>
-                </div>
-            </div>
-            <div class="stock-card-stats">
-                <div class="stock-stat">
-                    <span class="stock-stat-label">收盤價</span>
-                    <span class="stock-stat-value">${stock.closePrice || 'N/A'}</span>
-                </div>
-                <div class="stock-stat">
-                    <span class="stock-stat-label">漲跌幅</span>
-                    <span class="stock-stat-value ${changeClass}">${stock.changePercent > 0 ? '+' : ''}${stock.changePercent?.toFixed(2) || 0}%</span>
-                </div>
-                <div class="stock-stat">
-                    <span class="stock-stat-label">評分</span>
-                    <span class="stock-stat-value">${stock.score || 'N/A'}</span>
-                </div>
-                ${stock.peRatio ? `
-                <div class="stock-stat">
-                    <span class="stock-stat-label">本益比</span>
-                    <span class="stock-stat-value">${stock.peRatio}</span>
-                </div>
-                ` : ''}
-            </div>
-            <div class="stock-card-analysis">${stock.analysis || '分析資料載入中...'}</div>
-            <div class="stock-card-tags">${tagsHtml}</div>
-        </div>
-    `;
-}
 
 function renderWatchlist() {
     const container = elements.watchlistCards;

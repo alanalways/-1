@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026/1/30 下午6:51:35",
+  "lastUpdated": "2026/1/30 下午6:56:38",
   "analysisDate": "2026-01-30",
   "marketIntelligence": {
     "taiex": {
@@ -40,16 +40,16 @@
       {
         "symbol": "VIX",
         "name": "VIX 恐慌指數",
-        "price": "18.88",
-        "change": "2.00",
-        "changePercent": "11.85"
+        "price": "18.91",
+        "change": "2.03",
+        "changePercent": "12.03"
       },
       {
         "symbol": "DXY",
         "name": "DXY 美元指數",
-        "price": "96.63",
-        "change": "0.34",
-        "changePercent": "0.36"
+        "price": "96.60",
+        "change": "0.32",
+        "changePercent": "0.33"
       }
     ],
     "commodities": [
@@ -57,25 +57,25 @@
         "symbol": "GC=F",
         "name": "黃金",
         "icon": "🥇",
-        "price": "5107.20",
-        "change": "-247.60",
-        "changePercent": "-4.62"
+        "price": "5115.30",
+        "change": "-239.50",
+        "changePercent": "-4.47"
       },
       {
         "symbol": "SI=F",
         "name": "白銀",
         "icon": "🥈",
-        "price": "99.86",
-        "change": "-14.56",
-        "changePercent": "-12.73"
+        "price": "100.20",
+        "change": "-14.22",
+        "changePercent": "-12.43"
       },
       {
         "symbol": "CL=F",
         "name": "原油",
         "icon": "🛢️",
-        "price": "64.63",
-        "change": "-0.79",
-        "changePercent": "-1.21"
+        "price": "64.77",
+        "change": "-0.65",
+        "changePercent": "-0.99"
       },
       {
         "symbol": "NG=F",
@@ -83,23 +83,23 @@
         "icon": "🔥",
         "price": "3.88",
         "change": "-0.04",
-        "changePercent": "-0.97"
+        "changePercent": "-1.10"
       },
       {
         "symbol": "BTC-USD",
         "name": "Bitcoin",
         "icon": "₿",
-        "price": "82520.98",
-        "change": "-2032.71",
-        "changePercent": "-2.40"
+        "price": "82659.89",
+        "change": "-1893.80",
+        "changePercent": "-2.24"
       },
       {
         "symbol": "ETH-USD",
         "name": "Ethereum",
         "icon": "Ξ",
-        "price": "2726.69",
-        "change": "-91.36",
-        "changePercent": "-3.24"
+        "price": "2730.95",
+        "change": "-87.10",
+        "changePercent": "-3.09"
       }
     ]
   },
