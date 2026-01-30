@@ -135,26 +135,25 @@ export async function fetchTWSESectorList() {
             response.data.forEach(item => {
                 const code = (item['公司代號'] || item.code || '').trim();
                 const industryCode = item['產業別'] || '';
-                // [修正] 這裡需要引入 INDUSTRY_CODE_MAP (請確認檔案上方有定義)
                 let sector = INDUSTRY_CODE_MAP[industryCode] || '其他';
 
-                // 排除權證 (通常 03-08 開頭且長度為 6)
+                // 排除權證 (03-08開頭6碼)
                 if (code.length === 6 &&
                     (code.startsWith('03') || code.startsWith('04') ||
                         code.startsWith('05') || code.startsWith('06') ||
                         code.startsWith('07') || code.startsWith('08'))) {
-                    return; // Skip warrants
+                    return;
                 }
 
+                // 00 開頭強制為 ETF
                 if (code.startsWith('00')) {
                     sector = 'ETF';
                 }
 
                 if (code) sectorMap.set(code, sector);
             });
-        } console.log(`✅ TWSE 產業分類對照表: ${sectorMap.size} 檔`);
-        // 驗證幾檔主要股票
-        console.log(`   📊 驗證: 2330=${sectorMap.get('2330')}, 2317=${sectorMap.get('2317')}, 2881=${sectorMap.get('2881')}`);
+            console.log(`✅ TWSE 產業分類對照表: ${sectorMap.size} 檔`);
+        }
         return sectorMap;
     } catch (error) {
         console.error('TWSE 產業分類 API 失敗:', error.message);
@@ -275,34 +274,22 @@ export async function fetchTWSEAllStocks() {
                 const line = lines[i].trim();
                 if (!line) continue;
 
-                // [修正] 使用正確的 CSV 解析器，避免數字中的逗號導致欄位錯位
+                // [修改 1] 改用 parseCSVLine 來正確解析
                 const cols = parseCSVLine(line);
 
-                // [修正] STOCK_DAY_ALL 格式：證券代號(0), 證券名稱(1), ...
-                // 之前誤用了 cols[1] 當代號 (那是名稱)，導致 "台積電" 被當作代號過濾掉
+                // [修改 2] 修正欄位索引：代號是 0，名稱是 1
                 const code = cols[0];
                 const name = cols[1];
 
-                // 過濾 4-6 位數純數字代碼（包含 5 位數 ETF 如 00878, 00930, 00940 等）
+                // 過濾 4-6 位數純數字代碼（包含 5 位數 ETF）
                 if (!/^\d{4,6}$/.test(code)) continue;
 
-                const closePrice = parseNum(cols[7]); // 收盤價通常在第 8 欄 (Index 7)
-                // 根據 STOCK_DAY_ALL 格式:
-                // 0:代號, 1:名稱, 2:成交股數, 3:成交金額, 4:開盤, 5:最高, 6:最低, 7:收盤, 8:漲跌, 9:筆數
-
-                // 漲跌價差 (Index 8) 
-                // 注意：STOCK_DAY_ALL 有時會帶有 +/- 符號，有時沒有
-                let changeStr = cols[8];
-                const change = parseNum(changeStr);
+                // [修改 3] 修正價格欄位索引
+                // 格式: 代號(0), 名稱(1), 成交股(2), 金額(3), 開(4), 高(5), 低(6), 收(7), 漲跌(8), 筆數(9)
+                const closePrice = parseNum(cols[7]);
+                const change = parseNum(cols[8]); // 漲跌價差
 
                 // 計算漲跌幅
-                // 昨收 = 收盤 - 漲跌
-                // 注意：如果漲跌為負， 昨收 = 收盤 - (-值) = 收盤 + 值 (錯)
-                // 正確：昨收 = 收盤 - 漲跌 (若漲跌是帶符號的數值)
-                // 但 API 有時回傳絕對值，需要配合前面的符號，這裡假設 parseNum 已處理好負號
-                // 若 API 回傳的是字串 "+5.00" 或 "-5.00"，parseFloat 沒問題
-
-                // 更安全的計算漲跌幅： (漲跌 / (收盤 - 漲跌)) * 100
                 const prevClose = closePrice - change;
                 const changePercent = prevClose !== 0 ? (change / prevClose) * 100 : 0;
 
@@ -325,7 +312,7 @@ export async function fetchTWSEAllStocks() {
                 });
             }
         }
-        console.log(`   📈 STOCK_DAY_ALL 股價資料: ${stocks.length} 檔`);
+        console.log(`   📈 STOCK_DAY_ALL 股價資料: ${stocks.length} 檔 (應包含 2330 台積電)`);
 
         // 2. 補充基本面資料 (BWIBBU_d - 只有普通股票有本益比，ETF 沒有)
         try {
@@ -360,37 +347,28 @@ export async function fetchTWSEAllStocks() {
 
         console.log(`✅ TWSE 共 ${stocks.length} 檔上市股票 (含 ETF)`);
 
-        // 3. [修正 Point 1 & 3] 產業分類與 ETF 強制歸類
+        // 3. 補充產業分類資料
         try {
             const sectorMap = await fetchTWSESectorList();
 
             for (const stock of stocks) {
-                // 優先使用官方產業分類
-                const sector = sectorMap.get(stock.code);
-
+                // [強制] 00 開頭歸類為 ETF
                 if (stock.code.startsWith('00')) {
-                    // [強制] 只要是 00 開頭，強制歸類為 ETF，覆蓋任何其他分類
                     stock.sector = 'ETF';
-                } else if (sector && sector !== '其他') {
+                    continue;
+                }
+
+                const sector = sectorMap.get(stock.code);
+                if (sector && sector !== '其他') {
                     stock.sector = sector;
                 } else {
-                    stock.sector = '其他';
+                    stock.sector = '其他'; // 未分類
                 }
             }
         } catch (sectorError) {
-            console.warn('產業分類資料獲取失敗，使用基本判斷:', sectorError.message);
-            // Fallback
-            stocks.forEach(s => {
-                if (s.code.startsWith('00')) s.sector = 'ETF';
-                else s.sector = s.sector || '其他';
-            });
+            console.warn('產業分類資料獲取失敗（不影響主要數據）:', sectorError.message);
+            stocks.forEach(s => s.sector = s.sector || '其他');
         }
-
-        // 驗證 0050 和 2330
-        const etf0050 = stocks.find(s => s.code === '0050');
-        const tsmc = stocks.find(s => s.code === '2330');
-        if (etf0050) console.log(`   📊 驗證 ETF: 0050 元大台灣50 收盤價 = ${etf0050.closePrice}, 產業 = ${etf0050.sector}`);
-        if (tsmc) console.log(`   📊 驗證: 2330 台積電 收盤價 = ${tsmc.closePrice}, PE = ${tsmc.peRatio}, 產業 = ${tsmc.sector}`);
 
         return stocks;
     } catch (error) {
@@ -428,7 +406,6 @@ export async function fetchTPExAllStocks() {
 
                 const closePrice = parseNum(item.Close);
                 const change = parseNum(item.Change);
-                // [Fix] Calculate changePercent = (change / prevClose) * 100
                 const prevClose = closePrice - change;
                 const changePercent = prevClose !== 0 ? (change / prevClose) * 100 : 0;
 
@@ -484,11 +461,6 @@ export async function fetchTPExAllStocks() {
         }
 
         console.log(`✅ TPEx 共 ${stocks.length} 檔上櫃股票`);
-
-        // 驗證 8048
-        const desheng = stocks.find(s => s.code === '8048');
-        if (desheng) console.log(`   📊 驗證: 8048 德勝 收盤價 = ${desheng.closePrice}`);
-
         return stocks;
     } catch (error) {
         console.error('TPEx API 失敗:', error.message);
