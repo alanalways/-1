@@ -13,6 +13,9 @@ const priceCache = {
     THROTTLE_MS: 30000 // 30 秒節流
 };
 
+// Discover Latest Client Application
+console.log('🚀 App Version: 1.2 (ETF+Search Fix)');
+
 // === State Management ===
 const state = {
     currentPage: 'dashboard',
