@@ -13,7 +13,7 @@ import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import cron from 'node-cron';
-import { getStocks, getMarketSummary } from './lib/supabase.js';
+import { getStocks, getMarketSummary, getGeminiApiKeys } from './lib/supabase.js';
 
 // ES Module 路徑處理
 const __filename = fileURLToPath(import.meta.url);
@@ -98,59 +98,72 @@ app.use('/api/yahoo', async (req, res) => {
 
 
 // ========================================
-// Gemini AI 分析端點
+// Gemini AI 分析端點 (Dynamic Keys from Supabase)
 // ========================================
-// ========================================
-// Gemini AI 分析端點 (Multi-Key Rotation)
-// ========================================
-const GEMINI_API_KEYS = [
-    'AIzaSyBYeW6P87Hc5GiKy56ESI-2gotdfiNYWug',
-    'AIzaSyB2HQuUFBAkTD01HPQBlOuymIKKtfruHKs',
-    'AIzaSyBegBOQKsZ8VIQNxWxAFjIGFnR-N9HqD-A',
-    'AIzaSyBH4DospzODeYRHZ-KbnHgdfhkXjN28Yq4',
-    // 'AIzaSyBegBOQKsZ8VIQNxWxAFjIGFnR-N9HqD-A' // Duplicate removed
-];
-
 const GEMINI_MODELS = [
-    'gemini-3-flash-preview',           // Tier 1: 優先 (Better quality)
-    'gemini-2.5-flash-preview-09-2025'  // Tier 2: 備用 (Fallback)
+    'gemini-2.5-flash-preview-05-20',   // Tier 1: 優先 (Latest)
+    'gemini-2.0-flash'                  // Tier 2: 備用 (Stable)
 ];
 
-// Key 狀態管理 (各 Key 獨立 Rate Limit)
-const keyStates = GEMINI_API_KEYS.map(key => ({
-    key,
-    lastused: 0,
-    disabledUntil: 0 // 若遇到非相關錯誤可暫時停用
-}));
+// 動態 API Keys 管理 (從 Supabase 讀取)
+let geminiApiKeys = [];
+let keyStates = [];
+let keysLoaded = false;
+
+async function loadGeminiKeys() {
+    try {
+        geminiApiKeys = await getGeminiApiKeys();
+        if (geminiApiKeys.length > 0) {
+            keyStates = geminiApiKeys.map(key => ({
+                key,
+                lastused: 0,
+                disabledUntil: 0
+            }));
+            keysLoaded = true;
+            console.log(`✅ 已載入 ${geminiApiKeys.length} 組 Gemini API Keys`);
+        } else {
+            console.warn('⚠️ 未找到 Gemini API Keys，AI 功能將無法使用');
+        }
+    } catch (error) {
+        console.error('❌ 載入 Gemini API Keys 失敗:', error.message);
+    }
+}
 
 function getNextAvailableKey() {
+    if (keyStates.length === 0) return null;
+
     const now = Date.now();
-    // 簡單輪詢: 找一個最近最少使用且未被停用的 Key
-    // 這裡為了均勻分佈，可以排序 lastused
     const availableKeys = keyStates
         .filter(k => now > k.disabledUntil)
         .sort((a, b) => a.lastused - b.lastused);
 
     if (availableKeys.length === 0) {
-        // 若全部都在冷卻，選最早的一個 (強制等待)
         return keyStates.sort((a, b) => a.disabledUntil - b.disabledUntil)[0];
     }
     return availableKeys[0];
 }
 
-const MIN_REQUEST_INTERVAL = 2000; // 每個 Key 至少間隔 2 秒 (分散負載)
+const MIN_REQUEST_INTERVAL = 2000;
 
 async function callGeminiAPI(prompt) {
+    // 確保 API Keys 已載入
+    if (!keysLoaded || geminiApiKeys.length === 0) {
+        await loadGeminiKeys();
+    }
+
+    if (geminiApiKeys.length === 0) {
+        return { success: false, error: '未設定 Gemini API Keys，請在 Supabase config 表中新增 gemini_api_keys' };
+    }
+
     // 雙層迴圈: Model -> Keys
     for (const model of GEMINI_MODELS) {
-        // 嘗試所有可用的 Keys (最多嘗試次數 = Keys 數量)
-        // 為了避免單次請求過久，這裡限制每種模型最多試 3 次不同的 Key
         let attempts = 0;
-        const maxAttempts = GEMINI_API_KEYS.length;
+        const maxAttempts = geminiApiKeys.length;
 
         while (attempts < maxAttempts) {
             attempts++;
             const keyState = getNextAvailableKey();
+            if (!keyState) break;
             const now = Date.now();
 
             // 檢查是否需要等待 (Rate Limit)
@@ -466,7 +479,7 @@ async function checkAndInitializeData() {
 }
 
 // === 啟動伺服器 ===
-app.listen(PORT, '0.0.0.0', () => {
+app.listen(PORT, '0.0.0.0', async () => {
     console.log(`
     🚀 Discover Latest Server Started!
     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -475,6 +488,9 @@ app.listen(PORT, '0.0.0.0', () => {
     ⏰ Cron: 每個交易日 14:00 更新
     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     `);
+
+    // 啟動時載入 Gemini API Keys
+    await loadGeminiKeys();
 
     // 啟動後立即檢查資料狀態 (Cold Start Fix)
     checkAndInitializeData();
