@@ -536,6 +536,83 @@ async function loadMarketData() {
     }
 }
 
+// === [新增] 即時刷新功能 (混合架構核心) ===
+// 直接從 TWSE/TPEx 抓取最新資料並即時運算
+async function refreshLiveData() {
+    try {
+        showToast('🔄 正在從證交所即時抓取資料...', 'info');
+
+        // 顯示載入狀態
+        if (elements.stockCards) {
+            elements.stockCards.innerHTML = `
+                <div class="loading-card" style="grid-column: 1/-1; text-align: center; padding: 60px;">
+                    <div class="loading-spinner"></div>
+                    <p style="margin-top: 20px; color: var(--text-secondary);">
+                        正在從 TWSE/TPEx 即時抓取資料...<br>
+                        <small>此過程可能需要 30-60 秒</small>
+                    </p>
+                </div>
+            `;
+        }
+
+        const response = await fetch('/api/refresh');
+        const data = await response.json();
+
+        if (!data.success) {
+            throw new Error(data.error || '即時刷新失敗');
+        }
+
+        // 更新狀態
+        state.allStocks = data.stocks.map(s => ({
+            code: s.code,
+            name: s.name,
+            closePrice: parseFloat(s.closePrice) || 0,
+            openPrice: parseFloat(s.openPrice) || 0,
+            highPrice: parseFloat(s.highPrice) || 0,
+            lowPrice: parseFloat(s.lowPrice) || 0,
+            volume: parseInt(s.volume) || 0,
+            changePercent: parseFloat(s.changePercent) || 0,
+            signal: s.signal || 'NEUTRAL',
+            score: s.score || 0,
+            market: s.market || '上市',
+            sector: s.sector || '其他',
+            peRatio: s.peRatio,
+            analysis: s.analysis,
+            patterns: s.patterns
+        }));
+
+        state.filteredStocks = [...state.allStocks];
+
+        // 重新渲染
+        applyFiltersAndSort();
+
+        // 更新 UI
+        if (elements.lastUpdated) {
+            elements.lastUpdated.textContent = `${new Date().toLocaleString('zh-TW')} (即時更新: ${data.elapsed})`;
+            elements.lastUpdated.style.color = '#10b981';
+            setTimeout(() => elements.lastUpdated.style.color = '', 3000);
+        }
+
+        showToast(`✅ 即時更新完成！${data.totalStocks} 檔股票 (${data.elapsed})`, 'success');
+        console.log(`✅ 即時刷新：${data.totalStocks} 檔，看多 ${data.statistics.bullish}，看空 ${data.statistics.bearish}`);
+
+        return true;
+
+    } catch (error) {
+        console.error('即時刷新失敗:', error);
+        showToast('❌ 即時刷新失敗: ' + error.message, 'error');
+
+        // 回復顯示 (重新載入 Supabase 資料)
+        await loadMarketData();
+        renderStockCards();
+
+        return false;
+    }
+}
+
+// 將函數暴露到全域供 HTML 呼叫
+window.refreshLiveData = refreshLiveData;
+
 // === 即時報價更新 (僅更新畫面上可見的股票) ===
 async function updateVisiblePrices() {
     // 節流檢查：上次更新 < 30 秒不發請求

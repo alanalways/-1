@@ -75,8 +75,13 @@
                     <span class="update-label">最後更新</span>
                     <span class="update-time" id="lastUpdated">--</span>
                 </div>
-                <button class="refresh-btn" id="refreshBtn" title="重新載入數據">
+                <button class="refresh-btn" id="refreshBtn" title="從快取重新載入">
                     🔄 刷新數據
+                </button>
+                <button class="refresh-btn live-refresh" onclick="refreshLiveData()" 
+                        title="從證交所即時抓取最新資料 (需 30-60 秒)"
+                        style="background: linear-gradient(135deg, #f59e0b, #d97706); margin-top: 8px;">
+                    🔥 即時更新
                 </button>
             </div>
         </aside>

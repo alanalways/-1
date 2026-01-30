@@ -40,39 +40,10 @@ export async function runDailyUpdate() {
 
         console.log(`✅ 取得 ${allStocks.length} 檔股票`);
 
-        // === 2. 分析 SMC 訊號 ===
-        console.log('\n🧠 執行 SMC/ICT 分析...');
-        const analyzedStocks = analyzer.selectRecommendations(allStocks, allStocks.length);
-        console.log(`✅ 分析完成：${analyzedStocks.length} 檔`);
-
-        // [新增] 強制保留重要股票 (確保 2330、ETF 等一定在名單中)
-        const mustHaveCodes = ['2330', '2317', '2454', '3034', '2881', '2882', '2884', '2886', '2891', '2892'];
-        const mustHaveStocks = allStocks.filter(s =>
-            // 保留指定的權值股
-            mustHaveCodes.includes(s.code) ||
-            // 保留所有 ETF (代碼 00 開頭)
-            s.code.startsWith('00')
-        );
-
-        // 把「推薦股」和「強制保留股」合併，並去除重複
-        const finalStockMap = new Map();
-        analyzedStocks.forEach(s => finalStockMap.set(s.code, s));
-
-        mustHaveStocks.forEach(mustHave => {
-            if (!finalStockMap.has(mustHave.code)) {
-                // 如果原本名單沒有，補進去並給予預設評分
-                const scored = analyzer.selectRecommendations([mustHave], 1)[0] || {
-                    ...mustHave,
-                    score: mustHave.score || 50,
-                    signal: mustHave.signal || 'NEUTRAL',
-                    analysis: `⚖️ **${mustHave.name}** [${mustHave.sector || '其他'}] ➤ 盤整觀望。`
-                };
-                finalStockMap.set(mustHave.code, scored);
-            }
-        });
-
-        const finalStockList = Array.from(finalStockMap.values());
-        console.log(`📊 合併後共 ${finalStockList.length} 檔 (原 ${analyzedStocks.length} + 強制保留 ${finalStockList.length - analyzedStocks.length})`);
+        // === 2. 分析 SMC 訊號 (全部股票，無截斷) ===
+        console.log('\n🧠 執行 SMC/ICT 分析 (全市場)...');
+        const finalStockList = analyzer.analyzeAllStocks(allStocks);
+        console.log(`✅ 分析完成：${finalStockList.length} 檔 (全部股票皆已評分)`);
 
         // === 3. 儲存到 Supabase ===
         if (supabaseClient.isSupabaseEnabled()) {

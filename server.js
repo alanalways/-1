@@ -453,6 +453,64 @@ app.post('/api/trigger-update', async (req, res) => {
     }
 });
 
+// === [新增] 即時刷新端點 (混合架構核心) ===
+// 直接從 TWSE/TPEx 抓取最新資料並即時運算，不使用 Supabase 快取
+app.get('/api/refresh', async (req, res) => {
+    console.log('🔄 即時刷新請求...');
+    const startTime = Date.now();
+
+    try {
+        // 動態載入模組
+        const fetcher = await import('./scripts/fetch-data.js');
+        const analyzer = await import('./scripts/analyze.js');
+
+        // 1. 即時抓取股票資料
+        console.log('📡 從 TWSE/TPEx 即時抓取資料...');
+        const allStocks = await fetcher.default.fetchAllStocks();
+
+        if (allStocks.length === 0) {
+            return res.status(503).json({
+                success: false,
+                error: '無法取得即時資料 (可能為非交易時間或 API 維護中)'
+            });
+        }
+
+        // 2. 即時分析所有股票
+        console.log(`🧠 即時分析 ${allStocks.length} 檔股票...`);
+        const analyzedStocks = analyzer.default.analyzeAllStocks(allStocks);
+
+        // 3. 計算統計資料
+        const bullishCount = analyzedStocks.filter(s => s.signal === 'BULLISH').length;
+        const bearishCount = analyzedStocks.filter(s => s.signal === 'BEARISH').length;
+        const smcCount = analyzedStocks.filter(s => s.patterns?.ob || s.patterns?.fvg || s.patterns?.sweep).length;
+
+        const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+        console.log(`✅ 即時刷新完成！耗時 ${elapsed} 秒，共 ${analyzedStocks.length} 檔股票`);
+
+        // 4. 回傳資料
+        res.json({
+            success: true,
+            timestamp: new Date().toISOString(),
+            elapsed: `${elapsed}s`,
+            totalStocks: analyzedStocks.length,
+            statistics: {
+                bullish: bullishCount,
+                bearish: bearishCount,
+                neutral: analyzedStocks.length - bullishCount - bearishCount,
+                smcSignals: smcCount
+            },
+            stocks: analyzedStocks
+        });
+
+    } catch (error) {
+        console.error('❌ 即時刷新失敗:', error);
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
 // === 排程任務 ===
 // 台股收盤後更新：每個交易日下午 14:00 (台北時間)
 // Cron 格式：分 時 日 月 週 (週一到週五)

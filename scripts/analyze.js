@@ -388,9 +388,37 @@ export function selectRecommendations(stocks, limit = 20) {
     return scoredStocks.slice(0, limit);
 }
 
+/**
+ * [新增] 分析所有股票 - 不截斷，確保每檔都有完整評分
+ * 用於每日更新，確保 2330/ETF 等所有股票都會被正確評分
+ */
+export function analyzeAllStocks(stocks) {
+    console.log(`🧠 開始分析 ${stocks.length} 檔股票...`);
+
+    const scoredStocks = stocks.map(stock => {
+        const scoreResult = calculateStockScore(stock);
+        return {
+            ...stock,
+            ...scoreResult,
+            analysis: generateAnalysisText(stock, scoreResult),
+            tags: generateTags(stock, scoreResult)
+        };
+    });
+
+    // 依分數排序（但不截斷）
+    scoredStocks.sort((a, b) => {
+        if (b.score !== a.score) return b.score - a.score;
+        return parseFloat(b.volume || 0) - parseFloat(a.volume || 0);
+    });
+
+    console.log(`✅ 完成分析 ${scoredStocks.length} 檔股票 (無截斷)`);
+    return scoredStocks;
+}
+
 export default {
     calculateStockScore,
     generateAnalysisText,
     generateTags,
-    selectRecommendations
+    selectRecommendations,
+    analyzeAllStocks
 };

@@ -193,40 +193,11 @@ async function generateReport() {
     console.log('\n🧠 執行 SMC/ICT 分析 (全市場)...');
     console.time('SMC_Analysis');
 
-    // Analyze ALL stocks - 無數量限制
-    const analyzedStocks = analyzer.selectRecommendations(enrichedStocks, enrichedStocks.length);
-
-    // [新增] 強制保留重要股票 (確保 2330、ETF 等一定在名單中)
-    const mustHaveCodes = ['2330', '2317', '2454', '3034', '2881', '2882', '2884', '2886', '2891', '2892'];
-    const mustHaveStocks = enrichedStocks.filter(s =>
-        // 保留指定的權值股
-        mustHaveCodes.some(c => s.code.includes(c)) ||
-        // 保留所有 ETF (代碼 00 開頭)
-        s.code.startsWith('00')
-    );
-
-    // 把「推薦股」和「強制保留股」合併，並去除重複
-    const finalStockMap = new Map();
-    analyzedStocks.forEach(s => finalStockMap.set(s.code, s));
-
-    mustHaveStocks.forEach(mustHave => {
-        if (!finalStockMap.has(mustHave.code)) {
-            // 如果原本名單沒有，補進去並給予預設評分
-            const scored = analyzer.selectRecommendations([mustHave], 1)[0] || {
-                ...mustHave,
-                score: mustHave.score || 50,
-                signal: mustHave.signal || 'NEUTRAL',
-                analysis: `⚖️ **${mustHave.name}** [${mustHave.sector || '其他'}] ➤ 盤整觀望。`
-            };
-            finalStockMap.set(mustHave.code, scored);
-        }
-    });
-
-    const allAnalyzedStocks = Array.from(finalStockMap.values());
-    console.log(`📊 合併後共 ${allAnalyzedStocks.length} 檔 (原 ${analyzedStocks.length} + 強制保留 ${allAnalyzedStocks.length - analyzedStocks.length})`);
+    // [修正] 使用 analyzeAllStocks 分析全部股票，不截斷
+    const allAnalyzedStocks = analyzer.analyzeAllStocks(enrichedStocks);
 
     console.timeEnd('SMC_Analysis');
-    console.log(`✅ 全市場分析完成：${allAnalyzedStocks.length} 檔`);
+    console.log(`✅ 全市場分析完成：${allAnalyzedStocks.length} 檔 (全部股票皆已評分)`);
 
     // Statistics
     const bullishCount = allAnalyzedStocks.filter(s => s.signal === 'BULLISH').length;
