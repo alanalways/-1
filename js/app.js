@@ -1597,16 +1597,16 @@ function setupAIAnalysisButton(stock) {
                     }
                 }
 
+                // [修改] 移除模型顯示，將標題改為 Discover AI
                 resultDiv.innerHTML = `
                     <div class="ai-result-header">
                         <span class="ai-result-icon">🤖</span>
-                        <span class="ai-result-title">Gemini AI 分析</span>
-                        <span class="ai-result-model">${data.model}</span>
+                        <span class="ai-result-title">Discover AI 分析</span>
                     </div>
                     <div class="ai-result-content">${data.analysis.replace(/\n/g, '<br>')}</div>
                 `;
 
-                console.log(`✅ AI 分析完成 (${data.model}):`, data.stockCode);
+                console.log(`✅ AI 分析完成:`, data.stockCode);
             } else {
                 throw new Error(data.error || 'AI 分析失敗');
             }
