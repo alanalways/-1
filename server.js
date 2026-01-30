@@ -406,17 +406,98 @@ app.get('/api/ai-related-stocks', async (req, res) => {
         });
     }
 });// === API Proxy 端點 ===
-// [新增] 內部數據 API (讓前端讀取 Supabase)
+
+// === [修改] 完全即時架構：直接從 TWSE/TPEx 抓取 ===
+// 每天只寫入 Supabase 一次
+
+// 追蹤今日是否已同步到 Supabase
+const syncState = {
+    lastSyncDate: null,  // 上次同步的日期 (YYYY-MM-DD)
+    isSyncing: false     // 是否正在同步中
+};
+
+import { saveStocks, isSupabaseEnabled } from './lib/supabase.js';
+
 app.get('/api/data/stocks', async (req, res) => {
+    console.log('📡 [即時模式] 從 TWSE/TPEx 抓取股票資料...');
+    const startTime = Date.now();
+
     try {
-        const stocks = await getStocks();
-        if (!stocks || stocks.length === 0) {
-            return res.status(404).json({ error: '目前沒有資料' });
+        // 動態載入模組
+        const fetcher = await import('./scripts/fetch-data.js');
+        const analyzer = await import('./scripts/analyze.js');
+
+        // 1. 即時抓取股票資料
+        const allStocks = await fetcher.default.fetchAllStocks();
+
+        if (!allStocks || allStocks.length === 0) {
+            console.warn('⚠️ 無法從 TWSE 取得資料，嘗試從 Supabase 讀取快取...');
+            // Fallback: 如果 TWSE 失敗，嘗試從 Supabase 讀取
+            const cachedStocks = await getStocks();
+            if (cachedStocks && cachedStocks.length > 0) {
+                return res.json(cachedStocks);
+            }
+            return res.status(503).json({ error: '無法取得股票資料 (TWSE API 可能維護中)' });
         }
-        res.json(stocks);
+
+        // 2. 即時分析所有股票
+        console.log(`🧠 分析 ${allStocks.length} 檔股票...`);
+        const analyzedStocks = analyzer.default.analyzeAllStocks(allStocks);
+
+        // 3. 每天只寫入 Supabase 一次
+        const today = new Date().toISOString().split('T')[0];
+        if (isSupabaseEnabled() && syncState.lastSyncDate !== today && !syncState.isSyncing) {
+            syncState.isSyncing = true;
+            console.log('💾 今日首次請求，同步到 Supabase...');
+
+            try {
+                await saveStocks(analyzedStocks);
+                syncState.lastSyncDate = today;
+                console.log(`✅ 已同步 ${analyzedStocks.length} 檔股票到 Supabase (今日只執行一次)`);
+            } catch (dbError) {
+                console.error('⚠️ Supabase 同步失敗:', dbError.message);
+            } finally {
+                syncState.isSyncing = false;
+            }
+        }
+
+        const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+        console.log(`✅ 即時抓取完成！${analyzedStocks.length} 檔股票，耗時 ${elapsed}s`);
+
+        // 4. 轉換格式並回傳 (符合前端期望的格式)
+        const result = analyzedStocks.map(s => ({
+            code: s.code,
+            name: s.name,
+            close_price: s.closePrice,
+            open_price: s.openPrice,
+            high_price: s.highPrice,
+            low_price: s.lowPrice,
+            volume: s.volume,
+            change_percent: s.changePercent,
+            signal: s.signal,
+            score: s.score,
+            market: s.market,
+            sector: s.sector,
+            pe_ratio: s.peRatio,
+            analysis: s.analysis,
+            patterns: s.patterns
+        }));
+
+        res.json(result);
+
     } catch (error) {
-        console.error('API Error:', error);
-        res.status(500).json({ error: '伺服器讀取錯誤' });
+        console.error('❌ 即時抓取失敗:', error);
+
+        // Fallback: 嘗試從 Supabase 讀取快取
+        try {
+            const cachedStocks = await getStocks();
+            if (cachedStocks && cachedStocks.length > 0) {
+                console.log('📦 使用 Supabase 快取資料');
+                return res.json(cachedStocks);
+            }
+        } catch (e) { }
+
+        res.status(500).json({ error: '伺服器讀取錯誤: ' + error.message });
     }
 });
 
