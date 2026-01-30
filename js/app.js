@@ -272,9 +272,10 @@ function setupEventListeners() {
             // 如果找到結果，清空搜尋欄但保留結果
             if (state.filteredStocks.length > 0) {
                 const resultCount = state.filteredStocks.length;
-                elements.searchInput.value = ''; // 清空輸入欄
+                e.target.value = ''; // 直接清空 DOM
                 // 保留 state.searchQuery，讓篩選結果維持
-                showToast(`🔍 找到 ${resultCount} 檔股票`);
+                showToast(`🔍 已鎖定 ${resultCount} 檔搜尋結果`);
+                e.target.blur();
             } else {
                 showToast('❌ 找不到符合的股票', 'error');
             }
@@ -761,8 +762,13 @@ function applyFiltersAndSort() {
     // [新增] Apply sector filter (from Hot Sectors card click)
     if (state.sectorFilter) {
         const beforeCount = stocks.length;
-        stocks = stocks.filter(s => s.sector === state.sectorFilter);
+        stocks = stocks.filter(s => s.sector?.trim() === state.sectorFilter?.trim());
         console.log(`🔥 產業篩選 [${state.sectorFilter}]: ${beforeCount} → ${stocks.length} 檔`);
+        if (stocks.length === 0) {
+            console.warn(`⚠️ 篩選結果為空！有可能資料庫中的產業名稱不匹配。Filter: '${state.sectorFilter}'`);
+            // Debug: print some sectors
+            console.log('Available sectors sample:', state.allStocks.slice(0, 10).map(s => s.sector));
+        }
     }
 
     // Apply search filter

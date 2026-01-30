@@ -460,8 +460,10 @@ cron.schedule('0 14 * * 1-5', async () => {
 async function checkAndInitializeData() {
     console.log('🔍 Checking database status...');
     try {
+
         const summary = await getMarketSummary();
-        const stocks = await getStocks({ limit: 100 }); // Sample check
+        // Fetch ALL stocks to verify data integrity (specifically for ETF 00930 fix)
+        const stocks = await getStocks();
         const now = new Date();
         const oneDayCheck = 24 * 60 * 60 * 1000; // 24 hours
 
@@ -474,6 +476,13 @@ async function checkAndInitializeData() {
             const otherRatio = otherSectorCount / stocks.length;
             if (otherRatio > 0.8) { // 超過 80% 是 '其他'，表示需要更新
                 console.warn(`⚠️ Sector data looks incorrect (${(otherRatio * 100).toFixed(1)}% = '其他'). Forcing update...`);
+                needsUpdate = true;
+            }
+
+            // [新增] 條件：(4) 驗證 5 位數 ETF 是否存在 (如 00930)
+            const hasETF930 = stocks.some(s => s.code === '00930');
+            if (!hasETF930) {
+                console.warn(`⚠️ Missing ETF 00930 (Fix for 5-digit codes needed). Forcing update...`);
                 needsUpdate = true;
             }
         }
