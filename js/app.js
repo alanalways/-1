@@ -2387,63 +2387,101 @@ function generateDividendBars() {
     }).join('');
 }
 
-// Render related stocks graph using data-driven correlation
-function renderRelatedStocksGraph(stock) {
+// Render related stocks graph using AI-powered correlation analysis
+async function renderRelatedStocksGraph(stock) {
     const container = document.getElementById('relatedStocksGraph');
     if (!container) return;
 
-    // 1. Get related stocks from same sector
-    // [Fix] Treat '其他' as null to force fallback logic for generic sectors
-    const sector = (stock.sector === '其他' || !stock.sector) ? null : stock.sector;
+    // Show loading state
+    container.innerHTML = `
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 280px; color: var(--text-muted);">
+            <div class="loading-spinner" style="margin-bottom: 1rem;"></div>
+            <span>🤖 AI 正在分析產業關聯...</span>
+        </div>
+    `;
 
-    // Fallback: If sector is generic, use Top Volume stocks as 'related' by market interest
-    let relatedStocks = [];
-    if (sector) {
-        relatedStocks = state.allStocks.filter(s => s.sector === sector && s.code !== stock.code);
+    let nodes = [];
+    let aiSuccess = false;
+
+    // Try AI-powered analysis first
+    try {
+        const params = new URLSearchParams({
+            code: stock.code.replace('.TW', '').replace('.TWO', ''),
+            name: stock.name || '',
+            sector: stock.sector || '',
+            price: stock.closePrice || stock.close_price || '',
+            changePercent: stock.changePercent || stock.change_percent || 0
+        });
+
+        const response = await fetch(`/api/ai-related-stocks?${params}`);
+        const result = await response.json();
+
+        if (result.success && result.data?.relatedStocks?.length > 0) {
+            nodes = result.data.relatedStocks.map(rs => ({
+                code: rs.code,
+                name: rs.name,
+                relationship: rs.relationship || '',
+                beta: parseFloat(rs.beta) || 0.5,
+                reason: rs.reason || '',
+                // Try to get real change percent from our data
+                change: (() => {
+                    const found = state.allStocks.find(s =>
+                        s.code === rs.code ||
+                        s.code === rs.code + '.TW' ||
+                        s.code === rs.code + '.TWO'
+                    );
+                    return found ? (found.changePercent || found.change_percent || 0) : 0;
+                })()
+            })).slice(0, 6);
+            aiSuccess = true;
+            console.log('🤖 AI Related Stocks:', nodes);
+        }
+    } catch (error) {
+        console.warn('AI related stocks failed, using fallback:', error);
     }
 
-    // If not enough stocks in sector, grab some from same market or top volume
-    if (relatedStocks.length < 3) {
-        relatedStocks = state.allStocks
-            .filter(s => s.code !== stock.code)
-            .sort((a, b) => (b.volume || 0) - (a.volume || 0))
-            .slice(0, 8);
-    }
+    // Fallback to static logic if AI failed
+    if (!aiSuccess || nodes.length === 0) {
+        const sector = (stock.sector === '其他' || !stock.sector) ? null : stock.sector;
+        let relatedStocks = [];
 
-    // 2. Calculate Correlation (Snapshot Beta Proxy)
-    // We use daily change percent similarity as a proxy for immediate correlation
-    const centerChange = stock.changePercent || 0;
-
-    const nodes = relatedStocks.map(s => {
-        const change = s.changePercent || 0;
-        let beta = 0;
-
-        // Simple heuristic for snapshot beta:
-        // Same direction? Positive. Opposite? Negative.
-        // Magnitude similarity determines how close to 1 or -1.
-        if (Math.sign(centerChange) === Math.sign(change) && centerChange !== 0) {
-            const ratio = Math.min(Math.abs(centerChange), Math.abs(change)) / Math.max(Math.abs(centerChange), Math.abs(change));
-            beta = 0.5 + (ratio * 0.5); // 0.5 ~ 1.0 (Positive Correlation)
-        } else if (centerChange !== 0) {
-            beta = -0.5 - (Math.min(Math.abs(centerChange), Math.abs(change)) / Math.max(1, Math.abs(centerChange))) * 0.5; // -0.5 ~ -1.0
-        } else {
-            // If center didn't move, assume weak positive correlation for same sector
-            beta = 0.2;
+        if (sector) {
+            relatedStocks = state.allStocks.filter(s => s.sector === sector && s.code !== stock.code);
+        }
+        if (relatedStocks.length < 3) {
+            relatedStocks = state.allStocks
+                .filter(s => s.code !== stock.code)
+                .sort((a, b) => (b.volume || 0) - (a.volume || 0))
+                .slice(0, 8);
         }
 
-        return {
-            code: s.code.replace('.TW', '').replace('.TWO', ''),
-            name: s.name,
-            change: change,
-            beta: beta.toFixed(2)
-        };
-    })
-        .sort((a, b) => Math.abs(b.beta) - Math.abs(a.beta)) // Prioritize strong correlations (pos or neg)
-        .slice(0, 6); // Top 6
+        const centerChange = stock.changePercent || stock.change_percent || 0;
+        nodes = relatedStocks.map(s => {
+            const change = s.changePercent || s.change_percent || 0;
+            let beta = 0;
+            if (Math.sign(centerChange) === Math.sign(change) && centerChange !== 0) {
+                const ratio = Math.min(Math.abs(centerChange), Math.abs(change)) / Math.max(Math.abs(centerChange), Math.abs(change));
+                beta = 0.5 + (ratio * 0.5);
+            } else if (centerChange !== 0) {
+                beta = -0.5 - (Math.min(Math.abs(centerChange), Math.abs(change)) / Math.max(1, Math.abs(centerChange))) * 0.5;
+            } else {
+                beta = 0.2;
+            }
+            return {
+                code: s.code.replace('.TW', '').replace('.TWO', ''),
+                name: s.name,
+                relationship: '同產業',
+                change: change,
+                beta: beta
+            };
+        })
+            .sort((a, b) => Math.abs(b.beta) - Math.abs(a.beta))
+            .slice(0, 6);
+    }
 
-    // Create SVG force-directed graph
+    // Render SVG graph
     const width = container.offsetWidth || 400;
-    const height = 280;
+    const height = 320; // Slightly taller for relationship labels
     const centerX = width / 2;
     const centerY = height / 2;
 
@@ -2456,49 +2494,66 @@ function renderRelatedStocksGraph(stock) {
             <stop offset="0%" style="stop-color:#f59e0b;stop-opacity:1" />
             <stop offset="100%" style="stop-color:#b45309;stop-opacity:1" />
         </radialGradient>
+        <filter id="glow">
+            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+            <feMerge>
+                <feMergeNode in="coloredBlur"/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
     </defs>`;
 
-    // Draw connections lines first (so they are behind nodes)
+    // Draw connection lines first (behind nodes)
     nodes.forEach((rs, i) => {
-        const angle = (i / nodes.length) * Math.PI * 2;
-        // Stronger correlation = Closer distance
-        const distance = 80 + (1 - Math.abs(rs.beta)) * 60;
+        const angle = (i / nodes.length) * Math.PI * 2 - Math.PI / 2; // Start from top
+        const distance = 85 + (1 - Math.abs(rs.beta)) * 50;
         const x = centerX + Math.cos(angle) * distance;
         const y = centerY + Math.sin(angle) * distance;
 
-        const beta = parseFloat(rs.beta);
-        // Green for positive, Red for negative
+        const beta = rs.beta;
         const color = beta > 0 ? '#10b981' : '#ef4444';
-        const opacity = Math.min(Math.abs(beta), 1);
-        const dashArray = beta < 0 ? '4,4' : ''; // Dash for negative correlation
+        const opacity = Math.min(Math.abs(beta) + 0.3, 1);
+        const dashArray = beta < 0 ? '4,4' : '';
+        const strokeWidth = 1 + Math.abs(beta) * 2;
 
         svg += `<line x1="${centerX}" y1="${centerY}" x2="${x}" y2="${y}" 
-                  stroke="${color}" stroke-width="${1 + Math.abs(beta) * 2}" stroke-dasharray="${dashArray}" opacity="${opacity}"/>`;
+                  stroke="${color}" stroke-width="${strokeWidth}" stroke-dasharray="${dashArray}" opacity="${opacity}"/>`;
     });
 
     // Draw center node (main stock)
-    svg += `<circle cx="${centerX}" cy="${centerY}" r="38" fill="url(#centerGrad)" stroke="#fff" stroke-width="2"/>`;
-    svg += `<text x="${centerX}" y="${centerY - 6}" text-anchor="middle" fill="#fff" font-size="12" font-weight="bold">${stock.name?.slice(0, 4) || ''}</text>`;
-    svg += `<text x="${centerX}" y="${centerY + 8}" text-anchor="middle" fill="#fff" font-size="10" opacity="0.9">${stock.changePercent > 0 ? '+' : ''}${stock.changePercent?.toFixed(2)}%</text>`;
+    const stockChange = stock.changePercent || stock.change_percent || 0;
+    svg += `<circle cx="${centerX}" cy="${centerY}" r="42" fill="url(#centerGrad)" stroke="#fff" stroke-width="2" filter="url(#glow)"/>`;
+    svg += `<text x="${centerX}" y="${centerY - 8}" text-anchor="middle" fill="#fff" font-size="13" font-weight="bold">${stock.name?.slice(0, 4) || ''}</text>`;
+    svg += `<text x="${centerX}" y="${centerY + 8}" text-anchor="middle" fill="#fff" font-size="11" opacity="0.9">${stockChange > 0 ? '+' : ''}${stockChange?.toFixed(2)}%</text>`;
+    if (aiSuccess) {
+        svg += `<text x="${centerX}" y="${centerY + 22}" text-anchor="middle" fill="rgba(255,255,255,0.6)" font-size="8">🤖 AI 分析</text>`;
+    }
 
     // Draw related nodes
     nodes.forEach((rs, i) => {
-        const angle = (i / nodes.length) * Math.PI * 2;
-        const distance = 80 + (1 - Math.abs(rs.beta)) * 60;
+        const angle = (i / nodes.length) * Math.PI * 2 - Math.PI / 2;
+        const distance = 85 + (1 - Math.abs(rs.beta)) * 50;
         const x = centerX + Math.cos(angle) * distance;
         const y = centerY + Math.sin(angle) * distance;
 
-        const beta = parseFloat(rs.beta);
+        const beta = rs.beta;
         const isPositive = beta > 0;
         const nodeColor = isPositive ? '#064e3b' : '#450a0a';
         const strokeColor = isPositive ? '#10b981' : '#ef4444';
 
-        svg += `<circle cx="${x}" cy="${y}" r="30" fill="${nodeColor}" stroke="${strokeColor}" stroke-width="2"/>`;
-        svg += `<text x="${x}" y="${y - 4}" text-anchor="middle" fill="#fff" font-size="10" font-weight="bold">${rs.name?.slice(0, 3) || ''}</text>`;
-        svg += `<text x="${x}" y="${y + 8}" text-anchor="middle" fill="${strokeColor}" font-size="9">${rs.change > 0 ? '+' : ''}${rs.change.toFixed(1)}%</text>`;
+        svg += `<circle cx="${x}" cy="${y}" r="32" fill="${nodeColor}" stroke="${strokeColor}" stroke-width="2"/>`;
+        svg += `<text x="${x}" y="${y - 6}" text-anchor="middle" fill="#fff" font-size="10" font-weight="bold">${rs.name?.slice(0, 4) || ''}</text>`;
+        svg += `<text x="${x}" y="${y + 6}" text-anchor="middle" fill="${strokeColor}" font-size="9">${rs.change > 0 ? '+' : ''}${rs.change.toFixed(1)}%</text>`;
 
-        // Beta Label
-        // svg += `<text x="${x}" y="${y + 20}" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-size="8">β ${rs.beta}</text>`;
+        // Show relationship label (if from AI)
+        if (rs.relationship && aiSuccess) {
+            svg += `<text x="${x}" y="${y + 18}" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-size="8">${rs.relationship.slice(0, 4)}</text>`;
+        }
+
+        // Beta label on the line
+        const midX = (centerX + x) / 2;
+        const midY = (centerY + y) / 2;
+        svg += `<text x="${midX}" y="${midY - 5}" text-anchor="middle" fill="rgba(255,255,255,0.4)" font-size="8">β${beta.toFixed(2)}</text>`;
     });
 
     svg += `</svg>`;

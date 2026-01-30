@@ -283,9 +283,98 @@ app.get('/api/ai-analysis', async (req, res) => {
     }
 });
 
+// ========================================
+// AI 產業關聯股分析端點
+// ========================================
+app.get('/api/ai-related-stocks', async (req, res) => {
+    const { code, name, sector, price, changePercent } = req.query;
 
+    if (!code) {
+        return res.status(400).json({ error: '缺少股票代碼' });
+    }
 
-// === API Proxy 端點 ===
+    const prompt = `你是台灣股市專家 Discover AI。請分析【${code} ${name || ''}】的產業關聯股票。
+
+【目標股票資訊】
+- 股票代號：${code}
+- 股票名稱：${name || '未知'}
+- 產業類別：${sector || '未知'}
+- 目前股價：${price || '未知'} 元
+- 今日漲跌：${changePercent || 0}%
+
+【任務】
+請根據台股市場實際情況，列出 5-6 檔與此股票最相關的台灣上市櫃股票。
+
+分析關聯性時請考慮：
+1. **供應鏈關係**：上游供應商、下游客戶
+2. **競爭關係**：同產業直接競爭對手
+3. **集團關係**：同一集團或控股公司
+4. **產業連動**：同細分產業會一起漲跌的股票
+5. **業務互補**：業務有互補或合作關係
+
+【回傳格式】
+請嚴格按照以下 JSON 格式回傳（不要加任何其他文字）：
+
+{
+  "centerStock": "${code}",
+  "relatedStocks": [
+    {
+      "code": "股票代碼",
+      "name": "股票名稱",
+      "relationship": "關係描述（如：供應商、競爭對手、同集團、產業連動）",
+      "beta": 0.85,
+      "reason": "一句話說明為何相關"
+    }
+  ]
+}
+
+【Beta 相關性說明】
+- beta 範圍：-1.0 到 +1.0
+- +0.8 ~ +1.0：高度正相關（同漲同跌）
+- +0.5 ~ +0.8：中度正相關
+- +0.2 ~ +0.5：弱正相關
+- -0.2 ~ +0.2：幾乎無相關
+- -0.5 ~ -0.2：弱負相關
+- -1.0 ~ -0.5：負相關（反向連動）
+
+請只回傳 JSON，不要有任何額外說明文字。`;
+
+    const result = await callGeminiAPI(prompt);
+
+    if (result.success) {
+        try {
+            // 解析 AI 回傳的 JSON
+            let content = result.content.trim();
+            // 移除可能的 markdown code block
+            if (content.startsWith('```json')) {
+                content = content.replace(/^```json\s*/, '').replace(/\s*```$/, '');
+            } else if (content.startsWith('```')) {
+                content = content.replace(/^```\s*/, '').replace(/\s*```$/, '');
+            }
+
+            const parsed = JSON.parse(content);
+
+            res.json({
+                success: true,
+                model: result.model,
+                data: parsed
+            });
+        } catch (parseError) {
+            console.error('JSON Parse Error:', parseError.message);
+            console.error('Raw Content:', result.content);
+            res.status(500).json({
+                success: false,
+                error: 'AI 回傳格式解析失敗',
+                rawContent: result.content
+            });
+        }
+    } else {
+        res.status(500).json({
+            success: false,
+            error: result.error || 'AI 分析失敗'
+        });
+    }
+});// === API Proxy 端點 ===
 // [新增] 內部數據 API (讓前端讀取 Supabase)
 app.get('/api/data/stocks', async (req, res) => {
     try {
