@@ -2037,39 +2037,46 @@ async function loadTradingViewWidget(symbol, timeframe = '1Y') {
     }
 
     // === Strategy 4: Try Yahoo Finance via CORS proxy (備用) ===
-    try {
-        const twSymbol = `${cleanCode}.TW`;
-        // [修改] 使用動態 range 參數
-        const url = `https://query1.finance.yahoo.com/v8/finance/chart/${twSymbol}?interval=1d&range=${range.yahoo}`;
+    const tryYahoo = async (suffix) => {
+        try {
+            const yahooSymbol = `${cleanCode}.${suffix}`;
+            // [修改] 使用動態 range 參數
+            const url = `https://query1.finance.yahoo.com/v8/finance/chart/${yahooSymbol}?interval=1d&range=${range.yahoo}`;
 
-        if (loading) loading.innerHTML = '<span style="color: var(--accent-yellow);">📊 從 Yahoo 抓取資料中...</span>';
+            if (loading) loading.innerHTML = '<span style="color: var(--accent-yellow);">📊 從 Yahoo 抓取資料中...</span>';
 
-        const response = await fetchWithCORS(url);
-        const data = await response.json();
+            const response = await fetchWithCORS(url);
+            const data = await response.json();
 
-        if (data.chart?.result?.[0]) {
-            const result = data.chart.result[0];
-            const timestamps = result.timestamp || [];
-            const quotes = result.indicators?.quote?.[0] || {};
+            if (data.chart?.result?.[0]) {
+                const result = data.chart.result[0];
+                const timestamps = result.timestamp || [];
+                const quotes = result.indicators?.quote?.[0] || {};
 
-            const chartData = timestamps.map((t, i) => ({
-                date: new Date(t * 1000).toLocaleDateString('zh-TW', { month: 'short', day: 'numeric' }),
-                open: quotes.open?.[i] || quotes.close?.[i] || 0,
-                close: quotes.close?.[i] || 0,
-                high: quotes.high?.[i] || 0,
-                low: quotes.low?.[i] || 0
-            })).filter(d => d.close > 0);
+                const chartData = timestamps.map((t, i) => ({
+                    date: new Date(t * 1000).toLocaleDateString('zh-TW', { month: 'short', day: 'numeric' }),
+                    open: quotes.open?.[i] || quotes.close?.[i] || 0,
+                    close: quotes.close?.[i] || 0,
+                    high: quotes.high?.[i] || 0,
+                    low: quotes.low?.[i] || 0
+                })).filter(d => d.close > 0);
 
-            if (chartData.length > 0) {
-                renderSelfBuiltChart(container, chartData, symbol);
-                if (loading) loading.style.display = 'none';
-                console.log(`📊 Chart loaded from Yahoo API for ${cleanCode}`);
-                return;
+                if (chartData.length > 0) {
+                    renderSelfBuiltChart(container, chartData, symbol);
+                    if (loading) loading.style.display = 'none';
+                    console.log(`📊 Chart loaded from Yahoo API for ${yahooSymbol}`);
+                    return true;
+                }
             }
+        } catch (e) {
+            console.warn(`Yahoo Finance API failed for ${suffix}:`, e);
         }
-    } catch (e) {
-        console.warn('Yahoo Finance API failed:', e);
-    }
+        return false;
+    };
+
+    // 先試 TW (上市)，若失敗再試 TWO (上櫃)
+    if (await tryYahoo('TW')) return;
+    if (await tryYahoo('TWO')) return;
 
     // === Strategy 5: 使用當前股票的今日數據建立簡易圖表 ===
     try {
@@ -2380,21 +2387,27 @@ function generateDividendBars() {
     }).join('');
 }
 
-// Render related stocks graph using simple SVG
 // Render related stocks graph using data-driven correlation
 function renderRelatedStocksGraph(stock) {
     const container = document.getElementById('relatedStocksGraph');
     if (!container) return;
 
     // 1. Get related stocks from same sector
-    const sector = stock.sector || '其他';
-    // Filter stocks in same sector, excluding self
-    let relatedStocks = state.allStocks
-        .filter(s => s.sector === sector && s.code !== stock.code);
+    // [Fix] Treat '其他' as null to force fallback logic for generic sectors
+    const sector = (stock.sector === '其他' || !stock.sector) ? null : stock.sector;
+
+    // Fallback: If sector is generic, use Top Volume stocks as 'related' by market interest
+    let relatedStocks = [];
+    if (sector) {
+        relatedStocks = state.allStocks.filter(s => s.sector === sector && s.code !== stock.code);
+    }
 
     // If not enough stocks in sector, grab some from same market or top volume
     if (relatedStocks.length < 3) {
-        relatedStocks = state.allStocks.filter(s => s.code !== stock.code).sort((a, b) => b.volume - a.volume);
+        relatedStocks = state.allStocks
+            .filter(s => s.code !== stock.code)
+            .sort((a, b) => (b.volume || 0) - (a.volume || 0))
+            .slice(0, 8);
     }
 
     // 2. Calculate Correlation (Snapshot Beta Proxy)
