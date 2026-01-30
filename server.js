@@ -454,10 +454,75 @@ app.post('/api/trigger-update', async (req, res) => {
 });
 
 // === [新增] 即時刷新端點 (混合架構核心) ===
-// 直接從 TWSE/TPEx 抓取最新資料並即時運算，不使用 Supabase 快取
+// 直接從 TWSE/TPEx 抓取最新資料並即時運算
+// 保護機制：30 秒冷卻、每日最多 10 次、成功後寫入 Supabase
+
+// 刷新狀態追蹤
+const refreshState = {
+    lastRefreshTime: 0,      // 上次刷新的時間戳
+    dailyCount: 0,           // 今日刷新次數
+    dailyCountDate: null,    // 計數器的日期
+    COOLDOWN_MS: 30000,      // 30 秒冷卻
+    DAILY_LIMIT: 10          // 每日最多 10 次
+};
+
+// 重置每日計數器 (跨日重置)
+function resetDailyCounterIfNeeded() {
+    const today = new Date().toISOString().split('T')[0];
+    if (refreshState.dailyCountDate !== today) {
+        refreshState.dailyCount = 0;
+        refreshState.dailyCountDate = today;
+        console.log('📅 每日刷新計數器已重置');
+    }
+}
+
+// 查詢刷新狀態 API
+app.get('/api/refresh/status', (req, res) => {
+    resetDailyCounterIfNeeded();
+
+    const now = Date.now();
+    const cooldownRemaining = Math.max(0, refreshState.COOLDOWN_MS - (now - refreshState.lastRefreshTime));
+
+    res.json({
+        canRefresh: cooldownRemaining === 0 && refreshState.dailyCount < refreshState.DAILY_LIMIT,
+        cooldownRemaining: Math.ceil(cooldownRemaining / 1000),
+        dailyCount: refreshState.dailyCount,
+        dailyLimit: refreshState.DAILY_LIMIT,
+        lastRefreshTime: refreshState.lastRefreshTime ? new Date(refreshState.lastRefreshTime).toISOString() : null
+    });
+});
+
 app.get('/api/refresh', async (req, res) => {
     console.log('🔄 即時刷新請求...');
     const startTime = Date.now();
+
+    // === 保護機制檢查 ===
+    resetDailyCounterIfNeeded();
+
+    // 1. 冷卻時間檢查
+    const timeSinceLastRefresh = startTime - refreshState.lastRefreshTime;
+    if (timeSinceLastRefresh < refreshState.COOLDOWN_MS) {
+        const remaining = Math.ceil((refreshState.COOLDOWN_MS - timeSinceLastRefresh) / 1000);
+        console.log(`⏳ 冷卻中，還需等待 ${remaining} 秒`);
+        return res.status(429).json({
+            success: false,
+            error: `請稍候 ${remaining} 秒後再試`,
+            cooldownRemaining: remaining,
+            dailyCount: refreshState.dailyCount,
+            dailyLimit: refreshState.DAILY_LIMIT
+        });
+    }
+
+    // 2. 每日次數檢查
+    if (refreshState.dailyCount >= refreshState.DAILY_LIMIT) {
+        console.log(`🚫 今日刷新次數已達上限 (${refreshState.DAILY_LIMIT} 次)`);
+        return res.status(429).json({
+            success: false,
+            error: `今日刷新次數已達上限 (${refreshState.DAILY_LIMIT} 次)，請明日再試`,
+            dailyCount: refreshState.dailyCount,
+            dailyLimit: refreshState.DAILY_LIMIT
+        });
+    }
 
     try {
         // 動態載入模組
@@ -479,15 +544,30 @@ app.get('/api/refresh', async (req, res) => {
         console.log(`🧠 即時分析 ${allStocks.length} 檔股票...`);
         const analyzedStocks = analyzer.default.analyzeAllStocks(allStocks);
 
-        // 3. 計算統計資料
+        // 3. 寫入 Supabase (讓下一個使用者看到最新資料)
+        if (isSupabaseEnabled()) {
+            console.log('💾 同步寫入 Supabase...');
+            try {
+                await saveStocks(analyzedStocks);
+                console.log(`✅ 已同步 ${analyzedStocks.length} 檔股票到 Supabase`);
+            } catch (dbError) {
+                console.error('⚠️ Supabase 寫入失敗 (不影響回傳):', dbError.message);
+            }
+        }
+
+        // 4. 更新刷新狀態
+        refreshState.lastRefreshTime = Date.now();
+        refreshState.dailyCount++;
+
+        // 5. 計算統計資料
         const bullishCount = analyzedStocks.filter(s => s.signal === 'BULLISH').length;
         const bearishCount = analyzedStocks.filter(s => s.signal === 'BEARISH').length;
         const smcCount = analyzedStocks.filter(s => s.patterns?.ob || s.patterns?.fvg || s.patterns?.sweep).length;
 
         const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
-        console.log(`✅ 即時刷新完成！耗時 ${elapsed} 秒，共 ${analyzedStocks.length} 檔股票`);
+        console.log(`✅ 即時刷新完成！耗時 ${elapsed} 秒，共 ${analyzedStocks.length} 檔股票 (今日第 ${refreshState.dailyCount}/${refreshState.DAILY_LIMIT} 次)`);
 
-        // 4. 回傳資料
+        // 6. 回傳資料
         res.json({
             success: true,
             timestamp: new Date().toISOString(),
@@ -498,6 +578,11 @@ app.get('/api/refresh', async (req, res) => {
                 bearish: bearishCount,
                 neutral: analyzedStocks.length - bullishCount - bearishCount,
                 smcSignals: smcCount
+            },
+            rateLimit: {
+                dailyCount: refreshState.dailyCount,
+                dailyLimit: refreshState.DAILY_LIMIT,
+                nextRefreshAvailable: new Date(Date.now() + refreshState.COOLDOWN_MS).toISOString()
             },
             stocks: analyzedStocks
         });
@@ -510,6 +595,7 @@ app.get('/api/refresh', async (req, res) => {
         });
     }
 });
+
 
 // === 排程任務 ===
 // 台股收盤後更新：每個交易日下午 14:00 (台北時間)

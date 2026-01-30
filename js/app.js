@@ -538,8 +538,86 @@ async function loadMarketData() {
 
 // === [新增] 即時刷新功能 (混合架構核心) ===
 // 直接從 TWSE/TPEx 抓取最新資料並即時運算
-async function refreshLiveData() {
+// 包含冷卻計時器和每日限制處理
+
+let refreshCooldownTimer = null;
+
+// 更新刷新按鈕狀態
+function updateRefreshButtonState(canRefresh, cooldownRemaining = 0, dailyCount = 0, dailyLimit = 10) {
+    const btn = document.getElementById('liveRefreshBtn');
+    const remaining = document.getElementById('refreshRemaining');
+
+    if (remaining) {
+        remaining.textContent = dailyLimit - dailyCount;
+    }
+
+    if (btn) {
+        if (dailyCount >= dailyLimit) {
+            btn.disabled = true;
+            btn.innerHTML = '🚫 今日已達上限';
+            btn.style.background = '#666';
+        } else if (cooldownRemaining > 0) {
+            btn.disabled = true;
+            btn.innerHTML = `⏳ 冷卻中 ${cooldownRemaining}s`;
+            btn.style.background = '#666';
+        } else {
+            btn.disabled = false;
+            btn.innerHTML = '🔥 即時更新';
+            btn.style.background = 'linear-gradient(135deg, #f59e0b, #d97706)';
+        }
+    }
+}
+
+// 開始冷卻倒數計時
+function startCooldownTimer(seconds) {
+    if (refreshCooldownTimer) clearInterval(refreshCooldownTimer);
+
+    let remaining = seconds;
+    updateRefreshButtonState(false, remaining);
+
+    refreshCooldownTimer = setInterval(() => {
+        remaining--;
+        if (remaining <= 0) {
+            clearInterval(refreshCooldownTimer);
+            refreshCooldownTimer = null;
+            updateRefreshButtonState(true);
+        } else {
+            updateRefreshButtonState(false, remaining);
+        }
+    }, 1000);
+}
+
+// 獲取並顯示刷新狀態
+async function fetchRefreshStatus() {
     try {
+        const res = await fetch('/api/refresh/status');
+        const status = await res.json();
+        updateRefreshButtonState(
+            status.canRefresh,
+            status.cooldownRemaining,
+            status.dailyCount,
+            status.dailyLimit
+        );
+
+        // 如果正在冷卻，啟動計時器
+        if (status.cooldownRemaining > 0) {
+            startCooldownTimer(status.cooldownRemaining);
+        }
+    } catch (e) {
+        console.warn('無法獲取刷新狀態:', e.message);
+    }
+}
+
+async function refreshLiveData() {
+    const btn = document.getElementById('liveRefreshBtn');
+
+    try {
+        // 禁用按鈕
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '⏳ 抓取中...';
+        }
+
         showToast('🔄 正在從證交所即時抓取資料...', 'info');
 
         // 顯示載入狀態
@@ -557,6 +635,15 @@ async function refreshLiveData() {
 
         const response = await fetch('/api/refresh');
         const data = await response.json();
+
+        // 處理限制錯誤 (429)
+        if (response.status === 429) {
+            if (data.cooldownRemaining) {
+                startCooldownTimer(data.cooldownRemaining);
+            }
+            updateRefreshButtonState(false, data.cooldownRemaining || 0, data.dailyCount, data.dailyLimit);
+            throw new Error(data.error);
+        }
 
         if (!data.success) {
             throw new Error(data.error || '即時刷新失敗');
@@ -593,14 +680,20 @@ async function refreshLiveData() {
             setTimeout(() => elements.lastUpdated.style.color = '', 3000);
         }
 
-        showToast(`✅ 即時更新完成！${data.totalStocks} 檔股票 (${data.elapsed})`, 'success');
+        // 更新限制資訊並開始冷卻
+        if (data.rateLimit) {
+            updateRefreshButtonState(false, 30, data.rateLimit.dailyCount, data.rateLimit.dailyLimit);
+            startCooldownTimer(30);
+        }
+
+        showToast(`✅ 即時更新完成！${data.totalStocks} 檔股票已同步到資料庫 (${data.elapsed})`, 'success');
         console.log(`✅ 即時刷新：${data.totalStocks} 檔，看多 ${data.statistics.bullish}，看空 ${data.statistics.bearish}`);
 
         return true;
 
     } catch (error) {
         console.error('即時刷新失敗:', error);
-        showToast('❌ 即時刷新失敗: ' + error.message, 'error');
+        showToast('❌ ' + error.message, 'error');
 
         // 回復顯示 (重新載入 Supabase 資料)
         await loadMarketData();
@@ -612,6 +705,9 @@ async function refreshLiveData() {
 
 // 將函數暴露到全域供 HTML 呼叫
 window.refreshLiveData = refreshLiveData;
+
+// 初始化時獲取刷新狀態
+setTimeout(fetchRefreshStatus, 1000);
 
 // === 即時報價更新 (僅更新畫面上可見的股票) ===
 async function updateVisiblePrices() {
