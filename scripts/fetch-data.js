@@ -248,46 +248,36 @@ function parseCSVLine(line) {
 
 /**
  * 從證交所取得當日所有上市股票交易資料
- * 使用 STOCK_DAY_ALL API (股價) 為主，BWIBBU_d API (基本面) 為輔
- * 這樣可以包含 ETF (如 0050) 等沒有本益比的商品
+ * [修正] 改用 JSON 格式 API，避免 CSV 換行符解析問題
  */
 export async function fetchTWSEAllStocks() {
-    console.log('📡 正在從 TWSE 取得全部上市股票資料...');
+    console.log('📡 正在從 TWSE 取得全部上市股票資料 (JSON 格式)...');
 
     try {
-        // 1. 主要資料來源：STOCK_DAY_ALL (所有上市股票含 ETF)
+        // 1. 主要資料來源：STOCK_DAY_ALL (使用 JSON 格式，避免 CSV 換行符問題)
         const priceResponse = await http.get('https://www.twse.com.tw/exchangeReport/STOCK_DAY_ALL', {
-            params: { response: 'open_data' },
+            params: { response: 'json' },
             timeout: 60000
         });
 
-        // 解析股價資料（作為主要列表）
         const stocks = [];
         const parseNum = (str) => {
             if (!str || str === '--' || str === '') return 0;
-            return parseFloat(str.replace(/,/g, '')) || 0;
+            return parseFloat(String(str).replace(/,/g, '')) || 0;
         };
 
-        if (priceResponse.data) {
-            const lines = priceResponse.data.split('\n');
-            for (let i = 1; i < lines.length; i++) {
-                const line = lines[i].trim();
-                if (!line) continue;
-
-                // [修改 1] 改用 parseCSVLine 來正確解析
-                const cols = parseCSVLine(line);
-
-                // [修改 2] 修正欄位索引：代號是 0，名稱是 1
-                const code = cols[0];
-                const name = cols[1];
+        // JSON 格式: { stat: 'OK', data: [[code, name, volume, value, open, high, low, close, change, transactions], ...] }
+        if (priceResponse.data && priceResponse.data.stat === 'OK' && Array.isArray(priceResponse.data.data)) {
+            for (const row of priceResponse.data.data) {
+                // JSON 格式欄位: [0]代號, [1]名稱, [2]成交股數, [3]成交金額, [4]開盤, [5]最高, [6]最低, [7]收盤, [8]漲跌, [9]筆數
+                const code = String(row[0]).trim();
+                const name = String(row[1]).trim();
 
                 // 過濾 4-6 位數純數字代碼（包含 5 位數 ETF）
                 if (!/^\d{4,6}$/.test(code)) continue;
 
-                // [修改 3] 修正價格欄位索引
-                // 格式: 代號(0), 名稱(1), 成交股(2), 金額(3), 開(4), 高(5), 低(6), 收(7), 漲跌(8), 筆數(9)
-                const closePrice = parseNum(cols[7]);
-                const change = parseNum(cols[8]); // 漲跌價差
+                const closePrice = parseNum(row[7]);
+                const change = parseNum(row[8]); // 漲跌價差（帶正負號如 "+1.50" 或 "-2.00"）
 
                 // 計算漲跌幅
                 const prevClose = closePrice - change;
@@ -296,15 +286,15 @@ export async function fetchTWSEAllStocks() {
                 stocks.push({
                     code: code,
                     name: name || '',
-                    openPrice: parseNum(cols[4]),
-                    highPrice: parseNum(cols[5]),
-                    lowPrice: parseNum(cols[6]),
+                    openPrice: parseNum(row[4]),
+                    highPrice: parseNum(row[5]),
+                    lowPrice: parseNum(row[6]),
                     closePrice: closePrice,
-                    volume: parseNum(cols[2]),
-                    tradeValue: parseNum(cols[3]),
+                    volume: parseNum(row[2]),
+                    tradeValue: parseNum(row[3]),
                     change: change,
                     changePercent: parseFloat(changePercent.toFixed(2)),
-                    transactions: parseNum(cols[9]),
+                    transactions: parseNum(row[9]),
                     peRatio: null,
                     pbRatio: null,
                     dividendYield: null,
