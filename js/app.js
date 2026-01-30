@@ -46,12 +46,10 @@ const elements = {
     lastUpdated: document.getElementById('lastUpdated'),
     toast: document.getElementById('toast'),
     toastMessage: document.getElementById('toastMessage'),
+    modalOverlay: document.getElementById('modalOverlay'),
+    modalTitle: document.getElementById('modalTitle'),
     modalBody: document.getElementById('modalBody'),
-    pageTitle: document.getElementById('pageTitle'),
-    // === [新增] Header 進度條元件 ===
-    headerProgressContainer: document.getElementById('headerProgressContainer'),
-    headerProgressFill: document.getElementById('headerProgressFill'),
-    headerProgressText: document.getElementById('headerProgressText')
+    pageTitle: document.getElementById('pageTitle')
 };
 
 // === Initialization ===
@@ -448,68 +446,13 @@ function createStockCard(stock, index) {
     `;
 }
 
-// === [新增] Header 進度條控制 ===
-let headerProgressInterval = null;
-
-function updateHeaderProgress(percent, text = null) {
-    if (elements.headerProgressFill) {
-        elements.headerProgressFill.style.width = `${percent}%`;
-    }
-    if (elements.headerProgressText) {
-        elements.headerProgressText.textContent = text || `📡 載入中 ${Math.round(percent)}%`;
-    }
-}
-
-function simulateHeaderProgress() {
-    if (elements.headerProgressContainer) {
-        elements.headerProgressContainer.style.display = 'flex';
-    }
-
-    let currentPercent = 0;
-    updateHeaderProgress(0);
-
-    // 清除舊的計時器
-    if (headerProgressInterval) clearInterval(headerProgressInterval);
-
-    // 模擬進度：前 30 秒緩慢增加到 90%
-    // 每 200ms 增加一點
-    const totalSteps = 150; // 30秒 / 0.2秒
-    const stepIncrement = 90 / totalSteps;
-
-    headerProgressInterval = setInterval(() => {
-        if (currentPercent < 90) {
-            currentPercent += stepIncrement;
-            updateHeaderProgress(currentPercent);
-        } else if (currentPercent < 98) {
-            // 進入 90% 後變更慢
-            currentPercent += 0.1;
-            updateHeaderProgress(currentPercent, '🧠 分析中，請稍候...');
-        }
-    }, 200);
-}
-
-function finishHeaderProgress() {
-    if (headerProgressInterval) clearInterval(headerProgressInterval);
-    updateHeaderProgress(100, '✅ 載入完成');
-
-    setTimeout(() => {
-        if (elements.headerProgressContainer) {
-            elements.headerProgressContainer.style.opacity = '0';
-            setTimeout(() => {
-                elements.headerProgressContainer.style.display = 'none';
-                elements.headerProgressContainer.style.opacity = '1';
-            }, 500);
-        }
-    }, 1500);
-}
-
 // === Data Loading ===
 // [修改] 改為呼叫 Server API
 async function loadMarketData() {
     try {
         state.isLoading = true;
-        simulateHeaderProgress();
-        console.log('📡 正在從伺服器 API 請求數據 (即時模式)...');
+
+        console.log('📡 正在從伺服器 API 請求數據...');
 
         // 1. 平行請求股票列表與市場摘要
         const [stocksRes, marketRes] = await Promise.all([
@@ -569,10 +512,7 @@ async function loadMarketData() {
         state.allStocks = stocks;
         state.filteredStocks = [...state.allStocks];
 
-        // 5. 完成進度條
-        finishHeaderProgress();
-
-        // 6. 更新最後更新時間 UI (強制使用當前時間，確保使用者看到變化)
+        // 5. 更新最後更新時間 UI (強制使用當前時間，確保使用者看到變化)
         if (elements.lastUpdated) {
             const nowStr = new Date().toLocaleString('zh-TW');
             elements.lastUpdated.textContent = `${nowStr} (來源: 資料庫 API)`;
@@ -590,7 +530,6 @@ async function loadMarketData() {
 
     } catch (error) {
         console.error('Data Load Error:', error);
-        finishHeaderProgress();
         showToast('無法連接伺服器: ' + error.message, 'error');
         state.isLoading = false;
         return false;
