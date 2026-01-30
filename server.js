@@ -469,38 +469,69 @@ cron.schedule('0 14 * * 1-5', async () => {
     timezone: 'Asia/Taipei'
 });
 // === 初始化檢查機制 ===
+// [修改] 每次部署時強制更新 Supabase，確保程式碼與資料同步
 async function checkAndInitializeData() {
     console.log('🔍 Checking database status...');
     try {
-
         const summary = await getMarketSummary();
-        // Fetch ALL stocks to verify data integrity (specifically for ETF 00930 fix)
         const stocks = await getStocks();
         const now = new Date();
-        const oneDayCheck = 24 * 60 * 60 * 1000; // 24 hours
+        const taipeiHour = new Date().toLocaleString('en-US', { timeZone: 'Asia/Taipei', hour: 'numeric', hour12: false });
+        const currentHour = parseInt(taipeiHour);
 
-        // 條件：(1) 完全沒資料 或 (2) 資料過期超過 24 小時
-        let needsUpdate = !summary || !summary.updated_at || (now - new Date(summary.updated_at) > oneDayCheck);
+        // [新增] 強制更新標記：每次部署都觸發更新
+        // 這確保 GitHub 上的程式碼修改會立即反映到 Supabase 資料
+        const FORCE_UPDATE_ON_DEPLOY = true;
 
-        // [新增] 條件：(3) 產業分類資料不正確 (大部分都是 '其他')
-        if (!needsUpdate && stocks && stocks.length > 0) {
-            const otherSectorCount = stocks.filter(s => s.sector === '其他' || !s.sector).length;
-            const otherRatio = otherSectorCount / stocks.length;
-            if (otherRatio > 0.8) { // 超過 80% 是 '其他'，表示需要更新
-                console.warn(`⚠️ Sector data looks incorrect (${(otherRatio * 100).toFixed(1)}% = '其他'). Forcing update...`);
+        let needsUpdate = FORCE_UPDATE_ON_DEPLOY;
+        let updateReason = 'Deployment detected (force sync)';
+
+        // 額外條件檢查（即使強制更新關閉，這些條件也會觸發）
+        if (!FORCE_UPDATE_ON_DEPLOY) {
+            const oneDayCheck = 24 * 60 * 60 * 1000;
+
+            // 條件 1: 完全沒資料
+            if (!summary || !summary.updated_at) {
                 needsUpdate = true;
+                updateReason = 'No data in database';
             }
-
-            // [新增] 條件：(4) 驗證 5 位數 ETF 是否存在 (如 00930)
-            const hasETF930 = stocks.some(s => s.code === '00930');
-            if (!hasETF930) {
-                console.warn(`⚠️ Missing ETF 00930 (Fix for 5-digit codes needed). Forcing update...`);
+            // 條件 2: 資料過期超過 24 小時
+            else if ((now - new Date(summary.updated_at)) > oneDayCheck) {
                 needsUpdate = true;
+                updateReason = 'Data older than 24 hours';
             }
         }
 
+        // 條件 3: 產業分類資料不正確 (大部分都是 '其他')
+        if (!needsUpdate && stocks && stocks.length > 0) {
+            const otherSectorCount = stocks.filter(s => s.sector === '其他' || !s.sector).length;
+            const otherRatio = otherSectorCount / stocks.length;
+            if (otherRatio > 0.8) {
+                console.warn(`⚠️ Sector data looks incorrect (${(otherRatio * 100).toFixed(1)}% = '其他'). Forcing update...`);
+                needsUpdate = true;
+                updateReason = 'Sector data needs refresh';
+            }
+
+            // 條件 4: 驗證重要股票是否存在 (如 2330, 00930)
+            const hasTSMC = stocks.some(s => s.code === '2330');
+            const hasETF930 = stocks.some(s => s.code === '00930');
+            if (!hasTSMC) {
+                console.warn(`⚠️ Missing TSMC (2330). Forcing update...`);
+                needsUpdate = true;
+                updateReason = 'Missing critical stock 2330';
+            }
+            if (!hasETF930) {
+                console.warn(`⚠️ Missing ETF 00930. Forcing update...`);
+                needsUpdate = true;
+                updateReason = 'Missing ETF 00930';
+            }
+        }
+
+        // 交易時間檢查 (台北時間 9:00-14:30 為交易時段)
+        const isMarketHours = currentHour >= 9 && currentHour <= 14;
+
         if (needsUpdate) {
-            console.warn('⚠️ Database empty, stale, or sector data incorrect. Triggering immediate update...');
+            console.warn(`⚠️ Update needed: ${updateReason}`);
             console.log('🚀 Running Cold Start Update...');
 
             // 動態載入並執行更新
@@ -508,7 +539,10 @@ async function checkAndInitializeData() {
             await runDailyUpdate();
             console.log('✅ Cold Start Update Completed!');
         } else {
-            console.log('✅ Database is up to date. Last updated:', summary.updated_at);
+            console.log('✅ Database is up to date. Last updated:', summary?.updated_at);
+            if (!isMarketHours) {
+                console.log('ℹ️ Note: Outside market hours (09:00-14:30 TPE)');
+            }
         }
     } catch (error) {
         console.error('❌ Database Initialization Check Failed:', error);
