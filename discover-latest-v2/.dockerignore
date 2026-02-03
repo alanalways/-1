@@ -1,0 +1,11 @@
+# 忽略檔案
+node_modules
+npm-debug.log*
+.next
+.git
+.gitignore
+*.md
+.env*
+!.env.example
+Dockerfile*
+.dockerignore
