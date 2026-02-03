@@ -298,19 +298,24 @@ export class BacktestEngine {
         const drawdownPeriods: { start: string; end: string; drawdown: number }[] = [];
 
         for (const point of this.equityCurve) {
+            // 確保 equity 為正數，避免計算錯誤
+            if (point.equity <= 0) continue;
+
             if (point.equity > peak) {
                 if (currentDrawdownStart) {
                     // 回撤結束
+                    const dd = Math.min(100, Math.max(0, (peak - point.equity) / peak * 100));
                     drawdownPeriods.push({
                         start: currentDrawdownStart,
                         end: point.time,
-                        drawdown: (peak - point.equity) / peak * 100,
+                        drawdown: dd,
                     });
                     currentDrawdownStart = '';
                 }
                 peak = point.equity;
             } else {
-                const drawdown = (peak - point.equity) / peak * 100;
+                // 確保回撤在 0-100% 範圍內
+                const drawdown = Math.min(100, Math.max(0, (peak - point.equity) / peak * 100));
                 if (!currentDrawdownStart) {
                     currentDrawdownStart = point.time;
                 }
@@ -321,6 +326,9 @@ export class BacktestEngine {
                 }
             }
         }
+
+        // 確保最大回撤不超過 100%
+        maxDrawdown = Math.min(100, Math.max(0, maxDrawdown));
 
         return {
             maxDrawdown,
@@ -414,6 +422,20 @@ export function rsiStrategy(
 
         if (currRSI <= oversold) return 'buy';
         if (currRSI >= overbought) return 'sell';
+        return 'hold';
+    };
+}
+
+/**
+ * 長期持有策略：第一天買入，持有到期末
+ */
+export function buyAndHoldStrategy() {
+    let hasBought = false;
+    return (index: number, _data: CandlestickData[]): 'buy' | 'sell' | 'hold' => {
+        if (!hasBought) {
+            hasBought = true;
+            return 'buy';
+        }
         return 'hold';
     };
 }

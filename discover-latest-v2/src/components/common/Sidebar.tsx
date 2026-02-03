@@ -20,8 +20,6 @@ const navItems: NavItem[] = [
     { href: '/watchlist', icon: '⭐', label: '自選清單' },
     { href: '/analysis', icon: '🧠', label: '深度分析' },
     { href: '/backtest', icon: '🎯', label: '回測模擬器' },
-    { href: '/global', icon: '🌍', label: '國際市場' },
-    { href: '/crypto', icon: '🪙', label: '加密貨幣' },
 ];
 
 export function Sidebar() {

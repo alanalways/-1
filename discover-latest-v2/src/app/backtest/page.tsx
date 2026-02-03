@@ -10,12 +10,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Sidebar } from '@/components/common/Sidebar';
 import { Header } from '@/components/common/Header';
 import { useToast } from '@/components/common/Toast';
-import { BacktestEngine, goldenCrossStrategy, rsiStrategy } from '@/services/backtest';
+import { BacktestEngine, goldenCrossStrategy, rsiStrategy, buyAndHoldStrategy } from '@/services/backtest';
 import type { CandlestickData } from '@/types/stock';
 import type { BacktestResult, BacktestTrade } from '@/types/backtest';
 
 // 可用策略
 const STRATEGIES = [
+    { id: 'buy_hold', name: '長期持有', description: '第一天買入，持有到期末，被動投資策略' },
     { id: 'golden_cross', name: '黃金交叉', description: 'EMA10 上穿 EMA30 買入，下穿賣出' },
     { id: 'rsi', name: 'RSI 超買超賣', description: 'RSI<30 買入，RSI>70 賣出' },
     { id: 'custom', name: '自訂策略', description: '（開發中）' },
@@ -58,7 +59,7 @@ export default function BacktestPage() {
 
     // 狀態
     const [stockCode, setStockCode] = useState('2330');
-    const [selectedStrategy, setSelectedStrategy] = useState('golden_cross');
+    const [selectedStrategy, setSelectedStrategy] = useState('buy_hold');
     const [initialCapital, setInitialCapital] = useState(1000000);
     const [isRunning, setIsRunning] = useState(false);
     const [result, setResult] = useState<BacktestResult | null>(null);
@@ -91,6 +92,9 @@ export default function BacktestPage() {
             // 選擇策略
             let strategyFn;
             switch (selectedStrategy) {
+                case 'buy_hold':
+                    strategyFn = buyAndHoldStrategy();
+                    break;
                 case 'golden_cross':
                     strategyFn = goldenCrossStrategy(10, 30);
                     break;
@@ -98,7 +102,7 @@ export default function BacktestPage() {
                     strategyFn = rsiStrategy(14, 30, 70);
                     break;
                 default:
-                    strategyFn = goldenCrossStrategy(10, 30);
+                    strategyFn = buyAndHoldStrategy();
             }
 
             // 執行回測
