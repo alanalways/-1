@@ -1,3 +1,4 @@
+import 'dotenv/config'; // Load .env file
 /**
  * Discover Latest - Backend Server
  * 用於 Hugging Face Spaces 部署
