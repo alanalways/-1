@@ -13,8 +13,9 @@ import { Header } from '@/components/common/Header';
 import { LightweightChart } from '@/components/charts';
 import { useToast } from '@/components/common/Toast';
 import { ErrorState, LoadingState } from '@/components/common/ErrorState';
-import { getHistoricalData } from '@/services/yahoo';
+import { getHistoricalData, getFundamentals } from '@/services/yahoo';
 import { analyzeStock, initGemini, AnalysisResult } from '@/services/gemini';
+import { calculateTechnicalFeatures, PriceData, TechnicalFeatures } from '@/services/technicalAnalysis';
 import type { CandlestickData } from '@/types/stock';
 
 // Range 對應到 Yahoo API 的 range 參數
@@ -37,6 +38,10 @@ export default function AnalysisPage() {
     // AI 分析結果
     const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
     const [isAnalyzing, setIsAnalyzing] = useState(false);
+
+    // 新增：特徵數據狀態
+    const [technicalFeatures, setTechnicalFeatures] = useState<TechnicalFeatures | null>(null);
+    const [fundamentalData, setFundamentalData] = useState<any>(null);
 
     // 載入股票資料
     const loadStockData = useCallback(async (stockSymbol: string, range: '1M' | '3M' | '6M' | '1Y') => {
@@ -97,18 +102,57 @@ export default function AnalysisPage() {
         setIsAnalyzing(true);
 
         try {
-            // 取得最新價格
-            const latestData = chartData[chartData.length - 1];
-            const previousData = chartData[chartData.length - 2];
-            const changePercent = previousData
-                ? ((latestData.close - previousData.close) / previousData.close) * 100
-                : 0;
+            const isTwStock = /^\d{4,6}$/.test(symbol);
+            const yahooSymbol = isTwStock ? `${symbol}.TW` : symbol;
 
+            // 1. 取得基本面數據
+            let fundamentalData = null;
+            try {
+                fundamentalData = await getFundamentals(yahooSymbol);
+            } catch (fErr) {
+                console.warn('[AI Analysis] 無法取得基本面數據:', fErr);
+            }
+
+            // 2. 計算技術面特徵
+            const priceData: PriceData[] = chartData.map(d => ({
+                date: d.time as string,
+                open: d.open,
+                high: d.high,
+                low: d.low,
+                close: d.close,
+                volume: d.volume || 0,
+            }));
+
+            const technicalFeatures = calculateTechnicalFeatures(priceData);
+            setTechnicalFeatures(technicalFeatures);
+            setFundamentalData(fundamentalData);
+
+            // 3. 執行 AI 分析
             const result = await analyzeStock({
                 code: symbol,
                 name: stockName || symbol,
-                price: latestData.close,
-                changePercent,
+                price: technicalFeatures.current_price,
+                changePercent: ((technicalFeatures.current_price - (priceData[priceData.length - 2]?.close || technicalFeatures.current_price)) / (priceData[priceData.length - 2]?.close || technicalFeatures.current_price)) * 100,
+                technical: {
+                    trend_pattern: technicalFeatures.trend_pattern,
+                    rsi_level: technicalFeatures.rsi_level,
+                    rsi: technicalFeatures.rsi,
+                    macd_signal: technicalFeatures.macd_cross,
+                    macd: technicalFeatures.macd,
+                    price_vs_sr: technicalFeatures.price_vs_sr,
+                    ma5: technicalFeatures.ma5,
+                    ma20: technicalFeatures.ma20,
+                    ma60: technicalFeatures.ma60,
+                    support: technicalFeatures.support,
+                    resistance: technicalFeatures.resistance,
+                },
+                fundamental: fundamentalData ? {
+                    pe: fundamentalData.pe,
+                    pb: fundamentalData.pb,
+                    eps_growth: fundamentalData.epsGrowth,
+                    roe: fundamentalData.roe,
+                    fcf_yield: fundamentalData.freeCashFlow ? (fundamentalData.freeCashFlow / (fundamentalData.marketCap || 1)) * 100 : null,
+                } : undefined,
             });
 
             if (result) {
@@ -299,39 +343,124 @@ export default function AnalysisPage() {
                         )}
                     </motion.section>
 
-                    {/* 趨勢分析 */}
-                    <motion.section
-                        className="glass-card"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.2 }}
-                    >
-                        <h3 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: 'var(--spacing-md)' }}>
-                            📊 趨勢分析
-                        </h3>
+                    {/* 趨勢分析與詳細指標 */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--spacing-lg)' }}>
+                        <motion.section
+                            className="glass-card"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.2 }}
+                        >
+                            <h3 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: 'var(--spacing-md)' }}>
+                                📊 趨勢分析
+                            </h3>
 
-                        {analysisResult?.trend_analysis ? (
-                            <div style={{ fontSize: '0.875rem', lineHeight: 1.7, color: 'var(--text-secondary)' }}>
-                                <p>{analysisResult.trend_analysis}</p>
-                                {analysisResult.risk_warning && (
-                                    <div style={{
-                                        marginTop: 'var(--spacing-md)',
-                                        padding: 'var(--spacing-sm)',
-                                        background: 'rgba(239, 68, 68, 0.1)',
-                                        border: '1px solid rgba(239, 68, 68, 0.2)',
-                                        borderRadius: 'var(--radius-sm)',
-                                    }}>
-                                        <span style={{ color: '#fca5a5' }}>⚠️ 風險提醒：</span>
-                                        <span style={{ color: 'var(--text-muted)' }}> {analysisResult.risk_warning}</span>
+                            {analysisResult?.trend_analysis ? (
+                                <div style={{ fontSize: '0.875rem', lineHeight: 1.7, color: 'var(--text-secondary)' }}>
+                                    <p>{analysisResult.trend_analysis}</p>
+
+                                    {/* AI 理由與風險 (進階) */}
+                                    {analysisResult.advanced && (
+                                        <div style={{ marginTop: 'var(--spacing-md)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-md)' }}>
+                                            <div style={{ padding: 'var(--spacing-sm)', background: 'rgba(34, 197, 94, 0.05)', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(34, 197, 94, 0.1)' }}>
+                                                <h4 style={{ color: 'var(--stock-up)', fontSize: '0.875rem', marginBottom: '8px' }}>✅ 多方理由</h4>
+                                                <ul style={{ paddingLeft: '1.25rem', margin: 0 }}>
+                                                    {analysisResult.advanced.reasons.map((r, i) => <li key={i}>{r}</li>)}
+                                                </ul>
+                                            </div>
+                                            <div style={{ padding: 'var(--spacing-sm)', background: 'rgba(239, 68, 68, 0.05)', borderRadius: 'var(--radius-sm)', border: '1px solid rgba(239, 68, 68, 0.1)' }}>
+                                                <h4 style={{ color: 'var(--stock-down)', fontSize: '0.875rem', marginBottom: '8px' }}>⚠️ 風險提示</h4>
+                                                <ul style={{ paddingLeft: '1.25rem', margin: 0 }}>
+                                                    {analysisResult.advanced.risks.map((r, i) => <li key={i}>{r}</li>)}
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {analysisResult.risk_warning && !analysisResult.advanced && (
+                                        <div style={{
+                                            marginTop: 'var(--spacing-md)',
+                                            padding: 'var(--spacing-sm)',
+                                            background: 'rgba(239, 68, 68, 0.1)',
+                                            border: '1px solid rgba(239, 68, 68, 0.2)',
+                                            borderRadius: 'var(--radius-sm)',
+                                        }}>
+                                            <span style={{ color: '#fca5a5' }}>⚠️ 風險提醒：</span>
+                                            <span style={{ color: 'var(--text-muted)' }}> {analysisResult.risk_warning}</span>
+                                        </div>
+                                    )}
+                                </div>
+                            ) : (
+                                <div style={{ textAlign: 'center', padding: 'var(--spacing-xl)', color: 'var(--text-muted)' }}>
+                                    <p>執行 AI 分析後顯示趨勢分析</p>
+                                </div>
+                            )}
+                        </motion.section>
+
+                        {/* 技術指標數據 */}
+                        {technicalFeatures && (
+                            <motion.section
+                                className="glass-card"
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.25 }}
+                            >
+                                <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: 'var(--spacing-md)' }}>
+                                    📈 技術面指標
+                                </h3>
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', fontSize: '0.75rem' }}>
+                                    <div className="metric-item">
+                                        <span style={{ color: 'var(--text-muted)' }}>趨勢型態</span>
+                                        <span style={{ fontWeight: 600, color: technicalFeatures.trend_pattern === '多頭排列' ? 'var(--stock-up)' : 'var(--stock-down)' }}>{technicalFeatures.trend_pattern}</span>
                                     </div>
-                                )}
-                            </div>
-                        ) : (
-                            <div style={{ textAlign: 'center', padding: 'var(--spacing-xl)', color: 'var(--text-muted)' }}>
-                                <p>執行 AI 分析後顯示趨勢分析</p>
-                            </div>
+                                    <div className="metric-item">
+                                        <span style={{ color: 'var(--text-muted)' }}>RSI (14)</span>
+                                        <span style={{ fontWeight: 600 }}>{technicalFeatures.rsi} ({technicalFeatures.rsi_level})</span>
+                                    </div>
+                                    <div className="metric-item">
+                                        <span style={{ color: 'var(--text-muted)' }}>MACD 狀態</span>
+                                        <span style={{ fontWeight: 600 }}>{technicalFeatures.macd_cross} ({technicalFeatures.macd})</span>
+                                    </div>
+                                    <div className="metric-item">
+                                        <span style={{ color: 'var(--text-muted)' }}>支撐/壓力</span>
+                                        <span style={{ fontWeight: 600 }}>{technicalFeatures.support} / {technicalFeatures.resistance}</span>
+                                    </div>
+                                </div>
+                            </motion.section>
                         )}
-                    </motion.section>
+
+                        {/* 基本面數據 */}
+                        {fundamentalData && (
+                            <motion.section
+                                className="glass-card"
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.28 }}
+                            >
+                                <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: 'var(--spacing-md)' }}>
+                                    🏛️ 基本面指標
+                                </h3>
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px', fontSize: '0.75rem' }}>
+                                    <div className="metric-item">
+                                        <span style={{ color: 'var(--text-muted)' }}>本益比 (PE)</span>
+                                        <span style={{ fontWeight: 600 }}>{fundamentalData.pe ? fundamentalData.pe.toFixed(2) : '-'}</span>
+                                    </div>
+                                    <div className="metric-item">
+                                        <span style={{ color: 'var(--text-muted)' }}>股價淨值比 (PB)</span>
+                                        <span style={{ fontWeight: 600 }}>{fundamentalData.pb ? fundamentalData.pb.toFixed(2) : '-'}</span>
+                                    </div>
+                                    <div className="metric-item">
+                                        <span style={{ color: 'var(--text-muted)' }}>ROE</span>
+                                        <span style={{ fontWeight: 600 }}>{fundamentalData.roe ? (fundamentalData.roe * 100).toFixed(2) + '%' : '-'}</span>
+                                    </div>
+                                    <div className="metric-item">
+                                        <span style={{ color: 'var(--text-muted)' }}>預估成長</span>
+                                        <span style={{ fontWeight: 600 }}>{fundamentalData.epsGrowth ? (fundamentalData.epsGrowth * 100).toFixed(2) + '%' : '-'}</span>
+                                    </div>
+                                </div>
+                            </motion.section>
+                        )}
+                    </div>
 
                     {/* 投資策略建議 */}
                     <motion.section

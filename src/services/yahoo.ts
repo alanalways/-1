@@ -102,6 +102,30 @@ export async function getHistoricalData(
 }
 
 /**
+ * 取得股票的基本面資料 (PE, PB, ROE 等)
+ */
+export async function getFundamentals(symbol: string): Promise<any> {
+    try {
+        const response = await fetch(`/api/yahoo/fundamentals?symbol=${encodeURIComponent(symbol)}`);
+
+        if (!response.ok) {
+            throw new Error(`Yahoo 基本面 API 回應錯誤: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        if (!data.success) {
+            throw new Error(data.error || 'Yahoo 基本面 API 回傳失敗');
+        }
+
+        return data.fundamentals;
+    } catch (error) {
+        console.error('[Yahoo] 取得基本面資料失敗:', error);
+        throw error;
+    }
+}
+
+/**
  * 格式化指數價格
  */
 export function formatIndexPrice(price: number): string {

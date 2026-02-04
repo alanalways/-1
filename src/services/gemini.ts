@@ -400,13 +400,29 @@ function parseResponse(responseText: string): AnalysisResult | null {
         }
 
         const data = JSON.parse(text);
+
+        // 建立進階分析結果
+        const advanced: AdvancedAnalysisResult = {
+            recommendation: data.recommendation || 'hold',
+            time_horizon: data.time_horizon || 'medium',
+            target_price: data.target_price || 0,
+            stop_loss: data.stop_loss || 0,
+            confidence: data.confidence || 'medium',
+            reasons: data.reasons || [],
+            risks: data.risks || [],
+            analysis_summary: data.analysis_summary || data.trend_analysis || '',
+            bullish_points: data.bullish_points || [],
+            bearish_points: data.bearish_points || [],
+        };
+
         return {
             score: data.score ?? 50,
             strategy: data.strategy ?? {},
-            trend_analysis: data.trend_analysis ?? '無法解析分析結果',
+            trend_analysis: advanced.analysis_summary || '無法解析分析結果',
             correlation_insight: data.correlation_insight ?? '',
-            risk_warning: data.risk_warning ?? '',
-            confidence: data.confidence ?? 0.5,
+            risk_warning: advanced.risks.join('；') || data.risk_warning || '',
+            confidence: typeof data.confidence === 'number' ? data.confidence : (data.confidence === 'high' ? 0.9 : data.confidence === 'medium' ? 0.6 : 0.3),
+            advanced: advanced
         };
     } catch (e) {
         console.error('[Gemini] JSON 解析失敗:', e);
