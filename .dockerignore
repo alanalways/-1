@@ -9,3 +9,5 @@ npm-debug.log*
 !.env.example
 Dockerfile*
 .dockerignore
+
+discover-latest-v2
