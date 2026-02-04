@@ -34,58 +34,45 @@ export async function middleware(request: NextRequest) {
         return NextResponse.next();
     }
 
+    // ============================================================
+    // 🔧 暫時停用 Middleware Auth 檢查
+    // 
+    // 原因：
+    // 1. Supabase 在瀏覽器端使用 localStorage 存 session
+    // 2. Middleware 在 Edge Runtime 執行，無法讀取 localStorage
+    // 3. Cookie 名稱和格式與舊版不同
+    // 4. OAuth callback 後 session 建立有延遲
+    // 
+    // 解決方案：改在前端頁面處理 auth redirect
+    // ============================================================
+
+    // 只做 log，不阻擋（未來可改用 Supabase SSR helper）
+    console.log(`[Middleware] 路徑: ${pathname} - 放行`);
+
+    return NextResponse.next();
+
+    // ============ 以下為舊的驗證邏輯（保留供參考）============
+    /*
     // 檢查 Supabase 環境變數
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
     if (!supabaseUrl || !supabaseAnonKey) {
-        // Supabase 未設定，暫時允許訪問（開發模式）
         console.warn('[Middleware] Supabase 未設定，跳過認證檢查');
         return NextResponse.next();
     }
 
     // 從 cookies 取得 session tokens
-    const accessToken = request.cookies.get('sb-access-token')?.value;
-    const refreshToken = request.cookies.get('sb-refresh-token')?.value;
+    // 注意：Supabase 的 cookie 名稱格式是 sb-<project-ref>-auth-token
+    const cookies = request.cookies.getAll();
+    const authCookie = cookies.find(c => c.name.startsWith('sb-') && c.name.endsWith('-auth-token'));
 
-    // 沒有任何 token，重導向到登入頁面
-    if (!accessToken && !refreshToken) {
+    if (!authCookie) {
         const loginUrl = new URL('/login', request.url);
         loginUrl.searchParams.set('redirect', pathname);
         return NextResponse.redirect(loginUrl);
     }
-
-    // 建立 Supabase client 並設定 session
-    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-        auth: {
-            persistSession: false,
-        },
-        global: {
-            headers: {
-                Authorization: `Bearer ${accessToken}`,
-            },
-        },
-    });
-
-    // 實際驗證 token 有效性
-    try {
-        const { data: { user }, error } = await supabase.auth.getUser(accessToken);
-
-        if (error || !user) {
-            // Token 無效，清除並重導向到登入頁面
-            const loginUrl = new URL('/login', request.url);
-            loginUrl.searchParams.set('redirect', pathname);
-            const response = NextResponse.redirect(loginUrl);
-            response.cookies.delete('sb-access-token');
-            response.cookies.delete('sb-refresh-token');
-            return response;
-        }
-    } catch {
-        // 驗證過程出錯，允許通過（避免阻擋正常使用者）
-        console.warn('[Middleware] Token 驗證過程出錯，允許通過');
-    }
-
-    return NextResponse.next();
+    */
 }
 
 // 設定哪些路徑要執行中介軟體

@@ -8,7 +8,21 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 let supabase: SupabaseClient | null = null;
 
 if (supabaseUrl && supabaseAnonKey) {
-    supabase = createClient(supabaseUrl, supabaseAnonKey);
+    supabase = createClient(supabaseUrl, supabaseAnonKey, {
+        auth: {
+            // 自動刷新 token
+            autoRefreshToken: true,
+            // 持久化 session 到 localStorage
+            persistSession: true,
+            // 自動偵測 URL 中的 session（OAuth callback 用）
+            detectSessionInUrl: true,
+            // 使用瀏覽器 localStorage
+            storage: typeof window !== 'undefined' ? window.localStorage : undefined,
+            // Flow type: PKCE（更安全）
+            flowType: 'pkce',
+        },
+    });
+    console.log('[Supabase] 客戶端已建立，URL:', supabaseUrl.substring(0, 30) + '...');
 } else {
     console.warn('[Supabase] 未設定環境變數，部分功能將無法使用');
 }
