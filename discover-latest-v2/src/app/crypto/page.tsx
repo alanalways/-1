@@ -10,6 +10,7 @@ import { motion } from 'framer-motion';
 import { Sidebar } from '@/components/common/Sidebar';
 import { Header } from '@/components/common/Header';
 import { getAllCryptoPrices, getKlines, formatPrice, formatVolume, CryptoPrice, CryptoKline } from '@/services/binance';
+import { MiniCandlestickChart } from '@/components/charts/MiniAreaChart';
 
 export default function CryptoPage() {
     const [cryptos, setCryptos] = useState<CryptoPrice[]>([]);
@@ -264,39 +265,20 @@ export default function CryptoPage() {
                                     </div>
                                 </div>
 
-                                {/* 簡單價格走勢 */}
+                                {/* K 線走勢 - 使用 Lightweight Charts */}
                                 {klines.length > 0 && (
                                     <div>
                                         <h4 style={{ marginBottom: '1rem' }}>📈 近 30 日價格走勢</h4>
-                                        <div style={{
-                                            height: '200px',
-                                            background: 'var(--bg-tertiary)',
-                                            borderRadius: 'var(--radius-md)',
-                                            display: 'flex',
-                                            alignItems: 'flex-end',
-                                            padding: '1rem',
-                                            gap: '2px',
-                                        }}>
-                                            {klines.map((k, i) => {
-                                                const min = Math.min(...klines.map(x => x.low));
-                                                const max = Math.max(...klines.map(x => x.high));
-                                                const height = ((k.close - min) / (max - min)) * 150 + 10;
-                                                const isUp = k.close >= k.open;
-                                                return (
-                                                    <div
-                                                        key={i}
-                                                        style={{
-                                                            flex: 1,
-                                                            height: `${height}px`,
-                                                            background: isUp ? 'var(--stock-up)' : 'var(--stock-down)',
-                                                            borderRadius: '2px',
-                                                            opacity: 0.8,
-                                                        }}
-                                                        title={`${new Date(k.openTime).toLocaleDateString()}: $${k.close.toFixed(2)}`}
-                                                    />
-                                                );
-                                            })}
-                                        </div>
+                                        <MiniCandlestickChart
+                                            data={klines.map(k => ({
+                                                time: Math.floor(k.openTime / 1000),  // Unix timestamp in seconds
+                                                open: k.open,
+                                                high: k.high,
+                                                low: k.low,
+                                                close: k.close,
+                                            }))}
+                                            height={200}
+                                        />
                                     </div>
                                 )}
                             </div>
