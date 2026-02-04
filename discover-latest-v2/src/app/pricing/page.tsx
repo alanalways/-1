@@ -28,45 +28,43 @@ const PLANS = [
         priceLabel: '免費',
         features: [
             '每日 2 次 AI 深度分析',
+            '台股上市上櫃即時行情',
             '基本市場數據',
-            '台股即時行情',
             '基本圖表功能',
         ],
         notIncluded: [
             '進階 K 線分析',
-            'SMC 策略分析',
             '回測模擬器',
             '優先支援',
         ],
     },
     {
         tier: 'pro' as SubscriptionTier,
-        price: 299,
-        priceLabel: 'NT$ 299/月',
+        price: 79,
+        priceLabel: 'NT$ 79/月',
         features: [
             '每日 20 次 AI 深度分析',
+            '台股上市上櫃即時行情',
             '完整市場數據',
-            '台股即時行情',
             '進階 K 線圖表',
             'EMA 指標分析',
             '回測模擬器',
-            '優先電子郵件支援',
+            '電子郵件支援',
         ],
         notIncluded: [
             '無限 AI 分析',
-            'SMC 策略分析',
             'VIP 專屬群組',
         ],
         popular: true,
     },
     {
         tier: 'premium' as SubscriptionTier,
-        price: 599,
-        priceLabel: 'NT$ 599/月',
+        price: 299,
+        priceLabel: 'NT$ 299/月',
         features: [
-            '無限 AI 深度分析',
+            '無限次 AI 深度分析',
+            '台股上市上櫃即時行情',
             '完整市場數據',
-            '台股即時行情',
             '進階 K 線圖表',
             'EMA + SMC 策略分析',
             '完整回測模擬器',
@@ -77,6 +75,7 @@ const PLANS = [
         notIncluded: [],
     },
 ];
+
 
 export default function PricingPage() {
     const { user, loading: authLoading } = useAuth();
