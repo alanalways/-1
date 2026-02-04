@@ -1,11 +1,11 @@
 /**
  * Header 元件
- * 頁面標題、搜尋框、使用者選單
+ * 頁面標題、搜尋框、使用者選單、主題切換
  */
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -18,10 +18,42 @@ export function Header({ title, onSearch }: HeaderProps) {
     const { user, signIn, signOut } = useAuth();
     const [searchQuery, setSearchQuery] = useState('');
     const [showUserMenu, setShowUserMenu] = useState(false);
+    const [isDarkMode, setIsDarkMode] = useState(true);
+
+    // 初始化主題
+    useEffect(() => {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'light') {
+            setIsDarkMode(false);
+            document.documentElement.setAttribute('data-theme', 'light');
+        }
+    }, []);
+
+    // 切換主題
+    const toggleTheme = () => {
+        const newMode = !isDarkMode;
+        setIsDarkMode(newMode);
+
+        if (newMode) {
+            document.documentElement.removeAttribute('data-theme');
+            localStorage.setItem('theme', 'dark');
+        } else {
+            document.documentElement.setAttribute('data-theme', 'light');
+            localStorage.setItem('theme', 'light');
+        }
+    };
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
-        onSearch?.(searchQuery);
+        if (searchQuery.trim()) {
+            onSearch?.(searchQuery.trim());
+        }
+    };
+
+    const handleSearchClick = () => {
+        if (searchQuery.trim()) {
+            onSearch?.(searchQuery.trim());
+        }
     };
 
     return (
@@ -41,6 +73,16 @@ export function Header({ title, onSearch }: HeaderProps) {
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
+                    <motion.button
+                        type="button"
+                        className="search-btn"
+                        onClick={handleSearchClick}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        title="搜尋"
+                    >
+                        搜尋
+                    </motion.button>
                 </form>
 
                 {/* 使用者選單 */}
@@ -95,9 +137,15 @@ export function Header({ title, onSearch }: HeaderProps) {
                 </div>
 
                 {/* 主題切換 */}
-                <button className="theme-toggle" title="切換主題">
-                    🌙
-                </button>
+                <motion.button
+                    className="theme-toggle"
+                    onClick={toggleTheme}
+                    whileHover={{ scale: 1.1, rotate: 15 }}
+                    whileTap={{ scale: 0.9 }}
+                    title={isDarkMode ? '切換至亮色模式' : '切換至暗色模式'}
+                >
+                    {isDarkMode ? '🌙' : '☀️'}
+                </motion.button>
             </div>
         </header>
     );

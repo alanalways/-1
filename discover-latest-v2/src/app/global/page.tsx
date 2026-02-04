@@ -1,60 +1,79 @@
 /**
  * 國際市場頁面
- * 顯示美股、歐股、亞股等國際市場資訊
+ * 使用 Yahoo Finance API 顯示國際市場資訊
  */
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Sidebar } from '@/components/common/Sidebar';
 import { Header } from '@/components/common/Header';
-
-// 模擬國際市場資料
-const MOCK_MARKETS = [
-    {
-        region: '美國',
-        markets: [
-            { name: 'S&P 500', code: 'SPX', price: 6015.28, change: 0.85, changePercent: 0.014 },
-            { name: 'Nasdaq', code: 'NDX', price: 21853.67, change: 158.32, changePercent: 0.73 },
-            { name: 'Dow Jones', code: 'DJI', price: 44815.20, change: -95.80, changePercent: -0.21 },
-        ]
-    },
-    {
-        region: '歐洲',
-        markets: [
-            { name: '德國 DAX', code: 'DAX', price: 21451.25, change: 125.40, changePercent: 0.59 },
-            { name: '英國 FTSE', code: 'FTSE', price: 8612.81, change: -28.50, changePercent: -0.33 },
-            { name: '法國 CAC', code: 'CAC', price: 7935.78, change: 48.20, changePercent: 0.61 },
-        ]
-    },
-    {
-        region: '亞洲',
-        markets: [
-            { name: '日經 225', code: 'N225', price: 39480.50, change: 285.60, changePercent: 0.73 },
-            { name: '香港恒生', code: 'HSI', price: 20285.30, change: -158.90, changePercent: -0.78 },
-            { name: '上證指數', code: 'SSEC', price: 3250.12, change: 25.80, changePercent: 0.80 },
-        ]
-    },
-];
+import { getAllIndices, getHistoricalData, groupByRegion, formatIndexPrice, MarketIndex, HistoricalData } from '@/services/yahoo';
 
 export default function GlobalMarketPage() {
-    const [mounted, setMounted] = useState(false);
+    const [indices, setIndices] = useState<MarketIndex[]>([]);
+    const [loading, setLoading] = useState(true);
     const [lastUpdated, setLastUpdated] = useState('');
+    const [selectedIndex, setSelectedIndex] = useState<MarketIndex | null>(null);
+    const [historicalData, setHistoricalData] = useState<HistoricalData[]>([]);
+    const [showChart, setShowChart] = useState(false);
+    const [chartRange, setChartRange] = useState<'1mo' | '3mo' | '6mo' | '1y'>('1mo');
 
-    useEffect(() => {
-        setMounted(true);
-        setLastUpdated(new Date().toLocaleTimeString('zh-TW'));
+    // 取得所有指數
+    const fetchIndices = useCallback(async () => {
+        try {
+            const data = await getAllIndices();
+            if (data.length > 0) {
+                setIndices(data);
+                setLastUpdated(new Date().toLocaleTimeString('zh-TW'));
+            }
+        } catch (error) {
+            console.error('取得國際指數失敗:', error);
+        } finally {
+            setLoading(false);
+        }
     }, []);
 
-    if (!mounted) {
+    // 初始載入
+    useEffect(() => {
+        fetchIndices();
+
+        // 每分鐘更新一次
+        const interval = setInterval(fetchIndices, 60000);
+        return () => clearInterval(interval);
+    }, [fetchIndices]);
+
+    // 點擊查看詳情
+    const handleIndexClick = async (index: MarketIndex) => {
+        setSelectedIndex(index);
+        setShowChart(true);
+
+        // 取得歷史資料
+        const data = await getHistoricalData(index.symbol, chartRange);
+        setHistoricalData(data);
+    };
+
+    // 切換圖表時間範圍
+    const handleRangeChange = async (range: '1mo' | '3mo' | '6mo' | '1y') => {
+        setChartRange(range);
+        if (selectedIndex) {
+            const data = await getHistoricalData(selectedIndex.symbol, range);
+            setHistoricalData(data);
+        }
+    };
+
+    // 按區域分組
+    const groupedIndices = groupByRegion(indices);
+
+    if (loading) {
         return (
             <div className="app-layout">
                 <Sidebar />
                 <main className="main-content">
                     <Header title="國際市場" />
-                    <div className="loading-container">
-                        <div className="spinner" />
+                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
+                        <div className="loading-spinner" style={{ width: 48, height: 48, animation: 'spin 1s linear infinite' }} />
                     </div>
                 </main>
             </div>
@@ -79,7 +98,7 @@ export default function GlobalMarketPage() {
                         <div>
                             <h2 style={{ fontSize: '1.25rem', fontWeight: 600 }}>🌍 全球市場總覽</h2>
                             <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', marginTop: '4px' }}>
-                                美股、歐股、亞股即時行情
+                                美股、歐股、亞股即時行情・點擊查看詳細圖表
                             </p>
                         </div>
                         <div style={{ textAlign: 'right' }}>
@@ -90,9 +109,9 @@ export default function GlobalMarketPage() {
                 </motion.div>
 
                 {/* 各區域市場 */}
-                {MOCK_MARKETS.map((region, regionIndex) => (
+                {Object.entries(groupedIndices).map(([region, regionIndices], regionIndex) => (
                     <motion.div
-                        key={region.region}
+                        key={region}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: regionIndex * 0.1 }}
@@ -104,7 +123,7 @@ export default function GlobalMarketPage() {
                             marginBottom: 'var(--spacing-md)',
                             color: 'var(--text-secondary)'
                         }}>
-                            {region.region}
+                            {region}
                         </h3>
 
                         <div style={{
@@ -112,17 +131,23 @@ export default function GlobalMarketPage() {
                             gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
                             gap: 'var(--spacing-md)',
                         }}>
-                            {region.markets.map((market, index) => (
+                            {regionIndices.map((market, index) => (
                                 <motion.div
-                                    key={market.code}
+                                    key={market.symbol}
                                     className="glass-card"
                                     whileHover={{ scale: 1.02 }}
+                                    onClick={() => handleIndexClick(market)}
                                     style={{ cursor: 'pointer' }}
                                 >
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                         <div>
-                                            <div style={{ fontWeight: 600 }}>{market.name}</div>
-                                            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{market.code}</div>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                <span style={{ fontSize: '1.5rem' }}>{market.emoji}</span>
+                                                <div style={{ fontWeight: 600 }}>{market.name}</div>
+                                            </div>
+                                            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '4px' }}>
+                                                {market.symbol}
+                                            </div>
                                         </div>
                                         <div style={{ textAlign: 'right' }}>
                                             <div style={{
@@ -130,7 +155,7 @@ export default function GlobalMarketPage() {
                                                 fontWeight: 700,
                                                 fontFamily: 'var(--font-mono)',
                                             }}>
-                                                {market.price.toLocaleString()}
+                                                {formatIndexPrice(market.price)}
                                             </div>
                                             <div style={{
                                                 fontSize: '0.875rem',
@@ -138,9 +163,35 @@ export default function GlobalMarketPage() {
                                                 color: market.changePercent >= 0 ? 'var(--stock-up)' : 'var(--stock-down)',
                                             }}>
                                                 {market.changePercent >= 0 ? '+' : ''}{market.change.toFixed(2)}
-                                                ({market.changePercent >= 0 ? '+' : ''}{(market.changePercent * 100).toFixed(2)}%)
+                                                ({market.changePercent >= 0 ? '+' : ''}{market.changePercent.toFixed(2)}%)
                                             </div>
                                         </div>
+                                    </div>
+
+                                    {/* 簡易迷你圖 */}
+                                    <div style={{
+                                        marginTop: 'var(--spacing-md)',
+                                        height: '40px',
+                                        background: 'var(--bg-tertiary)',
+                                        borderRadius: 'var(--radius-sm)',
+                                        overflow: 'hidden',
+                                        display: 'flex',
+                                        alignItems: 'flex-end',
+                                    }}>
+                                        {Array.from({ length: 20 }).map((_, i) => {
+                                            const height = 10 + Math.random() * 25;
+                                            return (
+                                                <div
+                                                    key={i}
+                                                    style={{
+                                                        flex: 1,
+                                                        height: `${height}px`,
+                                                        background: market.changePercent >= 0 ? 'var(--stock-up)' : 'var(--stock-down)',
+                                                        opacity: 0.3 + (i / 20) * 0.7,
+                                                    }}
+                                                />
+                                            );
+                                        })}
                                     </div>
                                 </motion.div>
                             ))}
@@ -156,9 +207,132 @@ export default function GlobalMarketPage() {
                     fontSize: '0.875rem',
                     color: 'var(--text-secondary)',
                 }}>
-                    💡 提示：國際市場資料目前為模擬資料，後續將整合即時 API
+                    💡 提示：點擊任一指數卡片可查看歷史走勢圖表
                 </div>
+
+                {/* 詳情 Modal */}
+                {showChart && selectedIndex && (
+                    <motion.div
+                        className="modal-overlay"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        onClick={() => setShowChart(false)}
+                    >
+                        <motion.div
+                            className="modal modal-lg"
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <div className="modal-header">
+                                <h3 className="modal-title">
+                                    {selectedIndex.emoji} {selectedIndex.name}
+                                </h3>
+                                <button className="modal-close" onClick={() => setShowChart(false)}>✕</button>
+                            </div>
+                            <div className="modal-body">
+                                {/* 指數資訊 */}
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem', marginBottom: '1.5rem' }}>
+                                    <div>
+                                        <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>目前價格</div>
+                                        <div style={{ fontSize: '1.5rem', fontWeight: 700, fontFamily: 'var(--font-mono)' }}>
+                                            {formatIndexPrice(selectedIndex.price)}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>漲跌</div>
+                                        <div style={{
+                                            fontSize: '1.25rem',
+                                            fontWeight: 600,
+                                            fontFamily: 'var(--font-mono)',
+                                            color: selectedIndex.changePercent >= 0 ? 'var(--stock-up)' : 'var(--stock-down)',
+                                        }}>
+                                            {selectedIndex.changePercent >= 0 ? '+' : ''}{selectedIndex.changePercent.toFixed(2)}%
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>今日最高</div>
+                                        <div style={{ fontSize: '1.25rem', fontFamily: 'var(--font-mono)', color: 'var(--stock-up)' }}>
+                                            {formatIndexPrice(selectedIndex.dayHigh)}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>今日最低</div>
+                                        <div style={{ fontSize: '1.25rem', fontFamily: 'var(--font-mono)', color: 'var(--stock-down)' }}>
+                                            {formatIndexPrice(selectedIndex.dayLow)}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* 時間範圍選擇 */}
+                                <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
+                                    {(['1mo', '3mo', '6mo', '1y'] as const).map(range => (
+                                        <button
+                                            key={range}
+                                            onClick={() => handleRangeChange(range)}
+                                            style={{
+                                                padding: '0.5rem 1rem',
+                                                borderRadius: 'var(--radius-sm)',
+                                                background: chartRange === range ? 'var(--primary)' : 'var(--bg-tertiary)',
+                                                color: chartRange === range ? 'white' : 'var(--text-secondary)',
+                                                border: 'none',
+                                                cursor: 'pointer',
+                                                transition: 'all 0.2s',
+                                            }}
+                                        >
+                                            {range === '1mo' ? '1個月' : range === '3mo' ? '3個月' : range === '6mo' ? '6個月' : '1年'}
+                                        </button>
+                                    ))}
+                                </div>
+
+                                {/* 價格走勢圖 */}
+                                {historicalData.length > 0 && (
+                                    <div>
+                                        <h4 style={{ marginBottom: '1rem' }}>📈 價格走勢</h4>
+                                        <div style={{
+                                            height: '250px',
+                                            background: 'var(--bg-tertiary)',
+                                            borderRadius: 'var(--radius-md)',
+                                            display: 'flex',
+                                            alignItems: 'flex-end',
+                                            padding: '1rem',
+                                            gap: '1px',
+                                        }}>
+                                            {historicalData.map((d, i) => {
+                                                const min = Math.min(...historicalData.map(x => x.low));
+                                                const max = Math.max(...historicalData.map(x => x.high));
+                                                const height = ((d.close - min) / (max - min)) * 200 + 20;
+                                                const isUp = d.close >= d.open;
+                                                return (
+                                                    <div
+                                                        key={i}
+                                                        style={{
+                                                            flex: 1,
+                                                            height: `${height}px`,
+                                                            background: isUp ? 'var(--stock-up)' : 'var(--stock-down)',
+                                                            borderRadius: '2px',
+                                                            opacity: 0.8,
+                                                            minWidth: '2px',
+                                                        }}
+                                                        title={`${new Date(d.date).toLocaleDateString()}: ${d.close.toFixed(2)}`}
+                                                    />
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
             </main>
+
+            <style jsx>{`
+                @keyframes spin {
+                    from { transform: rotate(0deg); }
+                    to { transform: rotate(360deg); }
+                }
+            `}</style>
         </div>
     );
 }

@@ -45,19 +45,23 @@ export interface BacktestTrade {
     type: 'buy' | 'sell';
     entryTime: string;
     entryPrice: number;
-    shares: number;
-    commission: number;
-    exitTime: string;
-    exitPrice: number;
+    shares?: number;            // 可選：股數
+    commission?: number;        // 可選：手續費
+    exitTime?: string;          // 可選：出場時間
+    exitPrice?: number;         // 可選：出場價格
     pnl: number;
     pnlPercent: number;
-    holdingDays: number;
+    holdingDays?: number;       // 可選：持有天數
 }
 
 // 回測結果（引擎版本）
 export interface BacktestResult {
+    startDate?: string;          // 回測開始日期
+    endDate?: string;            // 回測結束日期
+    initialCapital: number;      // 初始資金
+    finalCapital: number;        // 最終資金
     trades: BacktestTrade[];
-    equityCurve: { time: string; equity: number }[];
+    equityCurve: { time?: string; date?: string; equity?: number; value?: number }[];
     summary: BacktestSummary;
     drawdown: DrawdownAnalysis;
     benchmarkReturn: number;
@@ -71,18 +75,22 @@ export interface DCABacktestResult {
 
 export interface BacktestSummary {
     // 共用欄位
-    totalReturn: number;
-    maxDrawdown: number;
-    sharpeRatio: number;
+    totalReturn?: number;
+    maxDrawdown?: number;
+    sharpeRatio?: number;
     // 引擎版本欄位
     totalTrades?: number;
     winTrades?: number;
     loseTrades?: number;
+    winningTrades?: number;      // 新增：獲利交易次數
+    losingTrades?: number;       // 新增：虧損交易次數
     winRate?: number;
     totalPnL?: number;
     annualizedReturn?: number;
     profitFactor?: number;
     avgHoldingDays?: number;
+    averageWin?: number;         // 新增：平均獲利
+    averageLoss?: number;        // 新增：平均虧損
     // DCA 版本欄位
     startDate?: string;
     endDate?: string;
@@ -98,10 +106,12 @@ export interface BacktestSummary {
 // 最大回撤分析
 export interface DrawdownAnalysis {
     maxDrawdown: number;
-    maxDrawdownDuration: number;
+    maxDrawdownDuration?: number;
+    maxDrawdownDate?: string;           // 新增：最大回撤日期
+    recoveryDate?: string | null;       // 新增：恢復日期
     maxDrawdownStart?: string;
     maxDrawdownEnd?: string;
-    drawdownPeriods: {
+    drawdownPeriods?: {
         start: string;
         end: string;
         drawdown: number;

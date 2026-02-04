@@ -218,6 +218,10 @@ export class BacktestEngine {
         const drawdown = this.calculateDrawdown();
 
         return {
+            startDate: data[0]?.time || '',
+            endDate: data[data.length - 1]?.time || '',
+            initialCapital: this.options.initialCapital,
+            finalCapital: this.currentCapital,
             trades: this.trades,
             equityCurve: this.equityCurve,
             summary,
@@ -273,7 +277,7 @@ export class BacktestEngine {
             sharpeRatio,
             profitFactor,
             avgHoldingDays: this.trades.length > 0
-                ? this.trades.reduce((sum, t) => sum + t.holdingDays, 0) / this.trades.length
+                ? this.trades.reduce((sum, t) => sum + (t.holdingDays || 0), 0) / this.trades.length
                 : 0,
         };
     }
