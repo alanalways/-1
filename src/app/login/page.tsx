@@ -114,7 +114,7 @@ function LoginContent() {
                             <span className="feature-icon">🧠</span>
                             <div>
                                 <h3>AI 深度分析</h3>
-                                <p>Gemini AI 提供專業投資建議</p>
+                                <p>頂尖 AI 模型提供專業投資建議</p>
                             </div>
                         </motion.div>
 
