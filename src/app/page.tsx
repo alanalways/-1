@@ -25,12 +25,27 @@ export default function DashboardPage() {
   const [topGainers, setTopGainers] = useState<TwseStock[]>([]);
   const [topLosers, setTopLosers] = useState<TwseStock[]>([]);
   const [stocksLoading, setStocksLoading] = useState(true);
+  const [stocksError, setStocksError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'all' | 'gainers' | 'losers'>('all');
   const [searchQuery, setSearchQuery] = useState('');
+
+  // 國際指數資料
+  const [marketIndices, setMarketIndices] = useState<{
+    name: string; code: string; price: number; change: number; icon: string;
+  }[]>([]);
+  const [indicesLoading, setIndicesLoading] = useState(true);
+
+  // 🔐 強制登入：未登入時跳轉到登入頁面
+  useEffect(() => {
+    if (!authLoading && !user) {
+      window.location.href = '/login';
+    }
+  }, [user, authLoading]);
 
   // 載入台股資料
   const loadStocks = useCallback(async () => {
     setStocksLoading(true);
+    setStocksError(null);
     try {
       const allStocks = await getAllStocks();
       const gainers = await getTopGainers(10);
@@ -42,19 +57,55 @@ export default function DashboardPage() {
       setLastUpdated(new Date().toLocaleTimeString('zh-TW'));
     } catch (error) {
       console.error('載入台股資料失敗:', error);
+      setStocksError(error instanceof Error ? error.message : '載入失敗');
     } finally {
       setStocksLoading(false);
+    }
+  }, []);
+
+  // 載入國際指數
+  const loadMarketIndices = useCallback(async () => {
+    setIndicesLoading(true);
+    try {
+      const response = await fetch('/api/yahoo/quotes');
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.quotes) {
+          setMarketIndices(data.quotes.map((q: any) => ({
+            name: q.name,
+            code: q.symbol,
+            price: q.price,
+            change: q.changePercent,
+            icon: q.symbol.includes('TW') ? '🇹🇼' :
+              q.symbol.includes('GSPC') || q.symbol.includes('DJI') ? '🇺🇸' :
+                q.symbol.includes('BTC') ? '🪙' : '📊'
+          })));
+        }
+      }
+    } catch (error) {
+      console.error('載入國際指數失敗:', error);
+    } finally {
+      setIndicesLoading(false);
     }
   }, []);
 
   // 客戶端初始化
   useEffect(() => {
     setIsClient(true);
-    loadStocks();
-  }, [loadStocks]);
+    // 只有登入後才載入資料
+    if (user) {
+      loadStocks();
+      loadMarketIndices();
+    }
+  }, [loadStocks, loadMarketIndices, user]);
 
   // 5 分鐘自動更新
-  useAutoRefresh(loadStocks, isClient ? 5 * 60 * 1000 : 0, isClient);
+  useAutoRefresh(() => {
+    if (user) {
+      loadStocks();
+      loadMarketIndices();
+    }
+  }, isClient && user ? 5 * 60 * 1000 : 0, isClient && !!user);
 
   // 搜尋處理
   const handleSearch = (query: string) => {
@@ -76,6 +127,26 @@ export default function DashboardPage() {
 
   // 顯示的股票列表
   const displayStocks = filteredStocks.slice(0, 20);
+
+  // 如果正在檢查登入狀態，顯示載入中
+  if (authLoading) {
+    return (
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        minHeight: '100vh',
+        background: 'var(--bg-primary)',
+      }}>
+        <div className="loading-spinner" style={{ width: 50, height: 50 }} />
+      </div>
+    );
+  }
+
+  // 未登入不渲染內容（會在 useEffect 中 redirect）
+  if (!user) {
+    return null;
+  }
 
   return (
     <div className="app-layout">
@@ -146,41 +217,46 @@ export default function DashboardPage() {
             gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
             gap: 'var(--spacing-md)',
           }}>
-            {[
-              { name: '加權指數', code: '^TWII', price: 22856.78, change: 1.23, icon: '🇹🇼' },
-              { name: '櫃買指數', code: '^TWOII', price: 256.34, change: -0.45, icon: '📈' },
-              { name: 'S&P 500', code: '^GSPC', price: 6015.28, change: 0.87, icon: '🇺🇸' },
-              { name: 'Bitcoin', code: 'BTC', price: 97890.45, change: 2.34, icon: '🪙' },
-            ].map((market, index) => (
-              <motion.div
-                key={market.code}
-                className="glass-card"
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.1 + index * 0.05 }}
-                style={{ cursor: 'pointer' }}
-                whileHover={{ scale: 1.02 }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
-                  <span style={{ fontSize: '1.5rem' }}>{market.icon}</span>
-                  <div>
-                    <div style={{ fontWeight: 500 }}>{market.name}</div>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{market.code}</div>
+            {indicesLoading ? (
+              <div className="glass-card" style={{ textAlign: 'center', padding: 'var(--spacing-lg)' }}>
+                <p style={{ color: 'var(--text-muted)' }}>載入國際指數...</p>
+              </div>
+            ) : marketIndices.length > 0 ? (
+              marketIndices.map((market, index) => (
+                <motion.div
+                  key={market.code}
+                  className="glass-card"
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.1 + index * 0.05 }}
+                  style={{ cursor: 'pointer' }}
+                  whileHover={{ scale: 1.02 }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                    <span style={{ fontSize: '1.5rem' }}>{market.icon}</span>
+                    <div>
+                      <div style={{ fontWeight: 500 }}>{market.name}</div>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{market.code}</div>
+                    </div>
                   </div>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-                  <span style={{ fontSize: '1.25rem', fontWeight: 600, fontFamily: 'var(--font-mono)' }}>
-                    {market.price.toLocaleString()}
-                  </span>
-                  <span style={{
-                    color: market.change >= 0 ? 'var(--stock-up)' : 'var(--stock-down)',
-                    fontWeight: 500,
-                  }}>
-                    {market.change >= 0 ? '+' : ''}{market.change}%
-                  </span>
-                </div>
-              </motion.div>
-            ))}
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+                    <span style={{ fontSize: '1.25rem', fontWeight: 600, fontFamily: 'var(--font-mono)' }}>
+                      {market.price.toLocaleString()}
+                    </span>
+                    <span style={{
+                      color: market.change >= 0 ? 'var(--stock-up)' : 'var(--stock-down)',
+                      fontWeight: 500,
+                    }}>
+                      {market.change >= 0 ? '+' : ''}{market.change.toFixed(2)}%
+                    </span>
+                  </div>
+                </motion.div>
+              ))
+            ) : (
+              <div className="glass-card" style={{ textAlign: 'center', padding: 'var(--spacing-lg)' }}>
+                <p style={{ color: 'var(--text-muted)' }}>暫無指數資料</p>
+              </div>
+            )}
           </div>
         </motion.section>
 

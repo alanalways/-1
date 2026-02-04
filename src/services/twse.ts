@@ -35,12 +35,9 @@ export interface TwseMarketInfo {
  */
 export async function getAllStocks(): Promise<TwseStock[]> {
     try {
-        // 使用 CORS proxy 或後端 API
-        const today = new Date();
-        const dateStr = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
-
-        // 直接使用 TWSE API（可能需要後端代理）
-        const response = await fetch(`/api/twse/stocks?date=${dateStr}`);
+        // 不傳入日期，讓 API 自動判斷最近的交易日
+        // 這樣盤後/開盤前都能取得最新資料
+        const response = await fetch('/api/twse/stocks');
 
         if (!response.ok) {
             throw new Error(`TWSE API 回應錯誤: ${response.status}`);

@@ -64,6 +64,8 @@ export function useAuth(): AuthState {
         try {
             await signOut();
             setUser(null);
+            // 登出後跳轉到登入頁面
+            window.location.href = '/login';
         } catch (error) {
             console.error('登出失敗:', error);
         }
