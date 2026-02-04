@@ -1,7 +1,5 @@
-# Hugging Face Spaces 設定
-
 ---
-title: Discover Latest - AI 金融分析儀表板
+title: Discover Latest
 emoji: 📈
 colorFrom: indigo
 colorTo: purple
