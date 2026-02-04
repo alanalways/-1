@@ -1,6 +1,6 @@
 /**
- * TWSE + TPEX 台股 API 代理
- * 使用官方 Open API 取得真實資料
+ * TWSE + TPEX 台股 API
+ * 使用官方 OpenAPI 取得即時股票資料
  * 
  * TWSE: https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL
  * TPEX: https://www.tpex.org.tw/openapi/v1/tpex_mainboard_daily_close_quotes
@@ -24,41 +24,39 @@ interface StockData {
 }
 
 /**
- * 從 TWSE Open API 取得上市股票資料
- * URL: https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL
+ * 從 TWSE OpenAPI 取得上市股票資料
  */
 async function fetchTWSE(): Promise<StockData[]> {
     const url = 'https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL';
 
-    console.log('[TWSE] 使用 Open API 取得資料...');
+    console.log('[TWSE OpenAPI] 取得上市股票資料...');
 
     const response = await fetch(url, {
         headers: {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
             'Accept': 'application/json',
         },
         cache: 'no-store',
     });
 
     if (!response.ok) {
-        throw new Error(`TWSE API 回應錯誤: ${response.status}`);
+        throw new Error(`TWSE OpenAPI 錯誤: ${response.status}`);
     }
 
     const data = await response.json();
 
     if (!Array.isArray(data) || data.length === 0) {
-        throw new Error('TWSE 回傳資料為空');
+        throw new Error('TWSE OpenAPI 無資料');
     }
 
-    console.log(`[TWSE] 成功取得 ${data.length} 筆資料`);
+    console.log(`[TWSE OpenAPI] 成功取得 ${data.length} 筆上市股票`);
 
-    // Open API 回傳格式：
-    // Code, Name, TradeVolume, TradeValue, OpeningPrice, HighestPrice, LowestPrice, ClosingPrice, Change, Transaction
     return data.map((item: any) => {
         const closingPrice = parseFloat(item.ClosingPrice) || 0;
         const change = parseFloat(item.Change) || 0;
         const prevClose = closingPrice - change;
-        const changePercent = prevClose > 0 ? parseFloat(((change / prevClose) * 100).toFixed(2)) : 0;
+        const changePercent = prevClose > 0
+            ? parseFloat(((change / prevClose) * 100).toFixed(2))
+            : 0;
 
         return {
             code: item.Code?.trim() || '',
@@ -78,41 +76,39 @@ async function fetchTWSE(): Promise<StockData[]> {
 }
 
 /**
- * 從 TPEX Open API 取得上櫃股票資料
- * URL: https://www.tpex.org.tw/openapi/v1/tpex_mainboard_daily_close_quotes
+ * 從 TPEX OpenAPI 取得上櫃股票資料
  */
 async function fetchTPEX(): Promise<StockData[]> {
     const url = 'https://www.tpex.org.tw/openapi/v1/tpex_mainboard_daily_close_quotes';
 
-    console.log('[TPEX] 使用 Open API 取得資料...');
+    console.log('[TPEX OpenAPI] 取得上櫃股票資料...');
 
     const response = await fetch(url, {
         headers: {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
             'Accept': 'application/json',
         },
         cache: 'no-store',
     });
 
     if (!response.ok) {
-        throw new Error(`TPEX API 回應錯誤: ${response.status}`);
+        throw new Error(`TPEX OpenAPI 錯誤: ${response.status}`);
     }
 
     const data = await response.json();
 
     if (!Array.isArray(data) || data.length === 0) {
-        throw new Error('TPEX 回傳資料為空');
+        throw new Error('TPEX OpenAPI 無資料');
     }
 
-    console.log(`[TPEX] 成功取得 ${data.length} 筆資料`);
+    console.log(`[TPEX OpenAPI] 成功取得 ${data.length} 筆上櫃股票`);
 
-    // Open API 回傳格式：
-    // SecuritiesCompanyCode, CompanyName, Close, Change, Open, High, Low, TradingVolume, TransactionAmount
     return data.map((item: any) => {
         const closingPrice = parseFloat(item.Close) || 0;
         const change = parseFloat(item.Change) || 0;
         const prevClose = closingPrice - change;
-        const changePercent = prevClose > 0 ? parseFloat(((change / prevClose) * 100).toFixed(2)) : 0;
+        const changePercent = prevClose > 0
+            ? parseFloat(((change / prevClose) * 100).toFixed(2))
+            : 0;
 
         return {
             code: item.SecuritiesCompanyCode?.trim() || '',
@@ -120,12 +116,12 @@ async function fetchTPEX(): Promise<StockData[]> {
             closingPrice,
             change,
             changePercent,
-            tradeVolume: parseInt(item.TradingVolume) || 0,
+            tradeVolume: parseInt(item.TradingShares) || 0,
             tradeValue: parseInt(item.TransactionAmount) || 0,
             openingPrice: parseFloat(item.Open) || 0,
             highestPrice: parseFloat(item.High) || 0,
             lowestPrice: parseFloat(item.Low) || 0,
-            transaction: 0, // TPEX API 不提供此欄位
+            transaction: parseInt(item.TransactionNumber) || 0,
             market: 'tpex' as const,
         };
     }).filter((s: StockData) => s.code && s.closingPrice > 0);
@@ -135,7 +131,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const marketParam = searchParams.get('market') || 'all';
 
-    let stocks: StockData[] = [];
+    const stocks: StockData[] = [];
     const errors: string[] = [];
     let twseCount = 0;
     let tpexCount = 0;
@@ -144,13 +140,11 @@ export async function GET(request: NextRequest) {
     if (marketParam === 'all' || marketParam === 'twse') {
         try {
             const twseStocks = await fetchTWSE();
-            if (twseStocks.length > 0) {
-                stocks.push(...twseStocks);
-                twseCount = twseStocks.length;
-            }
-        } catch (twseError: any) {
-            errors.push(`TWSE: ${twseError.message}`);
-            console.error('[TWSE] 錯誤:', twseError.message);
+            stocks.push(...twseStocks);
+            twseCount = twseStocks.length;
+        } catch (error: any) {
+            console.error('[TWSE]', error.message);
+            errors.push(`TWSE: ${error.message}`);
         }
     }
 
@@ -158,13 +152,11 @@ export async function GET(request: NextRequest) {
     if (marketParam === 'all' || marketParam === 'tpex') {
         try {
             const tpexStocks = await fetchTPEX();
-            if (tpexStocks.length > 0) {
-                stocks.push(...tpexStocks);
-                tpexCount = tpexStocks.length;
-            }
-        } catch (tpexError: any) {
-            errors.push(`TPEX: ${tpexError.message}`);
-            console.error('[TPEX] 錯誤:', tpexError.message);
+            stocks.push(...tpexStocks);
+            tpexCount = tpexStocks.length;
+        } catch (error: any) {
+            console.error('[TPEX]', error.message);
+            errors.push(`TPEX: ${error.message}`);
         }
     }
 
@@ -182,6 +174,9 @@ export async function GET(request: NextRequest) {
         stocks: stocks.slice(0, 300),
         total: stocks.length,
         source: 'openapi',
-        markets: { twse: twseCount, tpex: tpexCount },
+        markets: {
+            twse: twseCount,
+            tpex: tpexCount
+        },
     });
 }

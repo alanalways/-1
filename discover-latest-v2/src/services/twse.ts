@@ -1,35 +1,25 @@
 /**
  * TWSE/TPEX 台灣股票服務
- * 透過後端 API 取得真實資料
+ * 透過後端 API 取得真實資料（使用官方 OpenAPI）
  */
 
 export interface TwseStock {
-    code: string;           // 股票代號
-    name: string;           // 股票名稱
-    tradeVolume: number;    // 成交股數
-    tradeValue: number;     // 成交金額
-    openingPrice: number;   // 開盤價
-    highestPrice: number;   // 最高價
-    lowestPrice: number;    // 最低價
-    closingPrice: number;   // 收盤價
-    change: number;         // 漲跌
-    changePercent: number;  // 漲跌幅 %
-    transaction: number;    // 成交筆數
-    market?: 'twse' | 'tpex'; // 市場類別
-}
-
-export interface TwseMarketInfo {
-    date: string;
-    totalVolume: number;
-    totalValue: number;
+    code: string;
+    name: string;
+    tradeVolume: number;
+    tradeValue: number;
+    openingPrice: number;
+    highestPrice: number;
+    lowestPrice: number;
+    closingPrice: number;
+    change: number;
+    changePercent: number;
     transaction: number;
-    taiex: number;          // 加權指數
-    taiexChange: number;    // 指數漲跌
+    market?: 'twse' | 'tpex';
 }
 
 /**
  * 取得所有上市上櫃股票行情
- * 直接調用後端 API（不使用模擬資料）
  */
 export async function getAllStocks(): Promise<TwseStock[]> {
     try {
@@ -51,7 +41,7 @@ export async function getAllStocks(): Promise<TwseStock[]> {
         return data.stocks || [];
     } catch (error) {
         console.error('[TWSE Service] 取得股票資料失敗:', error);
-        throw error; // 不再使用模擬資料，直接拋出錯誤
+        throw error;
     }
 }
 
