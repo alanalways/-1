@@ -1,5 +1,3 @@
-# Hugging Face Spaces 設定
-
 ---
 title: Discover Latest - AI 金融分析儀表板
 emoji: 📈
