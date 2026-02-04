@@ -5,17 +5,102 @@
 
 import { NextResponse } from 'next/server';
 
+// 台灣證交所交易時間設定
+const TRADING_HOURS = {
+    start: 9,   // 09:00
+    end: 13.5,  // 13:30
+};
+
+// 台灣公休日（2024-2025）- 可以從外部 API 取得
+const HOLIDAYS_2025 = [
+    '2025-01-01', // 元旦
+    '2025-01-28', '2025-01-29', '2025-01-30', '2025-01-31', // 農曆春節
+    '2025-02-01', '2025-02-02', '2025-02-03', '2025-02-04',
+    '2025-02-28', // 和平紀念日
+    '2025-04-04', '2025-04-05', // 清明節
+    '2025-05-01', // 勞動節
+    '2025-05-31', '2025-06-01', '2025-06-02', // 端午節
+    '2025-10-06', '2025-10-07', '2025-10-08', // 中秋節
+    '2025-10-10', // 國慶日
+];
+
+/**
+ * 判斷是否為交易日
+ */
+function isTradingDay(date: Date): boolean {
+    const day = date.getDay();
+    // 週六(6)、週日(0) 不開盤
+    if (day === 0 || day === 6) {
+        return false;
+    }
+
+    // 檢查是否為公休日
+    const dateStr = date.toISOString().split('T')[0];
+    if (HOLIDAYS_2025.includes(dateStr)) {
+        return false;
+    }
+
+    return true;
+}
+
+/**
+ * 判斷是否在交易時間內
+ */
+function isTradingHours(date: Date): boolean {
+    if (!isTradingDay(date)) {
+        return false;
+    }
+
+    const hours = date.getHours() + date.getMinutes() / 60;
+    return hours >= TRADING_HOURS.start && hours <= TRADING_HOURS.end;
+}
+
+/**
+ * 取得最近的交易日日期字串
+ */
+function getLatestTradingDate(): string {
+    const now = new Date();
+    // 調整為台灣時區
+    const taiwanTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Taipei' }));
+
+    // 如果今天是交易日且已過開盤時間，使用今天
+    if (isTradingDay(taiwanTime) && taiwanTime.getHours() >= TRADING_HOURS.start) {
+        return formatDate(taiwanTime);
+    }
+
+    // 否則往前找最近的交易日
+    const checkDate = new Date(taiwanTime);
+    for (let i = 0; i < 10; i++) {
+        checkDate.setDate(checkDate.getDate() - 1);
+        if (isTradingDay(checkDate)) {
+            return formatDate(checkDate);
+        }
+    }
+
+    // Fallback: 返回今天
+    return formatDate(taiwanTime);
+}
+
+function formatDate(date: Date): string {
+    return `${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, '0')}${String(date.getDate()).padStart(2, '0')}`;
+}
+
 export async function GET(request: Request) {
     try {
         const { searchParams } = new URL(request.url);
-        const dateParam = searchParams.get('date');
+        let dateParam = searchParams.get('date');
 
-        // 格式化日期（TWSE 格式：YYYYMMDD）
-        const today = new Date();
-        const dateStr = dateParam || `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
+        // 如果沒有指定日期，使用最近的交易日
+        const dateStr = dateParam || getLatestTradingDate();
+
+        // 取得台灣時間
+        const now = new Date();
+        const taiwanTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Taipei' }));
+
+        // 檢查是否在交易時間
+        const inTradingHours = isTradingHours(taiwanTime);
 
         // 嘗試從 TWSE 取得資料
-        // 注意：TWSE API 可能有請求頻率限制
         const twseUrl = `https://www.twse.com.tw/exchangeReport/MI_INDEX?response=json&date=${dateStr}&type=ALLBUT0999`;
 
         const response = await fetch(twseUrl, {
@@ -23,16 +108,17 @@ export async function GET(request: Request) {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
                 'Accept': 'application/json',
             },
-            next: { revalidate: 300 }, // 快取 5 分鐘
+            next: { revalidate: inTradingHours ? 60 : 300 }, // 交易時間 1 分鐘快取，否則 5 分鐘
         });
 
         if (!response.ok) {
-            // 如果 TWSE API 失敗，返回模擬資料
             return NextResponse.json({
-                success: true,
-                source: 'mock',
-                stocks: getMockStocks(),
-            });
+                success: false,
+                error: `TWSE API 回應錯誤: ${response.status}`,
+                date: dateStr,
+                isTradingDay: isTradingDay(taiwanTime),
+                inTradingHours,
+            }, { status: 502 });
         }
 
         const data = await response.json();
@@ -57,26 +143,29 @@ export async function GET(request: Request) {
                 success: true,
                 source: 'twse',
                 date: dateStr,
+                isTradingDay: isTradingDay(taiwanTime),
+                inTradingHours,
+                stockCount: stocks.length,
                 stocks,
             });
         }
 
-        // 如果資料格式不符，返回模擬資料
+        // 如果 TWSE 回傳 stat 不是 OK（通常是非交易日）
         return NextResponse.json({
-            success: true,
-            source: 'mock',
-            message: 'TWSE 資料格式不符或無資料',
-            stocks: getMockStocks(),
-        });
+            success: false,
+            error: data.stat === 'OK' ? '無股票資料' : `TWSE 回傳: ${data.stat || '無資料'}`,
+            date: dateStr,
+            isTradingDay: isTradingDay(taiwanTime),
+            inTradingHours,
+            twseMessage: data.stat,
+        }, { status: 404 });
 
     } catch (error) {
         console.error('[TWSE API] 錯誤:', error);
         return NextResponse.json({
-            success: true,
-            source: 'mock',
-            error: '取得 TWSE 資料失敗',
-            stocks: getMockStocks(),
-        });
+            success: false,
+            error: error instanceof Error ? error.message : '取得 TWSE 資料失敗',
+        }, { status: 500 });
     }
 }
 
@@ -99,58 +188,4 @@ function calculateChangePercent(closingPrice: number, change: number): number {
     const previousPrice = closingPrice - change;
     if (previousPrice === 0) return 0;
     return (change / previousPrice) * 100;
-}
-
-/**
- * 模擬台股資料
- */
-function getMockStocks() {
-    const baseData = [
-        { code: '2330', name: '台積電', basePrice: 1120, volume: 25000000 },
-        { code: '2317', name: '鴻海', basePrice: 200, volume: 35000000 },
-        { code: '2454', name: '聯發科', basePrice: 1395, volume: 8500000 },
-        { code: '2412', name: '中華電', basePrice: 120, volume: 5400000 },
-        { code: '2881', name: '富邦金', basePrice: 90, volume: 18500000 },
-        { code: '2882', name: '國泰金', basePrice: 60, volume: 15400000 },
-        { code: '2303', name: '聯電', basePrice: 55, volume: 42000000 },
-        { code: '3711', name: '日月光投控', basePrice: 170, volume: 12500000 },
-        { code: '2308', name: '台達電', basePrice: 420, volume: 6500000 },
-        { code: '1301', name: '台塑', basePrice: 58, volume: 8500000 },
-        { code: '1303', name: '南亞', basePrice: 58, volume: 7500000 },
-        { code: '2886', name: '兆豐金', basePrice: 44, volume: 14500000 },
-        { code: '2891', name: '中信金', basePrice: 33, volume: 22500000 },
-        { code: '2892', name: '第一金', basePrice: 29, volume: 18500000 },
-        { code: '3008', name: '大立光', basePrice: 2350, volume: 1250000 },
-        { code: '2002', name: '中鋼', basePrice: 23, volume: 35400000 },
-        { code: '1216', name: '統一', basePrice: 70, volume: 8500000 },
-        { code: '2912', name: '統一超', basePrice: 288, volume: 3250000 },
-        { code: '2357', name: '華碩', basePrice: 560, volume: 4500000 },
-        { code: '2382', name: '廣達', basePrice: 330, volume: 12500000 },
-        { code: '2884', name: '玉山金', basePrice: 28.5, volume: 25000000 },
-        { code: '2890', name: '永豐金', basePrice: 22, volume: 18000000 },
-        { code: '2883', name: '開發金', basePrice: 17.5, volume: 28000000 },
-        { code: '3045', name: '台灣大', basePrice: 108, volume: 4500000 },
-        { code: '4904', name: '遠傳', basePrice: 85, volume: 3800000 },
-    ];
-
-    return baseData.map(stock => {
-        const changePercent = (Math.random() - 0.5) * 6; // -3% ~ +3%
-        const change = stock.basePrice * (changePercent / 100);
-        const closingPrice = stock.basePrice + change;
-        const volumeVariance = 0.8 + Math.random() * 0.4;
-
-        return {
-            code: stock.code,
-            name: stock.name,
-            tradeVolume: Math.floor(stock.volume * volumeVariance),
-            tradeValue: Math.floor(closingPrice * stock.volume * volumeVariance),
-            openingPrice: parseFloat((stock.basePrice * (0.99 + Math.random() * 0.02)).toFixed(2)),
-            highestPrice: parseFloat((closingPrice * (1 + Math.random() * 0.02)).toFixed(2)),
-            lowestPrice: parseFloat((closingPrice * (1 - Math.random() * 0.02)).toFixed(2)),
-            closingPrice: parseFloat(closingPrice.toFixed(2)),
-            change: parseFloat(change.toFixed(2)),
-            changePercent: parseFloat(changePercent.toFixed(2)),
-            transaction: Math.floor(stock.volume / 1000 * (0.8 + Math.random() * 0.4)),
-        };
-    });
 }

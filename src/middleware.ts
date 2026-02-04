@@ -44,27 +44,46 @@ export async function middleware(request: NextRequest) {
         return NextResponse.next();
     }
 
-    // 從 cookies 取得 session
-    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-        auth: {
-            persistSession: false,
-        },
-    });
-
-    // 嘗試從 cookies 取得 access token
+    // 從 cookies 取得 session tokens
     const accessToken = request.cookies.get('sb-access-token')?.value;
     const refreshToken = request.cookies.get('sb-refresh-token')?.value;
 
+    // 沒有任何 token，重導向到登入頁面
     if (!accessToken && !refreshToken) {
-        // 沒有 token，重導向到登入頁面
         const loginUrl = new URL('/login', request.url);
         loginUrl.searchParams.set('redirect', pathname);
         return NextResponse.redirect(loginUrl);
     }
 
-    // 驗證 session（可選，為了效能可以跳過）
-    // 這裡我們信任 token 存在即代表已登入
-    // 如果需要更嚴格的驗證，可以調用 supabase.auth.getUser()
+    // 建立 Supabase client 並設定 session
+    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+        auth: {
+            persistSession: false,
+        },
+        global: {
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+            },
+        },
+    });
+
+    // 實際驗證 token 有效性
+    try {
+        const { data: { user }, error } = await supabase.auth.getUser(accessToken);
+
+        if (error || !user) {
+            // Token 無效，清除並重導向到登入頁面
+            const loginUrl = new URL('/login', request.url);
+            loginUrl.searchParams.set('redirect', pathname);
+            const response = NextResponse.redirect(loginUrl);
+            response.cookies.delete('sb-access-token');
+            response.cookies.delete('sb-refresh-token');
+            return response;
+        }
+    } catch {
+        // 驗證過程出錯，允許通過（避免阻擋正常使用者）
+        console.warn('[Middleware] Token 驗證過程出錯，允許通過');
+    }
 
     return NextResponse.next();
 }
