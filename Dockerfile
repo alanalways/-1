@@ -29,6 +29,13 @@ COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 
+# 接收建置時的環境變數（Hugging Face 會透過 --build-arg 傳入）
+# 這些變數會在 npm run build 時被 Next.js 編譯進前端代碼
+ARG NEXT_PUBLIC_SUPABASE_URL
+ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
+ENV NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
+ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+
 # 建置應用程式（標準模式，非 standalone）
 RUN npm run build
 
