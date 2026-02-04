@@ -55,14 +55,23 @@ export default function AnalysisPage() {
             }
 
             // 轉換為 CandlestickData 格式
-            const data: CandlestickData[] = history.map((d: { time?: number; date?: string; open: number; high: number; low: number; close: number; volume?: number }) => ({
-                time: d.time ? new Date(d.time * 1000).toISOString().split('T')[0] : d.date?.split('T')[0] || '',
-                open: d.open,
-                high: d.high,
-                low: d.low,
-                close: d.close,
-                volume: d.volume || 0,
-            }));
+            const data: CandlestickData[] = history
+                .map((d) => {
+                    // d.date 是 Date 物件
+                    const dateObj = new Date(d.date);
+                    const timeStr = !isNaN(dateObj.getTime())
+                        ? dateObj.toISOString().split('T')[0]
+                        : '';
+                    return {
+                        time: timeStr,
+                        open: d.open,
+                        high: d.high,
+                        low: d.low,
+                        close: d.close,
+                        volume: d.volume || 0,
+                    };
+                })
+                .filter(item => item.time !== '');
 
             setChartData(data);
             setStockName(isTwStock ? stockSymbol : yahooSymbol);

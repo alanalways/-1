@@ -54,11 +54,7 @@ export default function DashboardPage() {
   }, [loadStocks]);
 
   // 5 分鐘自動更新
-  useAutoRefresh({
-    enabled: isClient,
-    interval: 5 * 60 * 1000,
-    onRefresh: loadStocks,
-  });
+  useAutoRefresh(loadStocks, isClient ? 5 * 60 * 1000 : 0, isClient);
 
   // 搜尋處理
   const handleSearch = (query: string) => {

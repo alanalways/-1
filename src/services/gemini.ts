@@ -89,8 +89,8 @@ class GeminiKeyManager {
 // ============ Gemini 分析師 ============
 
 const MODELS = [
-    'gemini-2.5-flash-preview-04-17',
-    'gemini-2.0-flash',
+    'gemini-3.0-flash',
+    'gemini-2.5-flash',
 ];
 
 // 華爾街交易員人設 System Prompt
@@ -131,12 +131,47 @@ const SYSTEM_PROMPT = `你是一位擁有 20 年經驗的華爾街資深交易�
 
 let keyManager: GeminiKeyManager | null = null;
 let currentModelIndex = 0;
+let isInitializing = false;
 
 /**
- * 初始化 Gemini 服務
+ * 自動初始化 Gemini 服務（從 Supabase 載入 keys）
+ */
+async function ensureInitialized(): Promise<boolean> {
+    if (keyManager) return true;
+    if (isInitializing) {
+        // 等待其他初始化完成
+        await new Promise(resolve => setTimeout(resolve, 100));
+        return keyManager !== null;
+    }
+
+    isInitializing = true;
+    try {
+        // 動態載入 apiKeys 服務（避免循環依賴）
+        const { getApiKeys } = await import('./apiKeys');
+        const keys = await getApiKeys('gemini');
+
+        if (keys.length > 0) {
+            keyManager = new GeminiKeyManager(keys);
+            console.log(`[Gemini] 自動初始化成功，載入 ${keys.length} 組 API Keys`);
+            return true;
+        } else {
+            console.error('[Gemini] 無法取得任何 API Keys');
+            return false;
+        }
+    } catch (error) {
+        console.error('[Gemini] 自動初始化失敗:', error);
+        return false;
+    } finally {
+        isInitializing = false;
+    }
+}
+
+/**
+ * 手動初始化 Gemini 服務（向下相容）
  */
 export function initGemini(apiKeys: string[]) {
     keyManager = new GeminiKeyManager(apiKeys);
+    console.log(`[Gemini] 手動初始化成功，載入 ${apiKeys.length} 組 API Keys`);
 }
 
 /**
@@ -150,12 +185,19 @@ export async function analyzeStock(params: {
     changePercent?: number;
     technicalData?: any;
 }): Promise<AnalysisResult | null> {
+    // 自動初始化（如果尚未初始化）
     if (!keyManager) {
-        console.error('[Gemini] 服務未初始化');
-        return null;
+        const initialized = await ensureInitialized();
+        if (!initialized) {
+            console.error('[Gemini] 服務未初始化且自動初始化失敗');
+            return getDefaultResult(params.price);
+        }
     }
 
-    await keyManager.checkRateLimit();
+    // 此時 keyManager 保證已初始化
+    const manager = keyManager!;
+
+    await manager.checkRateLimit();
 
     const prompt = buildPrompt(params);
 
@@ -163,7 +205,7 @@ export async function analyzeStock(params: {
     const maxRetries = 3;
     for (let attempt = 0; attempt < maxRetries; attempt++) {
         try {
-            const key = keyManager.getCurrentKey();
+            const key = manager.getCurrentKey();
             const genAI = new GoogleGenerativeAI(key);
             const model = genAI.getGenerativeModel({ model: MODELS[currentModelIndex] });
 
@@ -178,7 +220,7 @@ export async function analyzeStock(params: {
             const response = await result.response;
             const parsed = parseResponse(response.text());
 
-            keyManager.markSuccess(key);
+            manager.markSuccess(key);
             return parsed;
 
         } catch (error: any) {
@@ -186,7 +228,7 @@ export async function analyzeStock(params: {
 
             if (errorMsg.includes('quota') || errorMsg.includes('rate') || errorMsg.includes('limit')) {
                 console.log('[Gemini] API 達到速率限制，切換 Key...');
-                keyManager.markFailed(keyManager.getCurrentKey());
+                manager.markFailed(manager.getCurrentKey());
             } else {
                 console.error(`[Gemini] 分析錯誤 (嘗試 ${attempt + 1}/${maxRetries}):`, error);
                 if (attempt < maxRetries - 1) {
