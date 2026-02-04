@@ -15,6 +15,22 @@ export interface StrategyDetail {
     rationale: string;
 }
 
+// 新版 AI 分析結果結構
+export interface AdvancedAnalysisResult {
+    recommendation: 'buy' | 'sell' | 'hold';
+    time_horizon: 'short' | 'medium' | 'long';
+    target_price: number;
+    stop_loss: number;
+    confidence: 'low' | 'medium' | 'high';
+    reasons: string[];
+    risks: string[];
+    // 額外分析
+    analysis_summary: string;
+    bullish_points: string[];
+    bearish_points: string[];
+}
+
+// 向下相容舊版結構
 export interface AnalysisResult {
     score: number;
     strategy: {
@@ -26,6 +42,8 @@ export interface AnalysisResult {
     correlation_insight: string;
     risk_warning: string;
     confidence: number;
+    // 新增：進階分析
+    advanced?: AdvancedAnalysisResult;
 }
 
 // ============ Key 輪換管理器 ============
@@ -93,41 +111,85 @@ const MODELS = [
     'gemini-2.5-flash',
 ];
 
-// 華爾街交易員人設 System Prompt
-const SYSTEM_PROMPT = `你是一位擁有 20 年經驗的華爾街資深交易員，專精於技術分析與智慧資金概念 (SMC)。
+// 專業股票分析師 System Prompt（整合技術面/基本面/情緒面）
+const SYSTEM_PROMPT = `你是一個專業的股票投資分析師，專門分析台股與美股。你的任務是：
 
-你的分析風格：
-1. 數據驅動：所有判斷都基於具體數據
-2. 風險意識：永遠先考慮下行風險
-3. 多時間框架：短中長線分開考量
-4. 機構視角：從大資金角度思考市場結構
+1. 根據我提供的「結構化特徵」與「當日證交所／行情資料」，判讀該標的目前的投資狀態。
+2. 用「多空理由＋風險提示」的方式給出建議，不要用「一定漲／一定跌」這種確定性語氣。
+3. 回答請用「繁體中文」，結構清楚，最後用 JSON 格式輸出一個簡明的建議摘要。
 
-你必須嚴格按照以下 JSON 格式回覆（不要包含任何額外文字或 markdown 標記）：
+---
+
+### 輸入資料結構
+
+你會收到一個 JSON 物件，包含以下層面的特徵：
+
+1. **技術面（Technical）**
+   - trend_pattern：多頭排列 / 空頭排列 / 盤整
+   - rsi_level：超買 / 超賣 / 中性
+   - macd_signal：金叉 / 死叉 / 震盪
+   - price_vs_support_resistance：突破關鍵壓力 / 突破關鍵支撐 / 在壓力與支撐之間
+
+2. **基本面（Fundamental）**
+   - pe：本益比
+   - pb：股價淨值比
+   - eps_growth：EPS 成長率（%）
+   - roe：ROE（%）
+   - fcf_yield：自由現金流殖利率（%）
+
+3. **行情資料**
+   - 股票代碼、名稱、市場（台股／美股）
+   - 當日開盤價、最高價、最低價、收盤價、成交量
+   - 均線（MA5, MA20, MA60）、RSI、MACD 數值
+
+---
+
+### 分析步驟
+
+1. 先看「結構化特徵」，判斷目前是偏多、偏空，還是觀望
+2. 再看「行情資料」，確認是否有明顯的價格突破、成交量放大等訊號
+3. 綜合技術面、基本面，給出：
+   - 多空理由（2～3 點）
+   - 風險提示（2～3 點）
+   - 建議操作（買／賣／觀望），並說明理由
+
+---
+
+### 輸出格式（純 JSON，不要包含任何 markdown 標記或額外文字）
+
 {
-    "score": <0-100 整數，代表技術面強度>,
-    "strategy": {
-        "short_term": {
-            "bias": "<多/空/觀望>",
-            "entry": <建議進場價>,
-            "tp": <止盈價>,
-            "sl": <止損價>,
-            "rationale": "<簡短理由>"
-        },
-        "mid_term": { ... },
-        "long_term": { ... }
-    },
-    "trend_analysis": "<100-200字的市場結構分析，使用繁體中文>",
-    "correlation_insight": "<與大盤或同類股的連動性分析>",
-    "risk_warning": "<主要風險因素提醒>",
-    "confidence": <0.0-1.0 的信心度>
+  "score": <0-100 整數，代表綜合技術面強度>,
+  "recommendation": "buy / sell / hold",
+  "time_horizon": "short / medium / long",
+  "target_price": <目標價>,
+  "stop_loss": <停損價>,
+  "confidence": "low / medium / high",
+  "reasons": [
+    "多空理由 1",
+    "多空理由 2",
+    "多空理由 3"
+  ],
+  "risks": [
+    "風險 1",
+    "風險 2",
+    "風險 3"
+  ],
+  "analysis_summary": "<100-200字的完整分析摘要>",
+  "strategy": {
+    "short_term": { "bias": "多/空/觀望", "entry": <進場價>, "tp": <止盈價>, "sl": <止損價>, "rationale": "<理由>" },
+    "mid_term": { "bias": "多/空/觀望", "entry": <進場價>, "tp": <止盈價>, "sl": <止損價>, "rationale": "<理由>" },
+    "long_term": { "bias": "多/空/觀望", "entry": <進場價>, "tp": <止盈價>, "sl": <止損價>, "rationale": "<理由>" }
+  }
 }
 
-評分標準：
-- 80-100：強勢多頭，技術面極佳
+---
+
+### 評分標準
+- 80-100：強勢多頭，技術面極佳，基本面支撐
 - 60-79：偏多格局，可考慮做多
 - 40-59：震盪整理，觀望為主
 - 20-39：偏空格局，謹慎操作
-- 0-19：強勢空頭，建議避開或做空`;
+- 0-19：強勢空頭，建議避開`;
 
 let keyManager: GeminiKeyManager | null = null;
 let currentModelIndex = 0;
@@ -177,6 +239,30 @@ export function initGemini(apiKeys: string[]) {
 /**
  * 執行 AI 分析
  */
+// 技術面特徵輸入
+export interface TechnicalInput {
+    trend_pattern: string;
+    rsi_level: string;
+    rsi: number;
+    macd_signal: string;
+    macd: number;
+    price_vs_sr: string;
+    ma5: number;
+    ma20: number;
+    ma60: number;
+    support: number;
+    resistance: number;
+}
+
+// 基本面特徵輸入
+export interface FundamentalInput {
+    pe: number | null;
+    pb: number | null;
+    eps_growth: number | null;
+    roe: number | null;
+    fcf_yield: number | null;
+}
+
 export async function analyzeStock(params: {
     code: string;
     name: string;
@@ -184,6 +270,9 @@ export async function analyzeStock(params: {
     sector?: string;
     changePercent?: number;
     technicalData?: any;
+    // 新增：結構化技術面/基本面資料
+    technical?: TechnicalInput;
+    fundamental?: FundamentalInput;
 }): Promise<AnalysisResult | null> {
     // 自動初始化（如果尚未初始化）
     if (!keyManager) {
@@ -248,17 +337,56 @@ function buildPrompt(params: {
     sector?: string;
     changePercent?: number;
     technicalData?: any;
+    technical?: TechnicalInput;
+    fundamental?: FundamentalInput;
 }): string {
-    return `請分析以下股票的技術面狀況：
+    // 建構結構化特徵 JSON
+    const features: any = {
+        stock_info: {
+            code: params.code,
+            name: params.name || '未知',
+            sector: params.sector || '未知',
+            current_price: params.price,
+            change_percent: params.changePercent || 0,
+            market: params.code.match(/^[0-9]+$/) ? '台股' : '美股',
+        }
+    };
 
-【標的資訊】
-- 股票代碼：${params.code}
-- 股票名稱：${params.name || '未知'}
-- 產業類別：${params.sector || '未知'}
-- 目前股價：${params.price || '未知'} 元
-- 今日漲跌：${params.changePercent || 0}%
+    // 技術面特徵
+    if (params.technical) {
+        features.technical = {
+            trend_pattern: params.technical.trend_pattern,
+            rsi_level: params.technical.rsi_level,
+            macd_signal: params.technical.macd_signal,
+            price_vs_support_resistance: params.technical.price_vs_sr,
+        };
+        features.indicators = {
+            ma5: params.technical.ma5,
+            ma20: params.technical.ma20,
+            ma60: params.technical.ma60,
+            rsi: params.technical.rsi,
+            macd: params.technical.macd,
+            support: params.technical.support,
+            resistance: params.technical.resistance,
+        };
+    }
 
-請根據以上數據進行完整分析，以純 JSON 格式回覆（不要加任何 markdown 標記或額外文字）。`;
+    // 基本面特徵
+    if (params.fundamental) {
+        features.fundamental = {
+            pe: params.fundamental.pe,
+            pb: params.fundamental.pb,
+            eps_growth: params.fundamental.eps_growth ? `${params.fundamental.eps_growth}%` : null,
+            roe: params.fundamental.roe ? `${params.fundamental.roe}%` : null,
+            fcf_yield: params.fundamental.fcf_yield ? `${params.fundamental.fcf_yield}%` : null,
+        };
+    }
+
+    return `請根據以下結構化資料進行股票投資分析：
+
+${JSON.stringify(features, null, 2)}
+
+請根據上述技術面與基本面數據，進行完整的多空分析，以純 JSON 格式回覆（不要加任何 markdown 標記或額外文字）。`;
 }
 
 function parseResponse(responseText: string): AnalysisResult | null {
