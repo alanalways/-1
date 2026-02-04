@@ -41,9 +41,10 @@ function LoginContent() {
     // 已登入則重導向
     useEffect(() => {
         if (!loading && user) {
-            router.push('/');
+            const redirectPath = searchParams.get('redirect') || '/';
+            router.push(redirectPath);
         }
-    }, [user, loading, router]);
+    }, [user, loading, router, searchParams]);
 
     const handleGoogleLogin = async () => {
         setIsSigningIn(true);

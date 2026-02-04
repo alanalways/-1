@@ -101,12 +101,33 @@ export default function DashboardPage() {
           <h1 style={{ fontSize: '1.5rem', fontWeight: 600, marginBottom: '8px' }}>
             {user ? `👋 歡迎回來，${user.user_metadata?.full_name || '投資者'}！` : '👋 歡迎使用 Discover Latest'}
           </h1>
-          <p style={{ color: 'var(--text-secondary)' }}>
+          <p style={{ color: 'var(--text-secondary)', marginBottom: user ? 'var(--spacing-md)' : 0 }}>
             {user
               ? `您的自選清單中有 ${watchlist.length} 檔股票`
               : '登入以解鎖自選清單同步、歷史分析紀錄等功能'
             }
           </p>
+          {user && (
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => window.location.href = '/analysis'}
+              style={{
+                padding: '10px 20px',
+                background: 'linear-gradient(135deg, #4f46e5 0%, #6366f1 100%)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}
+            >
+              🚀 前往 AI 深度分析
+            </motion.button>
+          )}
         </motion.section>
 
         {/* 市場概覽卡片 */}
