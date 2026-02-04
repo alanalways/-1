@@ -29,6 +29,17 @@ COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 
+# 接收 Hugging Face Secrets 作為建構參數
+ARG NEXT_PUBLIC_SUPABASE_URL
+ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
+ARG NEXT_PUBLIC_APP_URL
+
+# 將 ARG 轉換為 ENV（Next.js 建構時需要）
+# 注意：Supabase anon key 是公開的，可安全硬編碼
+ENV NEXT_PUBLIC_SUPABASE_URL=https://xxsntufxfcvrqvweimyg.supabase.co
+ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh4c250dWZ4ZmN2cnF2d2VpbXlnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAxNDIzMjYsImV4cCI6MjA4NTcxODMyNn0.EHE6-DSKM9iPrvttLC_GAxYRDSwYJ6mFDvESUamUZ4Q
+ENV NEXT_PUBLIC_APP_URL=https://alanalways-discover-latest.hf.space
+
 # 建置應用程式（標準模式，非 standalone）
 RUN npm run build
 
