@@ -1,20 +1,66 @@
-# Node.js Docker image for Hugging Face Spaces
-FROM node:20-slim
+# ==========================================
+# Dockerfile for Hugging Face Spaces
+# Next.js 16 + Node.js 20 (標準建置模式)
+# ==========================================
 
-# Set working directory
+# 階段 1: 依賴安裝
+FROM node:20-alpine AS deps
 WORKDIR /app
 
-# Copy package files first for better caching
-COPY package*.json ./
+# 安裝依賴所需的套件
+RUN apk add --no-cache libc6-compat
 
-# Install dependencies
-RUN npm install --production
+# 複製 package 檔案
+COPY package.json package-lock.json ./
 
-# Copy all source files
+# 安裝依賴
+RUN npm ci --legacy-peer-deps
+
+# ==========================================
+# 階段 2: 建置
+FROM node:20-alpine AS builder
+WORKDIR /app
+
+# 複製依賴
+COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Expose port 7860 (Hugging Face default)
+# 設定環境變數（建置時）
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_ENV=production
+
+# 建置應用程式（標準模式，非 standalone）
+RUN npm run build
+
+# ==========================================
+# 階段 3: 運行
+FROM node:20-alpine AS runner
+WORKDIR /app
+
+# 設定環境變數
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV PORT=7860
+ENV HOSTNAME="0.0.0.0"
+
+# 建立 nextjs 使用者（非 root）
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+
+# 複製必要檔案
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package.json ./package.json
+
+# 設定正確的權限
+RUN chown -R nextjs:nodejs .next
+
+# 切換到非 root 使用者
+USER nextjs
+
+# 暴露端口（Hugging Face Spaces 使用 7860）
 EXPOSE 7860
 
-# Start the server
-CMD ["node", "server.js"]
+# 啟動應用程式
+CMD ["npm", "start"]

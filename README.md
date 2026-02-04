@@ -1,36 +1,25 @@
+# Hugging Face Spaces 設定
+
 ---
-title: Discover Latest
-emoji: 🚀
-colorFrom: blue
-colorTo: indigo
+title: Discover Latest - AI 金融分析儀表板
+emoji: 📈
+colorFrom: indigo
+colorTo: purple
 sdk: docker
 pinned: false
+license: mit
+app_port: 7860
 ---
 
-# Discover Latest - 台股市場儀表板
+# Discover Latest v2
+
+AI 驅動的智慧型金融分析儀表板，整合台股、國際市場與加密貨幣資訊。
 
 ## 功能特色
-- 📊 每日自動更新台股數據
-- 🧠 SMC/ICT 策略分析
-- 🎯 複利雪球模擬器
-- 🔄 Supabase 資料持久化
-- 🤖 Line Bot 整合 (規劃中)
 
-## 部署架構
-- **Frontend**: HTML5 + Vanilla JS
-- **Backend**: Node.js + Express
-- **Database**: Supabase (PostgreSQL)
-- **Deployment**: Hugging Face Spaces (Docker)
-
-## 本地開發
-
-```bash
-# 安裝依賴
-npm install
-
-# 啟動開發伺服器
-npm run dev
-
-# 手動觸發更新
-npm run daily-update
-```
+- 📊 **儀表板**：市場概覽、自選清單
+- 🧠 **深度分析**：K 線圖 + AI 評分 + 技術指標
+- ⭐ **自選清單**：支援雲端同步
+- 🎯 **回測模擬器**：黃金交叉、RSI、長期持有策略
+- 🌍 **國際市場**：美股、歐股、亞股行情
+- 🪙 **加密貨幣**：BTC、ETH 等主流幣種

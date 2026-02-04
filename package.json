@@ -1,27 +1,33 @@
 {
-    "name": "taiwan-stock-report",
-    "version": "2.0.0",
-    "description": "台股每日市場分析報告系統 - Hugging Face + Supabase 版本",
-    "type": "module",
-    "scripts": {
-        "start": "node server.js",
-        "update-data": "node scripts/generate-report.js",
-        "daily-update": "node scripts/daily-update.js",
-        "dev": "npx serve .",
-        "test:fetch": "node scripts/test-fetch.js"
-    },
-    "dependencies": {
-        "@supabase/supabase-js": "^2.39.0",
-        "axios": "^1.6.0",
-        "better-sqlite3": "^12.6.2",
-        "cheerio": "^1.0.0-rc.12",
-        "cors": "^2.8.5",
-        "dotenv": "^17.2.3",
-        "express": "^5.2.1",
-        "node-cron": "^4.2.1",
-        "yahoo-finance2": "^3.13.0"
-    },
-    "devDependencies": {
-        "serve": "^14.2.0"
-    }
+  "name": "discover-latest-v2",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start -p ${PORT:-3000}",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "@sentry/nextjs": "^10.38.0",
+    "@supabase/supabase-js": "^2.93.3",
+    "chart.js": "^4.5.1",
+    "framer-motion": "^12.29.2",
+    "lightweight-charts": "^5.1.0",
+    "next": "16.1.6",
+    "react": "19.2.3",
+    "react-chartjs-2": "^5.3.1",
+    "react-dom": "19.2.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.1.6",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
 }
