@@ -278,8 +278,15 @@ export async function analyzeStock(params: {
     if (!keyManager) {
         const initialized = await ensureInitialized();
         if (!initialized) {
-            console.error('[Gemini] 服務未初始化且自動初始化失敗');
-            return getDefaultResult(params.price);
+            console.error('[Gemini] 服務未初始化且自動初始化失敗。請檢查環境變數 GEMINI_API_KEY 或 Supabase api_keys 表權限。');
+            // 嘗試最後一次直接從環境變數載入
+            const envKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY || process.env.GEMINI_API_KEY;
+            if (envKey) {
+                console.log('[Gemini] 發現環境變數金鑰，執行緊急初始化...');
+                initGemini([envKey]);
+            } else {
+                return getDefaultResult(params.price);
+            }
         }
     }
 
