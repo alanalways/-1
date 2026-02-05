@@ -195,20 +195,24 @@ let keyManager: GeminiKeyManager | null = null;
 let currentModelIndex = 0;
 let isInitializing = false;
 
-/**
- * 自動初始化 Gemini 服務（從 Supabase 載入 keys）
- */
 async function ensureInitialized(): Promise<boolean> {
     if (keyManager) return true;
+
+    // 緊急備援：優先檢查客戶端環境變數 (繞過 Supabase RLS 延遲)
+    const envKeys = process.env.NEXT_PUBLIC_GEMINI_API_KEY || process.env.GEMINI_API_KEY;
+    if (envKeys) {
+        console.log('[Gemini] 優先從環境變數初始化服務...');
+        initGemini(envKeys.split(',').map(k => k.trim()));
+        return true;
+    }
+
     if (isInitializing) {
-        // 等待其他初始化完成
         await new Promise(resolve => setTimeout(resolve, 100));
         return keyManager !== null;
     }
 
     isInitializing = true;
     try {
-        // 動態載入 apiKeys 服務（避免循環依賴）
         const { getApiKeys } = await import('./apiKeys');
         const keys = await getApiKeys('gemini');
 
@@ -216,10 +220,8 @@ async function ensureInitialized(): Promise<boolean> {
             keyManager = new GeminiKeyManager(keys);
             console.log(`[Gemini] 自動初始化成功，載入 ${keys.length} 組 API Keys`);
             return true;
-        } else {
-            console.error('[Gemini] 無法取得任何 API Keys');
-            return false;
         }
+        return false;
     } catch (error) {
         console.error('[Gemini] 自動初始化失敗:', error);
         return false;
