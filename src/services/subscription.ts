@@ -38,6 +38,11 @@ export const TIER_COLORS: Record<SubscriptionTier, string> = {
  * 取得使用者訂閱資訊
  */
 export async function getUserSubscription(userId: string): Promise<UserSubscription> {
+    // 空值檢查：避免未登入時發送無效請求
+    if (!userId || userId.trim() === '') {
+        return getGuestUsage();
+    }
+
     // 先檢查 localStorage 快取
     const cached = getLocalUsage(userId);
 
