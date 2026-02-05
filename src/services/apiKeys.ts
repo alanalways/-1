@@ -63,7 +63,7 @@ export async function getApiKeys(service: string): Promise<string[]> {
     try {
         const { data, error } = await supabase
             .from('api_keys')
-            .select('key')
+            .select('api_key')
             .eq('service', service)
             .eq('is_active', true);
 
@@ -78,7 +78,7 @@ export async function getApiKeys(service: string): Promise<string[]> {
         }
 
         // 更新快取
-        cachedKeys[service] = data.map((row: { key: string }) => row.key);
+        cachedKeys[service] = data.map((row: { api_key: string }) => row.api_key);
         cacheTimestamp = now;
 
         console.log(`[API Keys] 從 Supabase 載入 ${service} keys 成功 (${cachedKeys[service].length} 組)`);
@@ -131,7 +131,7 @@ export async function deactivateApiKey(service: string, apiKey: string): Promise
             .from('api_keys')
             .update({ is_active: false })
             .eq('service', service)
-            .eq('key', apiKey);
+            .eq('api_key', apiKey);
 
         if (error) {
             console.error('[API Keys] 停用 key 失敗:', error.message);

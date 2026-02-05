@@ -227,12 +227,12 @@ export async function getGeminiApiKeys(): Promise<string[]> {
 
     const { data, error } = await supabase
         .from('api_keys')
-        .select('key')
+        .select('api_key')
         .eq('service', 'gemini')
         .eq('is_active', true);
 
     if (error) throw error;
-    return data?.map(row => row.key) || [];
+    return data?.map(row => row.api_key) || [];
 }
 
 // ============ 股票資料快取 ============
