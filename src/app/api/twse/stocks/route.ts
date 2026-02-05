@@ -135,9 +135,27 @@ export async function GET(request: Request) {
 
         const data = await response.json();
 
-        // 解析 TWSE 回傳格式
-        if (data.stat === 'OK' && data.data9) {
-            const stocks = data.data9.map((row: string[]) => ({
+        // 解析 TWSE 回傳格式（支援新舊兩種格式）
+        let stockData: string[][] | null = null;
+
+        // 新格式：tables 陣列（2026 年起 TWSE 改用此格式）
+        if (data.stat === 'OK' && data.tables && Array.isArray(data.tables)) {
+            // 找到「每日收盤行情」的 table（通常是最後一個有 data 的 table）
+            const stockTable = data.tables.find((t: { title?: string; data?: string[][] }) =>
+                t.title?.includes('每日收盤行情') && t.data
+            );
+            if (stockTable && stockTable.data) {
+                stockData = stockTable.data;
+            }
+        }
+        // 舊格式：直接使用 data9
+        else if (data.stat === 'OK' && data.data9) {
+            stockData = data.data9;
+        }
+
+        // 解析股票資料
+        if (stockData && stockData.length > 0) {
+            const stocks = stockData.map((row: string[]) => ({
                 code: row[0],           // 證券代號
                 name: row[1],           // 證券名稱
                 tradeVolume: parseInt(row[2].replace(/,/g, ''), 10) || 0,    // 成交股數
@@ -162,10 +180,10 @@ export async function GET(request: Request) {
             });
         }
 
-        // 如果 TWSE 回傳 stat 不是 OK（通常是非交易日）
+        // 如果 TWSE 沒有回傳股票資料
         return NextResponse.json({
             success: false,
-            error: data.stat === 'OK' ? '無股票資料' : `TWSE 回傳: ${data.stat || '無資料'}`,
+            error: data.stat === 'OK' ? '無法解析股票資料' : `TWSE 回傳: ${data.stat || '無資料'}`,
             date: dateStr,
             isTradingDay: isTradingDay(taiwanTime),
             inTradingHours,
