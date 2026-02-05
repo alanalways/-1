@@ -19,6 +19,76 @@ const INDICES_INFO: Record<string, { name: string; region: string; emoji: string
     '^TWII': { name: '台灣加權', region: '亞洲', emoji: '🇹🇼' },
 };
 
+// 預設指數清單（市場概覽用）
+const DEFAULT_SYMBOLS = ['^TWII', '^TPEX', '^GSPC', 'BTC-USD'];
+
+// GET: 取得預設指數的報價（市場概覽用）
+export async function GET() {
+    try {
+        const quotes = await Promise.all(
+            DEFAULT_SYMBOLS.map(async (symbol: string) => {
+                try {
+                    const yahooUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=5d`;
+                    const response = await fetch(yahooUrl, {
+                        headers: {
+                            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                        },
+                        next: { revalidate: 60 },
+                    });
+
+                    if (!response.ok) {
+                        console.warn(`[Yahoo] ${symbol} API 錯誤: ${response.status}`);
+                        return null;
+                    }
+
+                    const data = await response.json();
+                    const result = data.chart?.result?.[0];
+                    if (!result) return null;
+
+                    const meta = result.meta;
+                    const quote = result.indicators?.quote?.[0];
+                    const timestamps = result.timestamp || [];
+                    const lastIndex = timestamps.length - 1;
+
+                    const close = quote?.close?.[lastIndex] || meta.regularMarketPrice || 0;
+                    const previousClose = meta.previousClose || meta.chartPreviousClose || close;
+                    const change = close - previousClose;
+                    const changePercent = previousClose ? (change / previousClose) * 100 : 0;
+
+                    const info = INDICES_INFO[symbol] || {
+                        name: symbol === 'BTC-USD' ? 'Bitcoin' : symbol,
+                        region: '其他',
+                        emoji: symbol === 'BTC-USD' ? '🪙' : '📊'
+                    };
+
+                    return {
+                        symbol,
+                        name: info.name,
+                        price: close,
+                        changePercent,
+                    };
+                } catch (err) {
+                    console.error(`[Yahoo GET] ${symbol} 失敗:`, err);
+                    return null;
+                }
+            })
+        );
+
+        const validQuotes = quotes.filter(q => q !== null);
+
+        return NextResponse.json({
+            success: true,
+            quotes: validQuotes,
+        });
+    } catch (error) {
+        console.error('[Yahoo Quotes GET] 錯誤:', error);
+        return NextResponse.json({
+            success: false,
+            error: '取得市場概覽失敗',
+        }, { status: 500 });
+    }
+}
+
 export async function POST(request: Request) {
     try {
         const { symbols } = await request.json();
