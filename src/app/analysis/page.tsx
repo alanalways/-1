@@ -15,7 +15,7 @@ import { LightweightChart } from '@/components/charts';
 import { useToast } from '@/components/common/Toast';
 import { ErrorState, LoadingState } from '@/components/common/ErrorState';
 import { getHistoricalData, getFundamentals } from '@/services/yahoo';
-import { analyzeStock, initGemini, AnalysisResult } from '@/services/gemini';
+import { AnalysisResult } from '@/services/gemini';
 import { calculateTechnicalFeatures, PriceData, TechnicalFeatures } from '@/services/technicalAnalysis';
 import type { CandlestickData } from '@/types/stock';
 
@@ -131,39 +131,45 @@ function AnalysisPageContent() {
             setTechnicalFeatures(technicalFeatures);
             setFundamentalData(fundamentalData);
 
-            // 3. 執行 AI 分析
-            const result = await analyzeStock({
-                code: symbol,
-                name: stockName || symbol,
-                price: technicalFeatures.current_price,
-                changePercent: ((technicalFeatures.current_price - (priceData[priceData.length - 2]?.close || technicalFeatures.current_price)) / (priceData[priceData.length - 2]?.close || technicalFeatures.current_price)) * 100,
-                technical: {
-                    trend_pattern: technicalFeatures.trend_pattern,
-                    rsi_level: technicalFeatures.rsi_level,
-                    rsi: technicalFeatures.rsi,
-                    macd_signal: technicalFeatures.macd_cross,
-                    macd: technicalFeatures.macd,
-                    price_vs_sr: technicalFeatures.price_vs_sr,
-                    ma5: technicalFeatures.ma5,
-                    ma20: technicalFeatures.ma20,
-                    ma60: technicalFeatures.ma60,
-                    support: technicalFeatures.support,
-                    resistance: technicalFeatures.resistance,
-                },
-                fundamental: fundamentalData ? {
-                    pe: fundamentalData.pe,
-                    pb: fundamentalData.pb,
-                    eps_growth: fundamentalData.epsGrowth,
-                    roe: fundamentalData.roe,
-                    fcf_yield: fundamentalData.freeCashFlow ? (fundamentalData.freeCashFlow / (fundamentalData.marketCap || 1)) * 100 : null,
-                } : undefined,
+            // 3. 透過安全的 API 路由執行 AI 分析（API Key 不會暴露）
+            const response = await fetch('/api/ai/analyze', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    code: symbol,
+                    name: stockName || symbol,
+                    price: technicalFeatures.current_price,
+                    changePercent: ((technicalFeatures.current_price - (priceData[priceData.length - 2]?.close || technicalFeatures.current_price)) / (priceData[priceData.length - 2]?.close || technicalFeatures.current_price)) * 100,
+                    technical: {
+                        trend_pattern: technicalFeatures.trend_pattern,
+                        rsi_level: technicalFeatures.rsi_level,
+                        rsi: technicalFeatures.rsi,
+                        macd_signal: technicalFeatures.macd_cross,
+                        macd: technicalFeatures.macd,
+                        price_vs_sr: technicalFeatures.price_vs_sr,
+                        ma5: technicalFeatures.ma5,
+                        ma20: technicalFeatures.ma20,
+                        ma60: technicalFeatures.ma60,
+                        support: technicalFeatures.support,
+                        resistance: technicalFeatures.resistance,
+                    },
+                    fundamental: fundamentalData ? {
+                        pe: fundamentalData.pe,
+                        pb: fundamentalData.pb,
+                        eps_growth: fundamentalData.epsGrowth,
+                        roe: fundamentalData.roe,
+                        fcf_yield: fundamentalData.freeCashFlow ? (fundamentalData.freeCashFlow / (fundamentalData.marketCap || 1)) * 100 : null,
+                    } : undefined,
+                }),
             });
 
-            if (result) {
-                setAnalysisResult(result);
+            const data = await response.json();
+
+            if (data.success && data.result) {
+                setAnalysisResult(data.result);
                 showToast('AI 分析完成', 'success');
             } else {
-                throw new Error('AI 分析失敗');
+                throw new Error(data.error || 'AI 分析失敗');
             }
 
         } catch (err) {

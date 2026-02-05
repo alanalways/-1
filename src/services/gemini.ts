@@ -198,10 +198,10 @@ let isInitializing = false;
 async function ensureInitialized(): Promise<boolean> {
     if (keyManager) return true;
 
-    // 緊急備援：優先檢查客戶端環境變數 (繞過 Supabase RLS 延遲)
-    const envKeys = process.env.NEXT_PUBLIC_GEMINI_API_KEY || process.env.GEMINI_API_KEY;
+    // 備援：優先檢查服務端環境變數 (不會暴露給客戶端)
+    const envKeys = process.env.GEMINI_API_KEY;
     if (envKeys) {
-        console.log('[Gemini] 優先從環境變數初始化服務...');
+        console.log('[Gemini] 從服務端環境變數初始化服務...');
         initGemini(envKeys.split(',').map(k => k.trim()));
         return true;
     }
@@ -281,8 +281,8 @@ export async function analyzeStock(params: {
         const initialized = await ensureInitialized();
         if (!initialized) {
             console.error('[Gemini] 服務未初始化且自動初始化失敗。請檢查環境變數 GEMINI_API_KEY 或 Supabase api_keys 表權限。');
-            // 嘗試最後一次直接從環境變數載入
-            const envKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY || process.env.GEMINI_API_KEY;
+            // 嘗試最後一次直接從服務端環境變數載入
+            const envKey = process.env.GEMINI_API_KEY;
             if (envKey) {
                 console.log('[Gemini] 發現環境變數金鑰，執行緊急初始化...');
                 initGemini([envKey]);
