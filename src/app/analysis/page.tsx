@@ -6,7 +6,8 @@
 
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Sidebar } from '@/components/common/Sidebar';
 import { Header } from '@/components/common/Header';
@@ -26,7 +27,9 @@ const RANGE_MAP: Record<'1M' | '3M' | '6M' | '1Y', '1mo' | '3mo' | '6mo' | '1y'>
     '1Y': '1y',
 };
 
-export default function AnalysisPage() {
+// 包裝元件用於處理 Suspense
+function AnalysisPageContent() {
+    const searchParams = useSearchParams();
     const { showToast } = useToast();
     const [symbol, setSymbol] = useState<string>('');
     const [stockName, setStockName] = useState<string>('');
@@ -34,6 +37,7 @@ export default function AnalysisPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [currentRange, setCurrentRange] = useState<'1M' | '3M' | '6M' | '1Y'>('1M');
+    const [autoAnalyzeTriggered, setAutoAnalyzeTriggered] = useState(false);
 
     // AI 分析結果
     const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
@@ -193,6 +197,25 @@ export default function AnalysisPage() {
             loadStockData(symbol, currentRange);
         }
     };
+
+    // 🔥 從 URL 參數自動載入股票資料
+    useEffect(() => {
+        const code = searchParams.get('code');
+        if (code && !symbol) {
+            const upperCode = code.toUpperCase();
+            setSymbol(upperCode);
+            loadStockData(upperCode, currentRange);
+        }
+    }, [searchParams, symbol, loadStockData, currentRange]);
+
+    // 🔥 載入完成後自動執行 AI 分析（只觸發一次）
+    useEffect(() => {
+        const code = searchParams.get('code');
+        if (code && chartData.length > 0 && !autoAnalyzeTriggered && !isAnalyzing && !analysisResult) {
+            setAutoAnalyzeTriggered(true);
+            runAIAnalysis();
+        }
+    }, [searchParams, chartData, autoAnalyzeTriggered, isAnalyzing, analysisResult, runAIAnalysis]);
 
     // 取得評分顏色
     const getScoreColor = (score: number) => {
@@ -519,5 +542,24 @@ export default function AnalysisPage() {
                 </div>
             </main>
         </div>
+    );
+}
+
+// 🔥 導出包裝元件（處理 Suspense）
+export default function AnalysisPage() {
+    return (
+        <Suspense fallback={
+            <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                minHeight: '100vh',
+                background: 'var(--bg-primary)',
+            }}>
+                <div className="loading-spinner" style={{ width: 50, height: 50 }} />
+            </div>
+        }>
+            <AnalysisPageContent />
+        </Suspense>
     );
 }

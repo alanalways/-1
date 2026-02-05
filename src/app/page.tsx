@@ -16,7 +16,7 @@ import { getAllStocks, getTopGainers, getTopLosers, TwseStock, formatStockVolume
 
 export default function DashboardPage() {
   const { user, loading: authLoading } = useAuth();
-  const { items: watchlist, loading: watchlistLoading } = useWatchlist();
+  const { items: watchlist, loading: watchlistLoading, addItem, removeItem, isInWatchlist } = useWatchlist();
   const [lastUpdated, setLastUpdated] = useState<string>('--');
   const [isClient, setIsClient] = useState(false);
 
@@ -125,8 +125,8 @@ export default function DashboardPage() {
       : activeTab === 'losers' ? topLosers
         : stocks;
 
-  // 顯示的股票列表
-  const displayStocks = filteredStocks.slice(0, 20);
+  // 顯示的股票列表（增加到 50 筆）
+  const displayStocks = filteredStocks.slice(0, 50);
 
   // 如果正在檢查登入狀態，顯示載入中
   if (authLoading) {
@@ -379,23 +379,50 @@ export default function DashboardPage() {
                         {formatStockVolume(stock.tradeVolume)}
                       </td>
                       <td style={{ padding: '12px 16px', textAlign: 'center' }}>
-                        <motion.button
-                          whileHover={{ scale: 1.1 }}
-                          whileTap={{ scale: 0.9 }}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            window.location.href = `/analysis?code=${stock.code}`;
-                          }}
-                          style={{
-                            padding: '4px 12px',
-                            background: 'var(--primary)',
-                            color: 'white',
-                            borderRadius: 'var(--radius-sm)',
-                            fontSize: '0.75rem',
-                          }}
-                        >
-                          分析
-                        </motion.button>
+                        <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+                          {/* 自選按鈕 */}
+                          <motion.button
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (isInWatchlist(stock.code)) {
+                                removeItem(stock.code);
+                              } else {
+                                addItem(stock.code);
+                              }
+                            }}
+                            style={{
+                              padding: '4px 10px',
+                              background: isInWatchlist(stock.code) ? 'var(--warning)' : 'var(--bg-tertiary)',
+                              color: isInWatchlist(stock.code) ? 'white' : 'var(--text-secondary)',
+                              borderRadius: 'var(--radius-sm)',
+                              fontSize: '0.875rem',
+                              border: '1px solid var(--border-color)',
+                            }}
+                            title={isInWatchlist(stock.code) ? '移出自選' : '加入自選'}
+                          >
+                            {isInWatchlist(stock.code) ? '★' : '☆'}
+                          </motion.button>
+                          {/* 分析按鈕 */}
+                          <motion.button
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              window.location.href = `/analysis?code=${stock.code}`;
+                            }}
+                            style={{
+                              padding: '4px 12px',
+                              background: 'var(--primary)',
+                              color: 'white',
+                              borderRadius: 'var(--radius-sm)',
+                              fontSize: '0.75rem',
+                            }}
+                          >
+                            分析
+                          </motion.button>
+                        </div>
                       </td>
                     </motion.tr>
                   ))}
@@ -419,7 +446,7 @@ export default function DashboardPage() {
             fontSize: '0.75rem',
             color: 'var(--text-muted)',
           }}>
-            ⚠️ 資料來源：TWSE 開放資料（模擬資料）・資料約延遲 20 分鐘・僅供參考
+            ⚠️ 資料來源：TWSE 開放資料・資料約延遲 20 分鐘・僅供參考
           </div>
         </motion.section>
 
