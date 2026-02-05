@@ -8,6 +8,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/hooks/useAuth';
+import { getUserSubscription, getGuestUsage, TIER_LIMITS, TIER_NAMES, TIER_COLORS, type UserSubscription } from '@/services/subscription';
 
 interface HeaderProps {
     title: string;
@@ -19,6 +20,7 @@ export function Header({ title, onSearch }: HeaderProps) {
     const [searchQuery, setSearchQuery] = useState('');
     const [showUserMenu, setShowUserMenu] = useState(false);
     const [isDarkMode, setIsDarkMode] = useState(true);
+    const [subscription, setSubscription] = useState<UserSubscription | null>(null);
 
     // 初始化主題
     useEffect(() => {
@@ -28,6 +30,26 @@ export function Header({ title, onSearch }: HeaderProps) {
             document.documentElement.setAttribute('data-theme', 'light');
         }
     }, []);
+
+    // 取得使用量
+    useEffect(() => {
+        const fetchUsage = async () => {
+            if (user) {
+                const sub = await getUserSubscription(user.id);
+                setSubscription(sub);
+            } else {
+                const guestUsage = getGuestUsage();
+                setSubscription(guestUsage);
+            }
+        };
+
+        fetchUsage();
+
+        // 監聽使用量更新事件
+        const handleUsageUpdate = () => fetchUsage();
+        window.addEventListener('ai-usage-updated', handleUsageUpdate);
+        return () => window.removeEventListener('ai-usage-updated', handleUsageUpdate);
+    }, [user]);
 
     // 切換主題
     const toggleTheme = () => {
@@ -56,6 +78,19 @@ export function Header({ title, onSearch }: HeaderProps) {
         }
     };
 
+    // 計算使用進度
+    const getUsagePercent = () => {
+        if (!subscription || subscription.dailyLimit === -1) return 0;
+        return Math.min((subscription.usedToday / subscription.dailyLimit) * 100, 100);
+    };
+
+    const getRemainingText = () => {
+        if (!subscription) return '';
+        if (subscription.dailyLimit === -1) return '無限制';
+        const remaining = Math.max(0, subscription.dailyLimit - subscription.usedToday);
+        return `${remaining} / ${subscription.dailyLimit} 次`;
+    };
+
     return (
         <header className="header">
             <div className="header-left">
@@ -63,6 +98,44 @@ export function Header({ title, onSearch }: HeaderProps) {
             </div>
 
             <div className="header-right">
+                {/* AI 使用量顯示 */}
+                {subscription && (
+                    <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        padding: '6px 12px',
+                        background: 'var(--bg-tertiary)',
+                        borderRadius: 'var(--radius-md)',
+                        fontSize: '0.75rem',
+                    }}>
+                        <span style={{ color: TIER_COLORS[subscription.tier] }}>
+                            {TIER_NAMES[subscription.tier]}
+                        </span>
+                        <div style={{
+                            width: '60px',
+                            height: '6px',
+                            background: 'var(--bg-secondary)',
+                            borderRadius: '3px',
+                            overflow: 'hidden',
+                        }}>
+                            <div style={{
+                                height: '100%',
+                                width: `${getUsagePercent()}%`,
+                                background: getUsagePercent() >= 90
+                                    ? 'var(--stock-down)'
+                                    : getUsagePercent() >= 50
+                                        ? 'var(--warning)'
+                                        : 'var(--stock-up)',
+                                transition: 'width 0.3s ease',
+                            }} />
+                        </div>
+                        <span style={{ color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
+                            {getRemainingText()}
+                        </span>
+                    </div>
+                )}
+
                 {/* 搜尋框 */}
                 <form className="search-box" onSubmit={handleSearch}>
                     <span className="search-icon">🔍</span>
@@ -128,6 +201,48 @@ export function Header({ title, onSearch }: HeaderProps) {
                                 <span className="user-name">{user.user_metadata?.full_name || user.email}</span>
                                 <span className="user-email">{user.email}</span>
                             </div>
+
+                            {/* 使用量詳情 */}
+                            {subscription && (
+                                <div style={{
+                                    padding: '12px',
+                                    background: 'var(--bg-tertiary)',
+                                    borderRadius: 'var(--radius-sm)',
+                                    margin: '8px 0',
+                                }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', fontSize: '0.75rem' }}>
+                                        <span style={{ color: 'var(--text-muted)' }}>今日 AI 分析</span>
+                                        <span style={{ color: TIER_COLORS[subscription.tier], fontWeight: 600 }}>
+                                            {TIER_NAMES[subscription.tier]}
+                                        </span>
+                                    </div>
+                                    <div style={{
+                                        width: '100%',
+                                        height: '8px',
+                                        background: 'var(--bg-secondary)',
+                                        borderRadius: '4px',
+                                        overflow: 'hidden',
+                                        marginBottom: '6px',
+                                    }}>
+                                        <div style={{
+                                            height: '100%',
+                                            width: `${getUsagePercent()}%`,
+                                            background: getUsagePercent() >= 90
+                                                ? 'var(--stock-down)'
+                                                : getUsagePercent() >= 50
+                                                    ? 'var(--warning)'
+                                                    : 'var(--stock-up)',
+                                            transition: 'width 0.3s ease',
+                                        }} />
+                                    </div>
+                                    <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                                        {subscription.dailyLimit === -1
+                                            ? '✨ 無限制使用'
+                                            : `已使用 ${subscription.usedToday} / ${subscription.dailyLimit} 次`}
+                                    </div>
+                                </div>
+                            )}
+
                             <hr />
                             <button className="dropdown-item" onClick={signOut}>
                                 登出

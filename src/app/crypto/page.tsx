@@ -90,7 +90,7 @@ export default function CryptoPage() {
                         <div style={{ display: 'flex', gap: '2rem' }}>
                             <div>
                                 <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>24h Volume</span>
-                                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '1.125rem', fontWeight: 600 }}></div>
+                                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '1.125rem', fontWeight: 600 }}>${formatVolume(totalQuoteVolume)}</div>
                             </div>
                             <div style={{ textAlign: 'right' }}>
                                 <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Updated</span>
@@ -108,15 +108,15 @@ export default function CryptoPage() {
                                     <div><div style={{ fontWeight: 600 }}>{crypto.name}</div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{crypto.displaySymbol}</div></div>
                                 </div>
                                 <div style={{ textAlign: 'right' }}>
-                                    <div style={{ fontSize: '1.25rem', fontWeight: 700, fontFamily: 'var(--font-mono)' }}></div>
+                                    <div style={{ fontSize: '1.25rem', fontWeight: 700, fontFamily: 'var(--font-mono)' }}>{formatPrice(crypto.price)}</div>
                                     <div style={{ fontSize: '0.875rem', fontFamily: 'var(--font-mono)', color: crypto.priceChangePercent >= 0 ? 'var(--stock-up)' : 'var(--stock-down)' }}>{crypto.priceChangePercent >= 0 ? '+' : ''}{crypto.priceChangePercent.toFixed(2)}%</div>
                                 </div>
                             </div>
                             <div style={{ marginTop: 'var(--spacing-md)', paddingTop: 'var(--spacing-md)', borderTop: '1px solid var(--border-color)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--spacing-sm)', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                                <div><span>24h High: </span><span style={{ fontFamily: 'var(--font-mono)', color: 'var(--stock-up)' }}></span></div>
-                                <div><span>24h Low: </span><span style={{ fontFamily: 'var(--font-mono)', color: 'var(--stock-down)' }}></span></div>
+                                <div><span>24h High: </span><span style={{ fontFamily: 'var(--font-mono)', color: 'var(--stock-up)' }}>{formatPrice(crypto.high24h)}</span></div>
+                                <div><span>24h Low: </span><span style={{ fontFamily: 'var(--font-mono)', color: 'var(--stock-down)' }}>{formatPrice(crypto.low24h)}</span></div>
                                 <div><span>Volume: </span><span style={{ fontFamily: 'var(--font-mono)' }}>{formatVolume(crypto.volume24h)}</span></div>
-                                <div><span>Quote: </span><span style={{ fontFamily: 'var(--font-mono)' }}></span></div>
+                                <div><span>Quote: </span><span style={{ fontFamily: 'var(--font-mono)' }}>${formatVolume(crypto.quoteVolume24h)}</span></div>
                             </div>
                         </motion.div>
                     ))}
@@ -128,10 +128,10 @@ export default function CryptoPage() {
                             <div className="modal-header"><h3 className="modal-title">{selectedCrypto.icon} {selectedCrypto.name}</h3><button className="modal-close" onClick={() => setShowChart(false)}>X</button></div>
                             <div className="modal-body">
                                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem', marginBottom: '1.5rem' }}>
-                                    <div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Price</div><div style={{ fontSize: '1.5rem', fontWeight: 700, fontFamily: 'var(--font-mono)' }}></div></div>
+                                    <div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Price</div><div style={{ fontSize: '1.5rem', fontWeight: 700, fontFamily: 'var(--font-mono)' }}>{formatPrice(selectedCrypto.price)}</div></div>
                                     <div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>24h Change</div><div style={{ fontSize: '1.25rem', fontWeight: 600, fontFamily: 'var(--font-mono)', color: selectedCrypto.priceChangePercent >= 0 ? 'var(--stock-up)' : 'var(--stock-down)' }}>{selectedCrypto.priceChangePercent >= 0 ? '+' : ''}{selectedCrypto.priceChangePercent.toFixed(2)}%</div></div>
-                                    <div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>24h High</div><div style={{ fontSize: '1.25rem', fontFamily: 'var(--font-mono)', color: 'var(--stock-up)' }}></div></div>
-                                    <div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>24h Low</div><div style={{ fontSize: '1.25rem', fontFamily: 'var(--font-mono)', color: 'var(--stock-down)' }}></div></div>
+                                    <div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>24h High</div><div style={{ fontSize: '1.25rem', fontFamily: 'var(--font-mono)', color: 'var(--stock-up)' }}>{formatPrice(selectedCrypto.high24h)}</div></div>
+                                    <div><div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>24h Low</div><div style={{ fontSize: '1.25rem', fontFamily: 'var(--font-mono)', color: 'var(--stock-down)' }}>{formatPrice(selectedCrypto.low24h)}</div></div>
                                 </div>
                                 {klines.length > 0 && (
                                     <div><h4 style={{ marginBottom: '1rem' }}>30 Day Chart</h4><div style={{ height: '200px', background: 'var(--bg-tertiary)', borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'flex-end', padding: '1rem', gap: '2px' }}>

@@ -10,6 +10,8 @@ import { motion } from 'framer-motion';
 import { Sidebar } from '@/components/common/Sidebar';
 import { Header } from '@/components/common/Header';
 import { getAllIndices, getHistoricalData, groupByRegion, formatIndexPrice, MarketIndex, HistoricalData } from '@/services/yahoo';
+import { LightweightChart } from '@/components/charts/LightweightChart';
+import type { CandlestickData } from '@/types/stock';
 
 export default function GlobalMarketPage() {
     const [indices, setIndices] = useState<MarketIndex[]>([]);
@@ -285,40 +287,24 @@ export default function GlobalMarketPage() {
                                     ))}
                                 </div>
 
-                                {/* 價格走勢圖 */}
+                                {/* 價格走勢圖 - 使用 Lightweight Charts */}
                                 {historicalData.length > 0 && (
                                     <div>
                                         <h4 style={{ marginBottom: '1rem' }}>📈 價格走勢</h4>
-                                        <div style={{
-                                            height: '250px',
-                                            background: 'var(--bg-tertiary)',
-                                            borderRadius: 'var(--radius-md)',
-                                            display: 'flex',
-                                            alignItems: 'flex-end',
-                                            padding: '1rem',
-                                            gap: '1px',
-                                        }}>
-                                            {historicalData.map((d, i) => {
-                                                const min = Math.min(...historicalData.map(x => x.low));
-                                                const max = Math.max(...historicalData.map(x => x.high));
-                                                const height = ((d.close - min) / (max - min)) * 200 + 20;
-                                                const isUp = d.close >= d.open;
-                                                return (
-                                                    <div
-                                                        key={i}
-                                                        style={{
-                                                            flex: 1,
-                                                            height: `${height}px`,
-                                                            background: isUp ? 'var(--stock-up)' : 'var(--stock-down)',
-                                                            borderRadius: '2px',
-                                                            opacity: 0.8,
-                                                            minWidth: '2px',
-                                                        }}
-                                                        title={`${new Date(d.date).toLocaleDateString()}: ${d.close.toFixed(2)}`}
-                                                    />
-                                                );
-                                            })}
-                                        </div>
+                                        <LightweightChart
+                                            symbol={selectedIndex.symbol}
+                                            data={historicalData.map((d): CandlestickData => ({
+                                                time: typeof d.date === 'string' ? d.date : new Date(d.date).toISOString().split('T')[0],
+                                                open: d.open,
+                                                high: d.high,
+                                                low: d.low,
+                                                close: d.close,
+                                                volume: d.volume,
+                                            }))}
+                                            height={300}
+                                            showEMA={false}
+                                            showSMC={false}
+                                        />
                                     </div>
                                 )}
                             </div>

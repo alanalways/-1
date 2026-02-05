@@ -302,6 +302,14 @@ export default function BacktestPage() {
     const [isRunning, setIsRunning] = useState(false);
     const [result, setResult] = useState<(BacktestResult & { portfolioDetails?: any[] }) | null>(null);
 
+    // 通用回測時間設定
+    const [backtestStartDate, setBacktestStartDate] = useState(
+        new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+    );
+    const [backtestEndDate, setBacktestEndDate] = useState(
+        new Date().toISOString().split('T')[0]
+    );
+
     // 定期定額設定
     const [dcaSettings, setDcaSettings] = useState<DCASettings>({
         startDate: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
@@ -456,33 +464,51 @@ export default function BacktestPage() {
 
                     {/* 單一股票模式 */}
                     {mode === 'single' && (
-                        <div style={{
-                            display: 'grid',
-                            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                            gap: 'var(--spacing-md)',
-                        }}>
-                            <InputField label="股票代碼" value={stockCode} onChange={(v) => setStockCode(v.toUpperCase())} placeholder="例如: 2330" />
-                            <InputField label="初始資金 (NTD)" value={initialCapital} onChange={(v) => setInitialCapital(parseInt(v) || 0)} type="number" />
-                            <div>
-                                <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
-                                    交易策略
-                                </label>
-                                <select
-                                    value={selectedStrategy}
-                                    onChange={(e) => setSelectedStrategy(e.target.value)}
-                                    style={{
-                                        width: '100%',
-                                        padding: '10px 14px',
-                                        background: 'var(--bg-input)',
-                                        border: '1px solid var(--border-color)',
-                                        borderRadius: 'var(--radius-md)',
-                                        color: 'var(--text-primary)',
-                                    }}
-                                >
-                                    {STRATEGIES.map(s => (
-                                        <option key={s.id} value={s.id}>{s.name}</option>
-                                    ))}
-                                </select>
+                        <div>
+                            <div style={{
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                                gap: 'var(--spacing-md)',
+                            }}>
+                                <InputField label="股票代碼" value={stockCode} onChange={(v) => setStockCode(v.toUpperCase())} placeholder="例如: 2330" />
+                                <InputField label="初始資金 (NTD)" value={initialCapital} onChange={(v) => setInitialCapital(parseInt(v) || 0)} type="number" />
+                                <div>
+                                    <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
+                                        交易策略
+                                    </label>
+                                    <select
+                                        value={selectedStrategy}
+                                        onChange={(e) => setSelectedStrategy(e.target.value)}
+                                        style={{
+                                            width: '100%',
+                                            padding: '10px 14px',
+                                            background: 'var(--bg-input)',
+                                            border: '1px solid var(--border-color)',
+                                            borderRadius: 'var(--radius-md)',
+                                            color: 'var(--text-primary)',
+                                        }}
+                                    >
+                                        {STRATEGIES.map(s => (
+                                            <option key={s.id} value={s.id}>{s.name}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
+                            <div style={{
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                                gap: 'var(--spacing-md)',
+                                marginTop: 'var(--spacing-md)',
+                            }}>
+                                <InputField label="回測開始日期" value={backtestStartDate} onChange={(v) => setBacktestStartDate(v)} type="date" />
+                                <InputField label="回測結束日期" value={backtestEndDate} onChange={(v) => setBacktestEndDate(v)} type="date" />
+                            </div>
+                            <div style={{
+                                marginTop: 'var(--spacing-sm)',
+                                fontSize: '0.75rem',
+                                color: 'var(--text-muted)',
+                            }}>
+                                📅 回測期間：{backtestStartDate} ~ {backtestEndDate}
                             </div>
                         </div>
                     )}
@@ -783,7 +809,7 @@ export default function BacktestPage() {
                     )}
                 </AnimatePresence>
             </main>
-        </div>
+        </div >
     );
 }
 

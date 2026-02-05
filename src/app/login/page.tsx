@@ -18,8 +18,20 @@ function LoginContent() {
     const [error, setError] = useState<string | null>(null);
     const [isSigningIn, setIsSigningIn] = useState(false);
 
-    // 檢查錯誤參數
+    // 檢查登入狀態與錯誤參數
+    // 先檢查 session，若已登入則直接跳轉（不顯示錯誤訊息）
     useEffect(() => {
+        // 如果還在載入中，不做任何處理
+        if (loading) return;
+
+        // 如果已登入，直接跳轉（忽略 error 參數）
+        if (user) {
+            const redirectPath = searchParams.get('redirect') || '/';
+            router.push(redirectPath);
+            return;
+        }
+
+        // 只有在確認未登入時，才處理錯誤參數
         const errorParam = searchParams.get('error');
         if (errorParam) {
             switch (errorParam) {
@@ -35,14 +47,8 @@ function LoginContent() {
                 default:
                     setError('發生錯誤，請重試');
             }
-        }
-    }, [searchParams]);
-
-    // 已登入則重導向
-    useEffect(() => {
-        if (!loading && user) {
-            const redirectPath = searchParams.get('redirect') || '/';
-            router.push(redirectPath);
+            // 清除 URL 中的 error 參數（避免刷新後重複顯示）
+            window.history.replaceState({}, '', '/login');
         }
     }, [user, loading, router, searchParams]);
 
