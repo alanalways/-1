@@ -102,15 +102,61 @@ export async function GET(request: Request) {
         const { searchParams } = new URL(request.url);
         let dateParam = searchParams.get('date');
 
-        // 如果沒有指定日期，使用最近的交易日
-        const dateStr = dateParam || getLatestTradingDate();
-
         // 取得台灣時間
         const now = new Date();
         const taiwanTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Taipei' }));
 
+        // 如果沒有指定日期，使用最近的交易日
+        const dateStr = dateParam || getLatestTradingDate();
+
         // 檢查是否在交易時間
         const inTradingHours = isTradingHours(taiwanTime);
+        const isTradingDayToday = isTradingDay(taiwanTime);
+
+        // 動態引入 Supabase 函數（避免在邊緣運行時出錯）
+        let getStocksCache: any = null;
+        let saveStocksToCache: any = null;
+
+        try {
+            const supabaseModule = await import('@/services/supabase');
+            getStocksCache = supabaseModule.getStocksCache;
+            saveStocksToCache = supabaseModule.saveStocksToCache;
+        } catch (e) {
+            console.warn('[TWSE API] 無法載入 Supabase 模組');
+        }
+
+        // 🔥 如果不在交易時間，優先使用 Supabase 快取
+        if (!inTradingHours && getStocksCache) {
+            const cached = await getStocksCache(dateStr);
+            if (cached && cached.length > 0) {
+                console.log(`[TWSE API] 使用 Supabase 快取 (${cached.length} 筆，日期 ${dateStr})`);
+
+                // 轉換為統一格式
+                const stocks = cached.map((s: any) => ({
+                    code: s.code,
+                    name: s.name,
+                    tradeVolume: s.trade_volume,
+                    transaction: s.transaction,
+                    tradeValue: s.trade_value,
+                    openingPrice: s.opening_price,
+                    highestPrice: s.highest_price,
+                    lowestPrice: s.lowest_price,
+                    closingPrice: s.closing_price,
+                    change: s.change,
+                    changePercent: s.change_percent,
+                }));
+
+                return NextResponse.json({
+                    success: true,
+                    source: 'supabase_cache',
+                    date: dateStr,
+                    isTradingDay: isTradingDayToday,
+                    inTradingHours: false,
+                    stockCount: stocks.length,
+                    stocks,
+                });
+            }
+        }
 
         // 嘗試從 TWSE 取得資料
         const twseUrl = `https://www.twse.com.tw/exchangeReport/MI_INDEX?response=json&date=${dateStr}&type=ALLBUT0999`;
@@ -128,7 +174,7 @@ export async function GET(request: Request) {
                 success: false,
                 error: `TWSE API 回應錯誤: ${response.status}`,
                 date: dateStr,
-                isTradingDay: isTradingDay(taiwanTime),
+                isTradingDay: isTradingDayToday,
                 inTradingHours,
             }, { status: 502 });
         }
@@ -169,11 +215,35 @@ export async function GET(request: Request) {
                 changePercent: calculateChangePercent(parseFloat(row[8].replace(/,/g, '')) || 0, parseChange(row[9], row[10])),
             })).filter((s: { closingPrice: number }) => s.closingPrice > 0);
 
+            // 🔥 儲存到 Supabase 快取（只在交易時間或成功取得資料時）
+            if (saveStocksToCache && stocks.length > 0) {
+                const cacheData = stocks.map(s => ({
+                    code: s.code,
+                    name: s.name,
+                    trade_volume: s.tradeVolume,
+                    transaction: s.transaction,
+                    trade_value: s.tradeValue,
+                    opening_price: s.openingPrice,
+                    highest_price: s.highestPrice,
+                    lowest_price: s.lowestPrice,
+                    closing_price: s.closingPrice,
+                    change: s.change,
+                    change_percent: s.changePercent,
+                    trade_date: dateStr,
+                    updated_at: new Date().toISOString(),
+                }));
+
+                // 非同步儲存（不阻塞回應）
+                saveStocksToCache(cacheData, dateStr).catch((e: Error) =>
+                    console.error('[TWSE API] Supabase 快取儲存失敗:', e)
+                );
+            }
+
             return NextResponse.json({
                 success: true,
                 source: 'twse',
                 date: dateStr,
-                isTradingDay: isTradingDay(taiwanTime),
+                isTradingDay: isTradingDayToday,
                 inTradingHours,
                 stockCount: stocks.length,
                 stocks,
@@ -185,7 +255,7 @@ export async function GET(request: Request) {
             success: false,
             error: data.stat === 'OK' ? '無法解析股票資料' : `TWSE 回傳: ${data.stat || '無資料'}`,
             date: dateStr,
-            isTradingDay: isTradingDay(taiwanTime),
+            isTradingDay: isTradingDayToday,
             inTradingHours,
             twseMessage: data.stat,
         }, { status: 404 });

@@ -238,7 +238,128 @@ export async function getGeminiApiKeys(): Promise<string[]> {
 // ============ 股票資料快取 ============
 
 /**
- * 儲存股票資料到 Supabase
+ * TWSE 股票資料格式
+ */
+export interface TWSEStockCache {
+    code: string;
+    name: string;
+    trade_volume: number;
+    transaction: number;
+    trade_value: number;
+    opening_price: number;
+    highest_price: number;
+    lowest_price: number;
+    closing_price: number;
+    change: number;
+    change_percent: number;
+    trade_date: string;  // YYYYMMDD 格式
+    updated_at: string;
+}
+
+/**
+ * 從 Supabase 取得股票快取資料
+ */
+export async function getStocksCache(tradeDate?: string): Promise<TWSEStockCache[] | null> {
+    if (!supabase) return null;
+
+    try {
+        let query = supabase
+            .from('twse_stocks_cache')
+            .select('*')
+            .order('trade_volume', { ascending: false });
+
+        // 如果指定日期則篩選
+        if (tradeDate) {
+            query = query.eq('trade_date', tradeDate);
+        }
+
+        const { data, error } = await query;
+
+        if (error) {
+            console.error('[Supabase] 讀取股票快取失敗:', error);
+            return null;
+        }
+
+        return data || null;
+    } catch (error) {
+        console.error('[Supabase] 讀取股票快取發生錯誤:', error);
+        return null;
+    }
+}
+
+/**
+ * 取得最新的快取交易日期
+ */
+export async function getLatestCacheDate(): Promise<string | null> {
+    if (!supabase) return null;
+
+    try {
+        const { data, error } = await supabase
+            .from('twse_stocks_cache')
+            .select('trade_date')
+            .order('trade_date', { ascending: false })
+            .limit(1)
+            .single();
+
+        if (error || !data) return null;
+        return data.trade_date;
+    } catch {
+        return null;
+    }
+}
+
+/**
+ * 儲存 TWSE 股票資料到 Supabase（完整格式）
+ */
+export async function saveStocksToCache(stocks: TWSEStockCache[], tradeDate: string): Promise<boolean> {
+    if (!supabase) return false;
+
+    try {
+        // 先刪除該交易日的舊資料
+        await supabase
+            .from('twse_stocks_cache')
+            .delete()
+            .eq('trade_date', tradeDate);
+
+        // 分批寫入（每批 100 筆）
+        const batchSize = 100;
+        for (let i = 0; i < stocks.length; i += batchSize) {
+            const batch = stocks.slice(i, i + batchSize).map(s => ({
+                code: s.code,
+                name: s.name,
+                trade_volume: s.trade_volume,
+                transaction: s.transaction,
+                trade_value: s.trade_value,
+                opening_price: s.opening_price,
+                highest_price: s.highest_price,
+                lowest_price: s.lowest_price,
+                closing_price: s.closing_price,
+                change: s.change,
+                change_percent: s.change_percent,
+                trade_date: tradeDate,
+                updated_at: new Date().toISOString(),
+            }));
+
+            const { error } = await supabase
+                .from('twse_stocks_cache')
+                .upsert(batch, { onConflict: 'code,trade_date' });
+
+            if (error) {
+                console.error('[Supabase] 儲存股票快取批次錯誤:', error);
+                return false;
+            }
+        }
+
+        console.log(`[Supabase] 成功快取 ${stocks.length} 筆 ${tradeDate} 股票資料`);
+        return true;
+    } catch (error) {
+        console.error('[Supabase] 儲存股票快取失敗:', error);
+        return false;
+    }
+}
+
+/**
+ * 儲存股票資料到 Supabase（舊版格式，向下相容）
  */
 export async function saveStocks(stocks: any[]) {
     if (!supabase) return;
