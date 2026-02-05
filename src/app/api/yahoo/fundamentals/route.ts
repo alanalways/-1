@@ -19,21 +19,36 @@ export async function GET(request: Request) {
 
         // Yahoo Finance v10 quoteSummary API
         const modules = 'summaryDetail,defaultKeyStatistics,financialData';
-        const yahooUrl = `https://query1.finance.yahoo.com/v10/finance/quoteSummary/${encodeURIComponent(symbol)}?modules=${modules}`;
+
+        // 多個備用端點（有些可能被特定 IP 封鎖）
+        const endpoints = [
+            `https://query2.finance.yahoo.com/v10/finance/quoteSummary/${encodeURIComponent(symbol)}?modules=${modules}`,
+            `https://query1.finance.yahoo.com/v10/finance/quoteSummary/${encodeURIComponent(symbol)}?modules=${modules}`,
+        ];
 
         let lastError = null;
-        for (let attempt = 1; attempt <= 2; attempt++) {
+        for (const yahooUrl of endpoints) {
             try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 秒逾時
+
                 const response = await fetch(yahooUrl, {
+                    signal: controller.signal,
                     headers: {
-                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
-                        'Accept': '*/*',
+                        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+                        'Accept': 'application/json,text/html,application/xhtml+xml',
                         'Accept-Language': 'en-US,en;q=0.9',
-                        'Origin': 'https://finance.yahoo.com',
-                        'Referer': 'https://finance.yahoo.com/',
+                        'Accept-Encoding': 'gzip, deflate, br',
+                        'Connection': 'keep-alive',
+                        'Sec-Fetch-Dest': 'document',
+                        'Sec-Fetch-Mode': 'navigate',
+                        'Sec-Fetch-Site': 'none',
+                        'Cache-Control': 'no-cache',
                     },
-                    next: { revalidate: 3600 },
+                    cache: 'no-store',
                 });
+
+                clearTimeout(timeoutId);
 
                 if (response.ok) {
                     const data = await response.json();
@@ -48,14 +63,14 @@ export async function GET(request: Request) {
                 }
                 lastError = `Yahoo API 回應錯誤: ${response.status}`;
             } catch (e: any) {
-                lastError = e.message;
+                lastError = e.name === 'AbortError' ? '請求逾時' : e.message;
             }
-            if (attempt < 2) await new Promise(r => setTimeout(r, 1000));
         }
 
+        // 如果所有端點都失敗，返回基本資料（允許 AI 僅基於技術面分析）
         return NextResponse.json({
             success: false,
-            error: lastError || '無法從 Yahoo 取得資料',
+            error: lastError || '無法從 Yahoo 取得基本面資料，將僅使用技術面分析',
         }, { status: 502 });
 
     } catch (error) {
