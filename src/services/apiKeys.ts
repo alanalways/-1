@@ -50,7 +50,7 @@ export async function getApiKeys(service: string): Promise<string[]> {
     try {
         const { data, error } = await supabase
             .from('api_keys')
-            .select('api_key')
+            .select('key')
             .eq('service', service)
             .eq('is_active', true);
 
@@ -65,7 +65,7 @@ export async function getApiKeys(service: string): Promise<string[]> {
         }
 
         // 更新快取
-        cachedKeys[service] = data.map((row: { api_key: string }) => row.api_key);
+        cachedKeys[service] = data.map((row: { key: string }) => row.key);
         cacheTimestamp = now;
 
         console.log(`[API Keys] 從 Supabase 載入 ${service} keys 成功 (${cachedKeys[service].length} 組)`);
@@ -79,27 +79,13 @@ export async function getApiKeys(service: string): Promise<string[]> {
 
 /**
  * 備援：從環境變數取得 Keys（向下相容）
- * 支援：服務端 GEMINI_API_KEY 和客戶端 NEXT_PUBLIC_GEMINI_API_KEY
  */
 function getFallbackKeys(service: string): string[] {
     if (service === 'gemini') {
-        // 嘗試多種環境變數來源
-        const possibleKeys = [
-            process.env.GEMINI_API_KEY,                    // 服務端（優先）
-            process.env.NEXT_PUBLIC_GEMINI_API_KEY,        // 客戶端（公開）
-            typeof window !== 'undefined'
-                ? (window as any).__GEMINI_API_KEY__       // 動態注入
-                : undefined,
-        ].filter(Boolean);
-
-        if (possibleKeys.length > 0) {
-            const keyString = possibleKeys[0] as string;
-            if (keyString && keyString !== 'your_gemini_api_key') {
-                // 支援逗號分隔的多個 key
-                const keys = keyString.split(',').map(k => k.trim()).filter(k => k.length > 0);
-                console.log(`[API Keys] 從環境變數載入 ${keys.length} 組 gemini keys`);
-                return keys;
-            }
+        const envKey = process.env.GEMINI_API_KEY;
+        if (envKey && envKey !== 'your_gemini_api_key') {
+            // 支援逗號分隔的多個 key
+            return envKey.split(',').map(k => k.trim()).filter(k => k.length > 0);
         }
     }
 
@@ -132,7 +118,7 @@ export async function deactivateApiKey(service: string, apiKey: string): Promise
             .from('api_keys')
             .update({ is_active: false })
             .eq('service', service)
-            .eq('api_key', apiKey);
+            .eq('key', apiKey);
 
         if (error) {
             console.error('[API Keys] 停用 key 失敗:', error.message);
