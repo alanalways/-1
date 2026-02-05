@@ -41,9 +41,22 @@ export async function getApiKeys(service: string): Promise<string[]> {
         return cachedKeys[service];
     }
 
-    const supabase = getServiceClient();
+    // 嘗試使用 service_role client
+    let supabase = getServiceClient();
+
+    // 如果 service_role 不可用，使用 anon client 備援
     if (!supabase) {
-        console.warn('[API Keys] 無法建立服務端 Supabase Client，使用環境變數備援');
+        console.log('[API Keys] 嘗試使用 anon client 讀取 API Keys...');
+        try {
+            const { supabase: anonClient } = await import('@/services/supabase');
+            supabase = anonClient;
+        } catch (e) {
+            console.warn('[API Keys] 無法載入 anon client');
+        }
+    }
+
+    if (!supabase) {
+        console.warn('[API Keys] 無法建立 Supabase Client，使用環境變數備援');
         return getFallbackKeys(service);
     }
 
